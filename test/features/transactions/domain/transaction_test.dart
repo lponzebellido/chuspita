@@ -48,6 +48,30 @@ void main() {
       expect(transaction.note, isNull);
     });
 
+    test('updates details while preserving its identity', () {
+      final transaction = buildTransaction();
+
+      final updated = transaction.updateDetails(
+        type: TransactionType.income,
+        amount: const Money(minorUnits: 5000, currency: Currency.usd),
+        walletId: WalletId('wallet-2'),
+        categoryId: CategoryId('category-2'),
+        occurredOn: LocalDate(year: 2026, month: 9, day: 1),
+        note: ' Salary ',
+      );
+
+      expect(updated.id, transaction.id);
+      expect(updated.type, TransactionType.income);
+      expect(
+        updated.amount,
+        const Money(minorUnits: 5000, currency: Currency.usd),
+      );
+      expect(updated.walletId, WalletId('wallet-2'));
+      expect(updated.categoryId, CategoryId('category-2'));
+      expect(updated.occurredOn, LocalDate(year: 2026, month: 9, day: 1));
+      expect(updated.note, 'Salary');
+    });
+
     test('uses entity equality based on its id', () {
       final id = TransactionId('transaction-1');
       final first = buildTransaction(id: id);

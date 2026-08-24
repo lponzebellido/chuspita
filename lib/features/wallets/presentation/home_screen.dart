@@ -1,9 +1,11 @@
 import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
+import 'package:chuspita/app/settings/settings_screen.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
+import 'package:chuspita/features/transactions/presentation/transaction_list_screen.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_list_screen.dart';
@@ -22,6 +24,12 @@ final class HomeScreen extends ConsumerWidget {
     void openWalletForm() {
       Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (context) => const WalletFormScreen()),
+      );
+    }
+
+    void openSettings() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
       );
     }
 
@@ -47,6 +55,14 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openTransactionList() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const TransactionListScreen(),
+        ),
+      );
+    }
+
     Future<void> refreshBalance() {
       return ref.refresh(balanceSummaryProvider.future).then((_) {});
     }
@@ -57,6 +73,11 @@ final class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const AppLogo(),
         actions: [
+          IconButton(
+            tooltip: l10n.settingsTitle,
+            onPressed: openSettings,
+            icon: const Icon(Icons.settings_outlined),
+          ),
           IconButton(
             tooltip: l10n.manageCategories,
             onPressed: openCategoryList,
@@ -74,6 +95,7 @@ final class HomeScreen extends ConsumerWidget {
           data: (value) => _BalanceContent(
             summary: value,
             onAddWallet: openWalletForm,
+            onViewTransactions: openTransactionList,
             onRefresh: refreshBalance,
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -95,11 +117,13 @@ final class _BalanceContent extends StatelessWidget {
   const _BalanceContent({
     required this.summary,
     required this.onAddWallet,
+    required this.onViewTransactions,
     required this.onRefresh,
   });
 
   final BalanceSummary summary;
   final VoidCallback onAddWallet;
+  final VoidCallback onViewTransactions;
   final RefreshCallback onRefresh;
 
   @override
@@ -137,6 +161,12 @@ final class _BalanceContent extends StatelessWidget {
             _CurrencyBalanceCard(balance: balance.value),
             const SizedBox(height: 12),
           ],
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onViewTransactions,
+            icon: const Icon(Icons.receipt_long_outlined),
+            label: Text(context.l10n.viewTransactions),
+          ),
         ],
       ),
     );

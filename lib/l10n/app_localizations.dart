@@ -104,6 +104,66 @@ abstract class AppLocalizations {
   /// **'Chuspita'**
   String get appName;
 
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @languageSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageSettingsTitle;
+
+  /// No description provided for @appearanceSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceSettingsTitle;
+
+  /// No description provided for @systemOption.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get systemOption;
+
+  /// No description provided for @spanishLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get spanishLanguage;
+
+  /// No description provided for @englishLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get englishLanguage;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightTheme;
+
+  /// No description provided for @darkTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get darkTheme;
+
+  /// No description provided for @saveSettingsError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save the settings. Please try again.'**
+  String get saveSettingsError;
+
+  /// No description provided for @loadSettingsError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the settings.'**
+  String get loadSettingsError;
+
   /// No description provided for @balanceByCurrency.
   ///
   /// In en, this message translates to:
@@ -212,6 +272,36 @@ abstract class AppLocalizations {
   /// **'New transaction'**
   String get newTransactionTitle;
 
+  /// No description provided for @editTransactionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit transaction'**
+  String get editTransactionTitle;
+
+  /// No description provided for @transactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionsTitle;
+
+  /// No description provided for @viewTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'View transactions'**
+  String get viewTransactions;
+
+  /// No description provided for @noTransactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any transactions yet'**
+  String get noTransactionsTitle;
+
+  /// No description provided for @noTransactionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The expenses and income you record will appear here.'**
+  String get noTransactionsBody;
+
   /// No description provided for @expense.
   ///
   /// In en, this message translates to:
@@ -283,6 +373,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t save the transaction. Please try again.'**
   String get saveTransactionError;
+
+  /// No description provided for @deleteTransactionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transaction'**
+  String get deleteTransactionTitle;
+
+  /// No description provided for @deleteTransactionConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete the transaction and change the balance. It can\'t be undone.'**
+  String get deleteTransactionConfirmation;
+
+  /// No description provided for @deleteTransactionError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t delete the transaction. Please try again.'**
+  String get deleteTransactionError;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @unknownWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown wallet'**
+  String get unknownWallet;
+
+  /// No description provided for @unknownCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown category'**
+  String get unknownCategory;
 
   /// No description provided for @walletsTitle.
   ///

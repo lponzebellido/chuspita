@@ -7,6 +7,8 @@ import 'package:chuspita/features/categories/data/repositories/drift_category_re
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
 import 'package:chuspita/features/transactions/application/create_transaction.dart';
+import 'package:chuspita/features/transactions/application/delete_transaction.dart';
+import 'package:chuspita/features/transactions/application/update_transaction.dart';
 import 'package:chuspita/features/transactions/data/repositories/drift_transaction_repository.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
@@ -100,6 +102,18 @@ final createTransactionProvider = Provider<CreateTransaction>((ref) {
   return CreateTransaction(
     transactionRepository: ref.watch(transactionRepositoryProvider),
     idGenerator: ref.watch(transactionIdGeneratorProvider),
+  );
+});
+
+final updateTransactionProvider = Provider<UpdateTransaction>((ref) {
+  return UpdateTransaction(
+    transactionRepository: ref.watch(transactionRepositoryProvider),
+  );
+});
+
+final deleteTransactionProvider = Provider<DeleteTransaction>((ref) {
+  return DeleteTransaction(
+    transactionRepository: ref.watch(transactionRepositoryProvider),
   );
 });
 

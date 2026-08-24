@@ -13,6 +13,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Chuspita';
 
   @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get languageSettingsTitle => 'Language';
+
+  @override
+  String get appearanceSettingsTitle => 'Appearance';
+
+  @override
+  String get systemOption => 'System';
+
+  @override
+  String get spanishLanguage => 'Spanish';
+
+  @override
+  String get englishLanguage => 'English';
+
+  @override
+  String get lightTheme => 'Light';
+
+  @override
+  String get darkTheme => 'Dark';
+
+  @override
+  String get saveSettingsError =>
+      'We couldn\'t save the settings. Please try again.';
+
+  @override
+  String get loadSettingsError => 'We couldn\'t load the settings.';
+
+  @override
   String get balanceByCurrency => 'Balance by currency';
 
   @override
@@ -69,6 +100,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newTransactionTitle => 'New transaction';
 
   @override
+  String get editTransactionTitle => 'Edit transaction';
+
+  @override
+  String get transactionsTitle => 'Transactions';
+
+  @override
+  String get viewTransactions => 'View transactions';
+
+  @override
+  String get noTransactionsTitle => 'You don\'t have any transactions yet';
+
+  @override
+  String get noTransactionsBody =>
+      'The expenses and income you record will appear here.';
+
+  @override
   String get expense => 'Expense';
 
   @override
@@ -106,6 +153,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get saveTransactionError =>
       'We couldn\'t save the transaction. Please try again.';
+
+  @override
+  String get deleteTransactionTitle => 'Delete transaction';
+
+  @override
+  String get deleteTransactionConfirmation =>
+      'This will delete the transaction and change the balance. It can\'t be undone.';
+
+  @override
+  String get deleteTransactionError =>
+      'We couldn\'t delete the transaction. Please try again.';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get unknownWallet => 'Unknown wallet';
+
+  @override
+  String get unknownCategory => 'Unknown category';
 
   @override
   String get walletsTitle => 'Wallets';

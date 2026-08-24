@@ -1,3 +1,4 @@
+import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/parse_money.dart';
@@ -13,7 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final class TransactionFormScreen extends ConsumerStatefulWidget {
-  const TransactionFormScreen({super.key});
+  const TransactionFormScreen({super.key, this.transaction});
+
+  final Transaction? transaction;
 
   @override
   ConsumerState<TransactionFormScreen> createState() =>
@@ -23,9 +26,9 @@ final class TransactionFormScreen extends ConsumerStatefulWidget {
 final class _TransactionFormScreenState
     extends ConsumerState<TransactionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _noteController = TextEditingController();
-  TransactionType _type = TransactionType.expense;
+  late final TextEditingController _amountController;
+  late final TextEditingController _noteController;
+  late TransactionType _type;
   WalletId? _selectedWalletId;
   CategoryId? _selectedCategoryId;
   late LocalDate _occurredOn;
@@ -35,12 +38,20 @@ final class _TransactionFormScreenState
   @override
   void initState() {
     super.initState();
+    final transaction = widget.transaction;
     final today = DateTime.now();
-    _occurredOn = LocalDate(
-      year: today.year,
-      month: today.month,
-      day: today.day,
+    _amountController = TextEditingController(
+      text: transaction == null
+          ? null
+          : formatMoneyAmount(transaction.amount, localeName: 'en'),
     );
+    _noteController = TextEditingController(text: transaction?.note);
+    _type = transaction?.type ?? TransactionType.expense;
+    _selectedWalletId = transaction?.walletId;
+    _selectedCategoryId = transaction?.categoryId;
+    _occurredOn =
+        transaction?.occurredOn ??
+        LocalDate(year: today.year, month: today.month, day: today.day);
   }
 
   @override
@@ -89,16 +100,33 @@ final class _TransactionFormScreenState
     });
 
     try {
-      await ref
-          .read(createTransactionProvider)
-          .call(
-            type: _type,
-            amount: parseMoney(_amountController.text, wallet.currency),
-            walletId: wallet.id,
-            categoryId: category.id,
-            occurredOn: _occurredOn,
-            note: _noteController.text,
-          );
+      final amount = parseMoney(_amountController.text, wallet.currency);
+      final transaction = widget.transaction;
+
+      if (transaction == null) {
+        await ref
+            .read(createTransactionProvider)
+            .call(
+              type: _type,
+              amount: amount,
+              walletId: wallet.id,
+              categoryId: category.id,
+              occurredOn: _occurredOn,
+              note: _noteController.text,
+            );
+      } else {
+        await ref
+            .read(updateTransactionProvider)
+            .call(
+              transaction: transaction,
+              type: _type,
+              amount: amount,
+              walletId: wallet.id,
+              categoryId: category.id,
+              occurredOn: _occurredOn,
+              note: _noteController.text,
+            );
+      }
 
       ref.invalidate(transactionsProvider);
       ref.invalidate(balanceSummaryProvider);
@@ -111,6 +139,58 @@ final class _TransactionFormScreenState
         setState(() {
           _isSaving = false;
           _saveError = context.l10n.saveTransactionError;
+        });
+      }
+    }
+  }
+
+  Future<void> _delete() async {
+    final transaction = widget.transaction;
+
+    if (transaction == null) {
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.deleteTransactionTitle),
+        content: Text(context.l10n.deleteTransactionConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+      _saveError = null;
+    });
+
+    try {
+      await ref.read(deleteTransactionProvider).call(transaction);
+      ref.invalidate(transactionsProvider);
+      ref.invalidate(balanceSummaryProvider);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } on Object {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _saveError = context.l10n.deleteTransactionError;
         });
       }
     }
@@ -134,12 +214,22 @@ final class _TransactionFormScreenState
   Widget build(BuildContext context) {
     final wallets = ref.watch(walletsProvider);
     final categories = ref.watch(categoriesProvider);
+    final transaction = widget.transaction;
     final activeWallets =
-        wallets.asData?.value.where((wallet) => !wallet.isArchived).toList() ??
+        wallets.asData?.value
+            .where(
+              (wallet) =>
+                  !wallet.isArchived || wallet.id == transaction?.walletId,
+            )
+            .toList() ??
         const <Wallet>[];
     final activeCategories =
         categories.asData?.value
-            .where((category) => !category.isArchived)
+            .where(
+              (category) =>
+                  !category.isArchived ||
+                  category.id == transaction?.categoryId,
+            )
             .toList() ??
         const <Category>[];
     final dataLoaded = wallets.hasValue && categories.hasValue;
@@ -147,7 +237,21 @@ final class _TransactionFormScreenState
         dataLoaded && activeWallets.isNotEmpty && activeCategories.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.newTransactionTitle)),
+      appBar: AppBar(
+        title: Text(
+          transaction == null
+              ? context.l10n.newTransactionTitle
+              : context.l10n.editTransactionTitle,
+        ),
+        actions: [
+          if (transaction != null)
+            IconButton(
+              tooltip: context.l10n.delete,
+              onPressed: _isSaving ? null : _delete,
+              icon: const Icon(Icons.delete_outline),
+            ),
+        ],
+      ),
       body: _buildBody(
         wallets: wallets,
         categories: categories,

@@ -13,6 +13,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String get appName => 'Chuspita';
 
   @override
+  String get settingsTitle => 'Configuración';
+
+  @override
+  String get languageSettingsTitle => 'Idioma';
+
+  @override
+  String get appearanceSettingsTitle => 'Apariencia';
+
+  @override
+  String get systemOption => 'Sistema';
+
+  @override
+  String get spanishLanguage => 'Español';
+
+  @override
+  String get englishLanguage => 'Inglés';
+
+  @override
+  String get lightTheme => 'Claro';
+
+  @override
+  String get darkTheme => 'Oscuro';
+
+  @override
+  String get saveSettingsError =>
+      'No pudimos guardar la configuración. Inténtalo nuevamente.';
+
+  @override
+  String get loadSettingsError => 'No pudimos cargar la configuración.';
+
+  @override
   String get balanceByCurrency => 'Balance por moneda';
 
   @override
@@ -69,6 +100,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newTransactionTitle => 'Nuevo movimiento';
 
   @override
+  String get editTransactionTitle => 'Editar movimiento';
+
+  @override
+  String get transactionsTitle => 'Movimientos';
+
+  @override
+  String get viewTransactions => 'Ver movimientos';
+
+  @override
+  String get noTransactionsTitle => 'Aún no tienes movimientos';
+
+  @override
+  String get noTransactionsBody =>
+      'Los gastos e ingresos que registres aparecerán aquí.';
+
+  @override
   String get expense => 'Gasto';
 
   @override
@@ -106,6 +153,29 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get saveTransactionError =>
       'No pudimos guardar el movimiento. Inténtalo nuevamente.';
+
+  @override
+  String get deleteTransactionTitle => 'Eliminar movimiento';
+
+  @override
+  String get deleteTransactionConfirmation =>
+      'Esta acción eliminará el movimiento y modificará el balance. No se puede deshacer.';
+
+  @override
+  String get deleteTransactionError =>
+      'No pudimos eliminar el movimiento. Inténtalo nuevamente.';
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get unknownWallet => 'Monedero desconocido';
+
+  @override
+  String get unknownCategory => 'Categoría desconocida';
 
   @override
   String get walletsTitle => 'Monederos';

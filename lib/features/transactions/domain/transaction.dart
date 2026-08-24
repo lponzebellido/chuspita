@@ -57,6 +57,25 @@ final class Transaction {
   final LocalDate occurredOn;
   final String? note;
 
+  Transaction updateDetails({
+    required TransactionType type,
+    required Money amount,
+    required WalletId walletId,
+    required CategoryId categoryId,
+    required LocalDate occurredOn,
+    String? note,
+  }) {
+    return Transaction(
+      id: id,
+      type: type,
+      amount: amount,
+      walletId: walletId,
+      categoryId: categoryId,
+      occurredOn: occurredOn,
+      note: note,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) || other is Transaction && id == other.id;

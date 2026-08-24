@@ -142,6 +142,26 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
     });
   }
 
+  void _selectType(TransactionType? type) {
+    var categoryId = _categoryId;
+
+    if (type != null && categoryId.isNotEmpty) {
+      final selectedCategory = widget.categories
+          .where((category) => category.id.value == categoryId)
+          .firstOrNull;
+
+      if (selectedCategory != null &&
+          !_categoryAllowsType(selectedCategory, type)) {
+        categoryId = '';
+      }
+    }
+
+    setState(() {
+      _type = type;
+      _categoryId = categoryId;
+    });
+  }
+
   void _apply() {
     Navigator.of(context).pop(
       TransactionFilters(
@@ -161,11 +181,19 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
         (first, second) =>
             first.name.toLowerCase().compareTo(second.name.toLowerCase()),
       );
-    final categories = widget.categories.toList()
-      ..sort(
-        (first, second) =>
-            first.name.toLowerCase().compareTo(second.name.toLowerCase()),
-      );
+    final categories =
+        widget.categories
+            .where(
+              (category) =>
+                  _type == null ||
+                  category.id.value == _categoryId ||
+                  _categoryAllowsType(category, _type!),
+            )
+            .toList()
+          ..sort(
+            (first, second) =>
+                first.name.toLowerCase().compareTo(second.name.toLowerCase()),
+          );
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -189,19 +217,17 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
                 ChoiceChip(
                   label: Text(context.l10n.allOption),
                   selected: _type == null,
-                  onSelected: (_) => setState(() => _type = null),
+                  onSelected: (_) => _selectType(null),
                 ),
                 ChoiceChip(
                   label: Text(context.l10n.expense),
                   selected: _type == TransactionType.expense,
-                  onSelected: (_) =>
-                      setState(() => _type = TransactionType.expense),
+                  onSelected: (_) => _selectType(TransactionType.expense),
                 ),
                 ChoiceChip(
                   label: Text(context.l10n.income),
                   selected: _type == TransactionType.income,
-                  onSelected: (_) =>
-                      setState(() => _type = TransactionType.income),
+                  onSelected: (_) => _selectType(TransactionType.income),
                 ),
               ],
             ),
@@ -312,4 +338,11 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
 
     return '$start – $end';
   }
+}
+
+bool _categoryAllowsType(Category category, TransactionType type) {
+  return switch (type) {
+    TransactionType.expense => category.applicability.allowsExpenses,
+    TransactionType.income => category.applicability.allowsIncome,
+  };
 }

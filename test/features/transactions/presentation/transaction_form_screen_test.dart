@@ -4,6 +4,7 @@ import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_id.dart';
@@ -98,11 +99,62 @@ void main() {
 
     expect(
       find.text(
-        'Necesitas al menos una categoría activa para registrar un movimiento.',
+        'Necesitas al menos una categoría activa compatible con este tipo de movimiento.',
       ),
       findsOneWidget,
     );
     expect(find.widgetWithText(FilledButton, 'Guardar'), findsNothing);
+  });
+
+  testWidgets('shows only categories compatible with the transaction type', (
+    tester,
+  ) async {
+    final wallet = buildWallet();
+    final expenseCategory = buildCategory(
+      id: 'expense-category',
+      name: 'Alimentación',
+      applicability: CategoryApplicability.expense,
+    );
+    final incomeCategory = buildCategory(
+      id: 'income-category',
+      name: 'Sueldo',
+      applicability: CategoryApplicability.income,
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          balanceSummaryProvider.overrideWithValue(
+            AsyncData(
+              BalanceSummary(
+                byWallet: {wallet.id: wallet.initialBalance},
+                byCurrency: {wallet.currency: wallet.initialBalance},
+              ),
+            ),
+          ),
+          walletsProvider.overrideWithValue(AsyncData([wallet])),
+          categoriesProvider.overrideWithValue(
+            AsyncData([expenseCategory, incomeCategory]),
+          ),
+        ],
+        child: const ChuspitaApp(locale: Locale('es')),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(
+      find.widgetWithText(FloatingActionButton, 'Añadir movimiento'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alimentación'), findsOneWidget);
+    expect(find.text('Sueldo'), findsNothing);
+
+    await tester.tap(find.text('Ingreso'));
+    await tester.pump();
+
+    expect(find.text('Alimentación'), findsNothing);
+    expect(find.text('Sueldo'), findsOneWidget);
   });
 }
 
@@ -114,11 +166,16 @@ Wallet buildWallet() {
   );
 }
 
-Category buildCategory() {
+Category buildCategory({
+  String id = 'category-1',
+  String name = 'Alimentación',
+  CategoryApplicability applicability = CategoryApplicability.both,
+}) {
   return Category(
-    id: CategoryId('category-1'),
-    name: 'Alimentación',
+    id: CategoryId(id),
+    name: name,
     color: ArgbColor(0xFFF28C28),
+    applicability: applicability,
   );
 }
 

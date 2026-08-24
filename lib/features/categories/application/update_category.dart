@@ -1,5 +1,6 @@
 import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
 
 final class UpdateCategory {
@@ -11,8 +12,13 @@ final class UpdateCategory {
     required Category category,
     required String name,
     required ArgbColor color,
+    required CategoryApplicability applicability,
   }) async {
-    final updatedCategory = category.updateDetails(name: name, color: color);
+    final updatedCategory = category.updateDetails(
+      name: name,
+      color: color,
+      applicability: applicability,
+    );
     await categoryRepository.save(updatedCategory);
     return updatedCategory;
   }

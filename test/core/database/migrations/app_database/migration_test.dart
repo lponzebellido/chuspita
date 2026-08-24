@@ -9,6 +9,7 @@ import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -177,6 +178,100 @@ void main() {
         expect(
           expectedNewTransfersData,
           await newDb.select(newDb.transfers).get(),
+        );
+      },
+    );
+  });
+
+  test('migration from v2 to v3 keeps existing categories usable', () async {
+    final oldWalletsData = <v2.WalletsData>[
+      const v2.WalletsData(
+        id: 'wallet-eur',
+        name: 'Euros',
+        currencyCode: 'EUR',
+        initialBalanceMinor: 10000,
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final expectedNewWalletsData = <v3.WalletsData>[
+      const v3.WalletsData(
+        id: 'wallet-eur',
+        name: 'Euros',
+        currencyCode: 'EUR',
+        initialBalanceMinor: 10000,
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final oldCategoriesData = <v2.CategoriesData>[
+      const v2.CategoriesData(
+        id: 'category-food',
+        name: 'Food',
+        colorArgb: 0xFFFF9800,
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final expectedNewCategoriesData = <v3.CategoriesData>[
+      const v3.CategoriesData(
+        id: 'category-food',
+        name: 'Food',
+        colorArgb: 0xFFFF9800,
+        applicability: 'both',
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final oldTransactionsData = <v2.TransactionsData>[
+      const v2.TransactionsData(
+        id: 'transaction-1',
+        type: 'expense',
+        amountMinor: 1000,
+        walletId: 'wallet-eur',
+        categoryId: 'category-food',
+        occurredOn: '2026-08-23',
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final expectedNewTransactionsData = <v3.TransactionsData>[
+      const v3.TransactionsData(
+        id: 'transaction-1',
+        type: 'expense',
+        amountMinor: 1000,
+        walletId: 'wallet-eur',
+        categoryId: 'category-food',
+        occurredOn: '2026-08-23',
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 2,
+      newVersion: 3,
+      createOld: v2.DatabaseAtV2.new,
+      createNew: v3.DatabaseAtV3.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.wallets, oldWalletsData);
+        batch.insertAll(oldDb.categories, oldCategoriesData);
+        batch.insertAll(oldDb.transactions, oldTransactionsData);
+      },
+      validateItems: (newDb) async {
+        expect(expectedNewWalletsData, await newDb.select(newDb.wallets).get());
+        expect(
+          expectedNewCategoriesData,
+          await newDb.select(newDb.categories).get(),
+        );
+        expect(
+          expectedNewTransactionsData,
+          await newDb.select(newDb.transactions).get(),
         );
       },
     );

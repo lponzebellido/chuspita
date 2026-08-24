@@ -5,6 +5,7 @@ import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/data/repositories/drift_transaction_repository.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
@@ -107,6 +108,32 @@ void main() {
       expect(() => repository.save(transaction), throwsA(isA<StateError>()));
     });
 
+    test('rejects a category incompatible with the transaction type', () async {
+      await DriftCategoryRepository(
+        database,
+        nowMillis: () => currentTime,
+      ).save(buildCategory(applicability: CategoryApplicability.expense));
+      final transaction = buildTransaction(type: TransactionType.income);
+
+      expect(() => repository.save(transaction), throwsA(isA<StateError>()));
+    });
+
+    test(
+      'keeps an existing association after category applicability changes',
+      () async {
+        final transaction = buildTransaction(type: TransactionType.income);
+        await repository.save(transaction);
+        await DriftCategoryRepository(
+          database,
+          nowMillis: () => currentTime,
+        ).save(buildCategory(applicability: CategoryApplicability.expense));
+
+        await repository.save(buildTransaction(type: TransactionType.income));
+
+        expect(await repository.getById(transaction.id), isNotNull);
+      },
+    );
+
     test('deletes a transaction', () async {
       final transaction = buildTransaction();
       await repository.save(transaction);
@@ -126,11 +153,14 @@ Wallet buildWallet() {
   );
 }
 
-Category buildCategory() {
+Category buildCategory({
+  CategoryApplicability applicability = CategoryApplicability.both,
+}) {
   return Category(
     id: CategoryId('category-1'),
     name: 'Food',
     color: ArgbColor(0xFFFF9800),
+    applicability: applicability,
   );
 }
 

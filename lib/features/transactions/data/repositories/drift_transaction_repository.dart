@@ -66,9 +66,25 @@ final class DriftTransactionRepository implements TransactionRepository {
   @override
   Future<void> save(Transaction transaction) async {
     await _database.transaction(() async {
+      final query = _database.select(_database.transactions)
+        ..where((table) => table.id.equals(transaction.id.value));
+      final existingRow = await query.getSingleOrNull();
       final wallet = await _requireWallet(transaction.walletId);
-      await _requireCategory(transaction.categoryId);
+      final category = await _requireCategory(transaction.categoryId);
       final walletCurrency = Currency.fromCode(wallet.currencyCode);
+      final keepsExistingAssociation =
+          existingRow != null &&
+          existingRow.type == transaction.type.name &&
+          existingRow.categoryId == transaction.categoryId.value;
+
+      if (category.applicability != 'both' &&
+          category.applicability != transaction.type.name &&
+          !keepsExistingAssociation) {
+        throw StateError(
+          'Category ${category.id} cannot be used for '
+          '${transaction.type.name} transactions',
+        );
+      }
 
       if (transaction.amount.currency != walletCurrency) {
         throw StateError(
@@ -77,9 +93,6 @@ final class DriftTransactionRepository implements TransactionRepository {
         );
       }
 
-      final query = _database.select(_database.transactions)
-        ..where((table) => table.id.equals(transaction.id.value));
-      final existingRow = await query.getSingleOrNull();
       final now = _nowMillis();
 
       if (existingRow == null) {
@@ -141,12 +154,15 @@ final class DriftTransactionRepository implements TransactionRepository {
     return wallet;
   }
 
-  Future<void> _requireCategory(CategoryId id) async {
+  Future<CategoryRow> _requireCategory(CategoryId id) async {
     final query = _database.select(_database.categories)
       ..where((table) => table.id.equals(id.value));
+    final category = await query.getSingleOrNull();
 
-    if (await query.getSingleOrNull() == null) {
+    if (category == null) {
       throw StateError('Category ${id.value} does not exist');
     }
+
+    return category;
   }
 }

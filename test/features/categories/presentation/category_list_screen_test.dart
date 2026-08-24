@@ -2,6 +2,7 @@ import 'package:chuspita/app/app.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
@@ -20,6 +21,7 @@ void main() {
 
     expect(find.text('Categorías'), findsOneWidget);
     expect(find.text('Alimentación'), findsOneWidget);
+    expect(find.text('Gastos e ingresos'), findsOneWidget);
 
     await tester.tap(find.text('Alimentación'));
     await tester.pumpAndSettle();
@@ -76,6 +78,7 @@ Category buildCategory() {
     id: CategoryId('category-1'),
     name: 'Alimentación',
     color: ArgbColor(0xFFF28C28),
+    applicability: CategoryApplicability.both,
   );
 }
 

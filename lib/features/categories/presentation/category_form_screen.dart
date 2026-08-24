@@ -1,6 +1,7 @@
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/presentation/category_color_palette.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ final class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late Color _selectedColor;
+  late CategoryApplicability _applicability;
   bool _isSaving = false;
   String? _saveError;
 
@@ -30,6 +32,7 @@ final class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
     _selectedColor = category == null
         ? CategoryColorPalette.values.first
         : Color(category.color.value);
+    _applicability = category?.applicability ?? CategoryApplicability.both;
   }
 
   @override
@@ -57,7 +60,11 @@ final class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
       if (category == null) {
         await ref
             .read(createCategoryProvider)
-            .call(name: _nameController.text, color: color);
+            .call(
+              name: _nameController.text,
+              color: color,
+              applicability: _applicability,
+            );
       } else {
         await ref
             .read(updateCategoryProvider)
@@ -65,6 +72,7 @@ final class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
               category: category,
               name: _nameController.text,
               color: color,
+              applicability: _applicability,
             );
       }
 
@@ -114,6 +122,34 @@ final class _CategoryFormScreenState extends ConsumerState<CategoryFormScreen> {
 
                 return null;
               },
+            ),
+            const SizedBox(height: 28),
+            Text(
+              l10n.categoryApplicabilityLabel,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            SegmentedButton<CategoryApplicability>(
+              segments: [
+                ButtonSegment(
+                  value: CategoryApplicability.expense,
+                  label: Text(l10n.categoryExpenseOption),
+                ),
+                ButtonSegment(
+                  value: CategoryApplicability.income,
+                  label: Text(l10n.categoryIncomeOption),
+                ),
+                ButtonSegment(
+                  value: CategoryApplicability.both,
+                  label: Text(l10n.categoryBothOption),
+                ),
+              ],
+              selected: {_applicability},
+              showSelectedIcon: false,
+              onSelectionChanged: _isSaving
+                  ? null
+                  : (selection) =>
+                        setState(() => _applicability = selection.first),
             ),
             const SizedBox(height: 28),
             Text(

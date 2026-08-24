@@ -1,5 +1,6 @@
 import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -10,6 +11,7 @@ void main() {
 
       expect(category.name, 'Food');
       expect(category.color, ArgbColor(0xFFFF9800));
+      expect(category.applicability, CategoryApplicability.both);
       expect(category.isArchived, isFalse);
     });
 
@@ -39,11 +41,13 @@ void main() {
       final updated = category.updateDetails(
         name: 'Transport',
         color: ArgbColor(0xFF2196F3),
+        applicability: CategoryApplicability.expense,
       );
 
       expect(updated.id, category.id);
       expect(updated.name, 'Transport');
       expect(updated.color, ArgbColor(0xFF2196F3));
+      expect(updated.applicability, CategoryApplicability.expense);
       expect(updated.isArchived, isTrue);
     });
 
@@ -71,12 +75,14 @@ Category buildCategory({
   CategoryId? id,
   String name = 'Food',
   ArgbColor? color,
+  CategoryApplicability applicability = CategoryApplicability.both,
   bool isArchived = false,
 }) {
   return Category(
     id: id ?? CategoryId('category-1'),
     name: name,
     color: color ?? ArgbColor(0xFFFF9800),
+    applicability: applicability,
     isArchived: isArchived,
   );
 }

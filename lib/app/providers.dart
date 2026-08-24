@@ -12,7 +12,9 @@ import 'package:chuspita/features/transactions/application/update_transaction.da
 import 'package:chuspita/features/transactions/data/repositories/drift_transaction_repository.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
+import 'package:chuspita/features/transfers/application/create_transfer.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
+import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/application/create_wallet.dart';
@@ -125,6 +127,24 @@ final transactionsProvider = FutureProvider<List<Transaction>>(
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return DriftTransferRepository(ref.watch(appDatabaseProvider));
 });
+
+final transferIdGeneratorProvider = Provider<String Function()>((ref) {
+  final uuid = Uuid();
+
+  return () => uuid.v4();
+});
+
+final createTransferProvider = Provider<CreateTransfer>((ref) {
+  return CreateTransfer(
+    transferRepository: ref.watch(transferRepositoryProvider),
+    idGenerator: ref.watch(transferIdGeneratorProvider),
+  );
+});
+
+final transfersProvider = FutureProvider<List<Transfer>>(
+  (ref) => ref.watch(transferRepositoryProvider).getAll(),
+  retry: (retryCount, error) => null,
+);
 
 final loadBalanceSummaryProvider = Provider<LoadBalanceSummary>((ref) {
   return LoadBalanceSummary(

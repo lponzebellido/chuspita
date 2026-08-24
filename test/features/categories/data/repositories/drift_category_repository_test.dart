@@ -2,6 +2,7 @@ import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +36,7 @@ void main() {
       expect(restored!.id, category.id);
       expect(restored.name, 'Food');
       expect(restored.color, category.color);
+      expect(restored.applicability, CategoryApplicability.income);
       expect(restored.isArchived, isFalse);
     });
 
@@ -69,10 +71,14 @@ void main() {
   });
 }
 
-Category buildCategory({String id = 'category-1'}) {
+Category buildCategory({
+  String id = 'category-1',
+  CategoryApplicability applicability = CategoryApplicability.income,
+}) {
   return Category(
     id: CategoryId(id),
     name: 'Food',
     color: ArgbColor(0xFFFF9800),
+    applicability: applicability,
   );
 }

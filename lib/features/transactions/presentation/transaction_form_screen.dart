@@ -223,18 +223,26 @@ final class _TransactionFormScreenState
             )
             .toList() ??
         const <Wallet>[];
-    final activeCategories =
+    final availableCategories =
         categories.asData?.value
             .where(
               (category) =>
                   !category.isArchived ||
                   category.id == transaction?.categoryId,
             )
+            .where(
+              (category) =>
+                  _categoryAllowsType(category, _type) ||
+                  category.id == transaction?.categoryId &&
+                      _type == transaction?.type,
+            )
             .toList() ??
         const <Category>[];
     final dataLoaded = wallets.hasValue && categories.hasValue;
     final canSave =
-        dataLoaded && activeWallets.isNotEmpty && activeCategories.isNotEmpty;
+        dataLoaded &&
+        activeWallets.isNotEmpty &&
+        availableCategories.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -256,7 +264,7 @@ final class _TransactionFormScreenState
         wallets: wallets,
         categories: categories,
         activeWallets: activeWallets,
-        activeCategories: activeCategories,
+        availableCategories: availableCategories,
       ),
       bottomNavigationBar: canSave
           ? SafeArea(
@@ -264,7 +272,7 @@ final class _TransactionFormScreenState
               child: FilledButton(
                 onPressed: _isSaving
                     ? null
-                    : () => _save(activeWallets, activeCategories),
+                    : () => _save(activeWallets, availableCategories),
                 child: _isSaving
                     ? const SizedBox.square(
                         dimension: 20,
@@ -281,7 +289,7 @@ final class _TransactionFormScreenState
     required AsyncValue<List<Wallet>> wallets,
     required AsyncValue<List<Category>> categories,
     required List<Wallet> activeWallets,
-    required List<Category> activeCategories,
+    required List<Category> availableCategories,
   }) {
     if (wallets.isLoading || categories.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -296,10 +304,10 @@ final class _TransactionFormScreenState
       );
     }
 
-    if (activeWallets.isEmpty || activeCategories.isEmpty) {
+    if (activeWallets.isEmpty || availableCategories.isEmpty) {
       return _MissingRequirements(
         needsWallet: activeWallets.isEmpty,
-        needsCategory: activeCategories.isEmpty,
+        needsCategory: availableCategories.isEmpty,
         onManageWallets: () => Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (context) => const WalletListScreen(),
@@ -317,13 +325,13 @@ final class _TransactionFormScreenState
       (first, second) =>
           first.name.toLowerCase().compareTo(second.name.toLowerCase()),
     );
-    activeCategories.sort(
+    availableCategories.sort(
       (first, second) =>
           first.name.toLowerCase().compareTo(second.name.toLowerCase()),
     );
 
     final selectedWallet = _selectedWallet(activeWallets);
-    final selectedCategory = _selectedCategory(activeCategories);
+    final selectedCategory = _selectedCategory(availableCategories);
 
     return Form(
       key: _formKey,
@@ -398,13 +406,16 @@ final class _TransactionFormScreenState
           ),
           const SizedBox(height: 20),
           DropdownButtonFormField<CategoryId>(
+            key: ValueKey(
+              'category-${_type.name}-${selectedCategory.id.value}',
+            ),
             initialValue: selectedCategory.id,
             decoration: InputDecoration(
               labelText: context.l10n.categoryLabel,
               border: const OutlineInputBorder(),
             ),
             items: [
-              for (final category in activeCategories)
+              for (final category in availableCategories)
                 DropdownMenuItem(
                   value: category.id,
                   child: Row(
@@ -468,6 +479,13 @@ final class _TransactionFormScreenState
       ),
     );
   }
+}
+
+bool _categoryAllowsType(Category category, TransactionType type) {
+  return switch (type) {
+    TransactionType.expense => category.applicability.allowsExpenses,
+    TransactionType.income => category.applicability.allowsIncome,
+  };
 }
 
 final class _MissingRequirements extends StatelessWidget {

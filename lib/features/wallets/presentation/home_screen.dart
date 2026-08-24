@@ -6,6 +6,7 @@ import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_list_screen.dart';
+import 'package:chuspita/features/transfers/presentation/transfer_form_screen.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_list_screen.dart';
@@ -63,6 +64,14 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openTransferForm() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const TransferFormScreen(),
+        ),
+      );
+    }
+
     Future<void> refreshBalance() {
       return ref.refresh(balanceSummaryProvider.future).then((_) {});
     }
@@ -96,6 +105,7 @@ final class HomeScreen extends ConsumerWidget {
             summary: value,
             onAddWallet: openWalletForm,
             onViewTransactions: openTransactionList,
+            onTransfer: openTransferForm,
             onRefresh: refreshBalance,
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -118,12 +128,14 @@ final class _BalanceContent extends StatelessWidget {
     required this.summary,
     required this.onAddWallet,
     required this.onViewTransactions,
+    required this.onTransfer,
     required this.onRefresh,
   });
 
   final BalanceSummary summary;
   final VoidCallback onAddWallet;
   final VoidCallback onViewTransactions;
+  final VoidCallback onTransfer;
   final RefreshCallback onRefresh;
 
   @override
@@ -162,6 +174,12 @@ final class _BalanceContent extends StatelessWidget {
             const SizedBox(height: 12),
           ],
           const SizedBox(height: 8),
+          FilledButton.tonalIcon(
+            onPressed: onTransfer,
+            icon: const Icon(Icons.swap_horiz),
+            label: Text(context.l10n.transferBetweenWallets),
+          ),
+          const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: onViewTransactions,
             icon: const Icon(Icons.receipt_long_outlined),

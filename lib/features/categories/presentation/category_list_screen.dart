@@ -1,5 +1,6 @@
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/presentation/category_form_screen.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
@@ -120,6 +121,11 @@ final class _CategoryList extends StatelessWidget {
       itemBuilder: (context, index) {
         final category = sortedCategories[index];
         final color = Color(category.color.value);
+        final applicabilityLabel = switch (category.applicability) {
+          CategoryApplicability.expense => context.l10n.categoryExpenseOption,
+          CategoryApplicability.income => context.l10n.categoryIncomeOption,
+          CategoryApplicability.both => context.l10n.categoryBothDescription,
+        };
 
         return Opacity(
           opacity: category.isArchived ? 0.6 : 1,
@@ -138,7 +144,11 @@ final class _CategoryList extends StatelessWidget {
               child: Icon(Icons.category_outlined, color: color),
             ),
             title: Text(category.name),
-            subtitle: category.isArchived ? Text(context.l10n.archived) : null,
+            subtitle: Text(
+              category.isArchived
+                  ? '$applicabilityLabel · ${context.l10n.archived}'
+                  : applicabilityLabel,
+            ),
             onTap: () => onEdit(category),
             trailing: PopupMenuButton<_CategoryAction>(
               onSelected: (action) {

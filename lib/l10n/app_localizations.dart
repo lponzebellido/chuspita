@@ -242,6 +242,36 @@ abstract class AppLocalizations {
   /// **'Enter a category name.'**
   String get categoryNameRequired;
 
+  /// No description provided for @categoryApplicabilityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use for'**
+  String get categoryApplicabilityLabel;
+
+  /// No description provided for @categoryExpenseOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get categoryExpenseOption;
+
+  /// No description provided for @categoryIncomeOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get categoryIncomeOption;
+
+  /// No description provided for @categoryBothOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get categoryBothOption;
+
+  /// No description provided for @categoryBothDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses and income'**
+  String get categoryBothDescription;
+
   /// No description provided for @categoryColorLabel.
   ///
   /// In en, this message translates to:
@@ -449,7 +479,7 @@ abstract class AppLocalizations {
   /// No description provided for @transactionNeedsCategory.
   ///
   /// In en, this message translates to:
-  /// **'You need at least one active category to record a transaction.'**
+  /// **'You need at least one active category compatible with this transaction type.'**
   String get transactionNeedsCategory;
 
   /// No description provided for @saveTransactionError.
@@ -457,6 +487,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t save the transaction. Please try again.'**
   String get saveTransactionError;
+
+  /// No description provided for @transferBetweenWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer between wallets'**
+  String get transferBetweenWallets;
+
+  /// No description provided for @newTransferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New transfer'**
+  String get newTransferTitle;
+
+  /// No description provided for @sourceWalletLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From wallet'**
+  String get sourceWalletLabel;
+
+  /// No description provided for @destinationWalletLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To wallet'**
+  String get destinationWalletLabel;
+
+  /// No description provided for @sourceAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount sent'**
+  String get sourceAmountLabel;
+
+  /// No description provided for @destinationAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount received'**
+  String get destinationAmountLabel;
+
+  /// No description provided for @transferAmountInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount greater than zero.'**
+  String get transferAmountInvalid;
+
+  /// No description provided for @transferNeedsWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least two active wallets to make a transfer.'**
+  String get transferNeedsWallets;
+
+  /// No description provided for @crossCurrencyTransferHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the amount that will arrive in the destination currency.'**
+  String get crossCurrencyTransferHint;
+
+  /// No description provided for @useExchangeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Use conversion factor'**
+  String get useExchangeRate;
+
+  /// No description provided for @exchangeRateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion factor'**
+  String get exchangeRateLabel;
+
+  /// No description provided for @exchangeRateInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a conversion factor greater than zero.'**
+  String get exchangeRateInvalid;
+
+  /// No description provided for @approximateExchangeRateWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This factor is approximate and may be outdated. Verify that it is correct before saving.'**
+  String get approximateExchangeRateWarning;
+
+  /// No description provided for @lastSavedExchangeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'The last factor recorded for this currency pair is used as a reference.'**
+  String get lastSavedExchangeRate;
+
+  /// No description provided for @noSavedExchangeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no saved factor for this currency pair yet.'**
+  String get noSavedExchangeRate;
+
+  /// No description provided for @calculatedDestinationAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated amount'**
+  String get calculatedDestinationAmount;
+
+  /// No description provided for @saveTransferError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save the transfer. Please try again.'**
+  String get saveTransferError;
 
   /// No description provided for @deleteTransactionTitle.
   ///

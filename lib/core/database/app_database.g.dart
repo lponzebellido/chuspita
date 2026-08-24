@@ -524,6 +524,18 @@ class $CategoriesTable extends Categories
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _applicabilityMeta = const VerificationMeta(
+    'applicability',
+  );
+  @override
+  late final GeneratedColumn<String> applicability = GeneratedColumn<String>(
+    'applicability',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('both'),
+  );
   static const VerificationMeta _isArchivedMeta = const VerificationMeta(
     'isArchived',
   );
@@ -566,6 +578,7 @@ class $CategoriesTable extends Categories
     id,
     name,
     colorArgb,
+    applicability,
     isArchived,
     createdAtMillis,
     updatedAtMillis,
@@ -602,6 +615,15 @@ class $CategoriesTable extends Categories
       );
     } else if (isInserting) {
       context.missing(_colorArgbMeta);
+    }
+    if (data.containsKey('applicability')) {
+      context.handle(
+        _applicabilityMeta,
+        applicability.isAcceptableOrUnknown(
+          data['applicability']!,
+          _applicabilityMeta,
+        ),
+      );
     }
     if (data.containsKey('is_archived')) {
       context.handle(
@@ -652,6 +674,10 @@ class $CategoriesTable extends Categories
         DriftSqlType.int,
         data['${effectivePrefix}color_argb'],
       )!,
+      applicability: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}applicability'],
+      )!,
       isArchived: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_archived'],
@@ -677,6 +703,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
   final String id;
   final String name;
   final int colorArgb;
+  final String applicability;
   final bool isArchived;
   final int createdAtMillis;
   final int updatedAtMillis;
@@ -684,6 +711,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
     required this.id,
     required this.name,
     required this.colorArgb,
+    required this.applicability,
     required this.isArchived,
     required this.createdAtMillis,
     required this.updatedAtMillis,
@@ -694,6 +722,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['color_argb'] = Variable<int>(colorArgb);
+    map['applicability'] = Variable<String>(applicability);
     map['is_archived'] = Variable<bool>(isArchived);
     map['created_at_millis'] = Variable<int>(createdAtMillis);
     map['updated_at_millis'] = Variable<int>(updatedAtMillis);
@@ -705,6 +734,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
       id: Value(id),
       name: Value(name),
       colorArgb: Value(colorArgb),
+      applicability: Value(applicability),
       isArchived: Value(isArchived),
       createdAtMillis: Value(createdAtMillis),
       updatedAtMillis: Value(updatedAtMillis),
@@ -720,6 +750,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       colorArgb: serializer.fromJson<int>(json['colorArgb']),
+      applicability: serializer.fromJson<String>(json['applicability']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       createdAtMillis: serializer.fromJson<int>(json['createdAtMillis']),
       updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
@@ -732,6 +763,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'colorArgb': serializer.toJson<int>(colorArgb),
+      'applicability': serializer.toJson<String>(applicability),
       'isArchived': serializer.toJson<bool>(isArchived),
       'createdAtMillis': serializer.toJson<int>(createdAtMillis),
       'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
@@ -742,6 +774,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
     String? id,
     String? name,
     int? colorArgb,
+    String? applicability,
     bool? isArchived,
     int? createdAtMillis,
     int? updatedAtMillis,
@@ -749,6 +782,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
     id: id ?? this.id,
     name: name ?? this.name,
     colorArgb: colorArgb ?? this.colorArgb,
+    applicability: applicability ?? this.applicability,
     isArchived: isArchived ?? this.isArchived,
     createdAtMillis: createdAtMillis ?? this.createdAtMillis,
     updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -758,6 +792,9 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       colorArgb: data.colorArgb.present ? data.colorArgb.value : this.colorArgb,
+      applicability: data.applicability.present
+          ? data.applicability.value
+          : this.applicability,
       isArchived: data.isArchived.present
           ? data.isArchived.value
           : this.isArchived,
@@ -776,6 +813,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('colorArgb: $colorArgb, ')
+          ..write('applicability: $applicability, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis')
@@ -788,6 +826,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
     id,
     name,
     colorArgb,
+    applicability,
     isArchived,
     createdAtMillis,
     updatedAtMillis,
@@ -799,6 +838,7 @@ class CategoryRow extends DataClass implements Insertable<CategoryRow> {
           other.id == this.id &&
           other.name == this.name &&
           other.colorArgb == this.colorArgb &&
+          other.applicability == this.applicability &&
           other.isArchived == this.isArchived &&
           other.createdAtMillis == this.createdAtMillis &&
           other.updatedAtMillis == this.updatedAtMillis);
@@ -808,6 +848,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
   final Value<String> id;
   final Value<String> name;
   final Value<int> colorArgb;
+  final Value<String> applicability;
   final Value<bool> isArchived;
   final Value<int> createdAtMillis;
   final Value<int> updatedAtMillis;
@@ -816,6 +857,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.colorArgb = const Value.absent(),
+    this.applicability = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAtMillis = const Value.absent(),
     this.updatedAtMillis = const Value.absent(),
@@ -825,6 +867,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
     required String id,
     required String name,
     required int colorArgb,
+    this.applicability = const Value.absent(),
     this.isArchived = const Value.absent(),
     required int createdAtMillis,
     required int updatedAtMillis,
@@ -838,6 +881,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
     Expression<String>? id,
     Expression<String>? name,
     Expression<int>? colorArgb,
+    Expression<String>? applicability,
     Expression<bool>? isArchived,
     Expression<int>? createdAtMillis,
     Expression<int>? updatedAtMillis,
@@ -847,6 +891,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (colorArgb != null) 'color_argb': colorArgb,
+      if (applicability != null) 'applicability': applicability,
       if (isArchived != null) 'is_archived': isArchived,
       if (createdAtMillis != null) 'created_at_millis': createdAtMillis,
       if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
@@ -858,6 +903,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
     Value<String>? id,
     Value<String>? name,
     Value<int>? colorArgb,
+    Value<String>? applicability,
     Value<bool>? isArchived,
     Value<int>? createdAtMillis,
     Value<int>? updatedAtMillis,
@@ -867,6 +913,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
       id: id ?? this.id,
       name: name ?? this.name,
       colorArgb: colorArgb ?? this.colorArgb,
+      applicability: applicability ?? this.applicability,
       isArchived: isArchived ?? this.isArchived,
       createdAtMillis: createdAtMillis ?? this.createdAtMillis,
       updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -885,6 +932,9 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
     }
     if (colorArgb.present) {
       map['color_argb'] = Variable<int>(colorArgb.value);
+    }
+    if (applicability.present) {
+      map['applicability'] = Variable<String>(applicability.value);
     }
     if (isArchived.present) {
       map['is_archived'] = Variable<bool>(isArchived.value);
@@ -907,6 +957,7 @@ class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('colorArgb: $colorArgb, ')
+          ..write('applicability: $applicability, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis, ')
@@ -2688,6 +2739,7 @@ typedef $$CategoriesTableCreateCompanionBuilder = CategoriesCompanion Function({
   required String id,
   required String name,
   required int colorArgb,
+  Value<String> applicability,
   Value<bool> isArchived,
   required int createdAtMillis,
   required int updatedAtMillis,
@@ -2697,6 +2749,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder = CategoriesCompanion Function({
   Value<String> id,
   Value<String> name,
   Value<int> colorArgb,
+  Value<String> applicability,
   Value<bool> isArchived,
   Value<int> createdAtMillis,
   Value<int> updatedAtMillis,
@@ -2747,6 +2800,11 @@ class $$CategoriesTableFilterComposer
 
   ColumnFilters<int> get colorArgb => $composableBuilder(
     column: $table.colorArgb,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get applicability => $composableBuilder(
+    column: $table.applicability,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2815,6 +2873,11 @@ class $$CategoriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get applicability => $composableBuilder(
+    column: $table.applicability,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
     builder: (column) => ColumnOrderings(column),
@@ -2848,6 +2911,11 @@ class $$CategoriesTableAnnotationComposer
 
   GeneratedColumn<int> get colorArgb =>
       $composableBuilder(column: $table.colorArgb, builder: (column) => column);
+
+  GeneratedColumn<String> get applicability => $composableBuilder(
+    column: $table.applicability,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
@@ -2921,6 +2989,7 @@ class $$CategoriesTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<int> colorArgb = const Value.absent(),
+                Value<String> applicability = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> createdAtMillis = const Value.absent(),
                 Value<int> updatedAtMillis = const Value.absent(),
@@ -2929,6 +2998,7 @@ class $$CategoriesTableTableManager
                 id: id,
                 name: name,
                 colorArgb: colorArgb,
+                applicability: applicability,
                 isArchived: isArchived,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,
@@ -2939,6 +3009,7 @@ class $$CategoriesTableTableManager
                 required String id,
                 required String name,
                 required int colorArgb,
+                Value<String> applicability = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 required int createdAtMillis,
                 required int updatedAtMillis,
@@ -2947,6 +3018,7 @@ class $$CategoriesTableTableManager
                 id: id,
                 name: name,
                 colorArgb: colorArgb,
+                applicability: applicability,
                 isArchived: isArchived,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,

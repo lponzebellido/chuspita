@@ -49,6 +49,7 @@ final class DriftCategoryRepository implements CategoryRepository {
               id: category.id.value,
               name: category.name,
               colorArgb: category.color.value,
+              applicability: Value(category.applicability.name),
               isArchived: Value(category.isArchived),
               createdAtMillis: now,
               updatedAtMillis: now,
@@ -68,6 +69,7 @@ final class DriftCategoryRepository implements CategoryRepository {
       CategoriesCompanion(
         name: Value(category.name),
         colorArgb: Value(category.color.value),
+        applicability: Value(category.applicability.name),
         isArchived: Value(category.isArchived),
         updatedAtMillis: Value(updatedAtMillis),
       ),

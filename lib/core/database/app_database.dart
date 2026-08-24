@@ -12,7 +12,7 @@ final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -23,6 +23,16 @@ final class AppDatabase extends _$AppDatabase {
       onUpgrade: stepByStep(
         from1To2: (migrator, schema) async {
           await migrator.alterTable(TableMigration(schema.wallets));
+        },
+        from2To3: (migrator, schema) async {
+          await migrator.alterTable(
+            TableMigration(
+              schema.categories,
+              columnTransformer: {
+                schema.categories.applicability: const Constant('both'),
+              },
+            ),
+          );
         },
       ),
       beforeOpen: (details) async {

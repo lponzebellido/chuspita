@@ -28,6 +28,7 @@ class Categories extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   IntColumn get colorArgb => integer()();
+  TextColumn get applicability => text().withDefault(const Constant('both'))();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   IntColumn get createdAtMillis => integer()();
   IntColumn get updatedAtMillis => integer()();
@@ -39,6 +40,7 @@ class Categories extends Table {
   List<String> get customConstraints => [
     'CHECK (length(trim(name)) > 0)',
     'CHECK (color_argb BETWEEN 0 AND 4294967295)',
+    "CHECK (applicability IN ('expense', 'income', 'both'))",
     'CHECK (is_archived IN (0, 1))',
     'CHECK (created_at_millis > 0)',
     'CHECK (updated_at_millis >= created_at_millis)',

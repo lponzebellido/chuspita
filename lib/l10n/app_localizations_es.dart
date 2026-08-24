@@ -84,6 +84,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get categoryNameRequired => 'Escribe un nombre para la categoría.';
 
   @override
+  String get categoryApplicabilityLabel => 'Usar en';
+
+  @override
+  String get categoryExpenseOption => 'Gastos';
+
+  @override
+  String get categoryIncomeOption => 'Ingresos';
+
+  @override
+  String get categoryBothOption => 'Ambos';
+
+  @override
+  String get categoryBothDescription => 'Gastos e ingresos';
+
+  @override
   String get categoryColorLabel => 'Color';
 
   @override
@@ -191,11 +206,69 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transactionNeedsCategory =>
-      'Necesitas al menos una categoría activa para registrar un movimiento.';
+      'Necesitas al menos una categoría activa compatible con este tipo de movimiento.';
 
   @override
   String get saveTransactionError =>
       'No pudimos guardar el movimiento. Inténtalo nuevamente.';
+
+  @override
+  String get transferBetweenWallets => 'Transferir entre monederos';
+
+  @override
+  String get newTransferTitle => 'Nueva transferencia';
+
+  @override
+  String get sourceWalletLabel => 'Monedero de origen';
+
+  @override
+  String get destinationWalletLabel => 'Monedero de destino';
+
+  @override
+  String get sourceAmountLabel => 'Cantidad enviada';
+
+  @override
+  String get destinationAmountLabel => 'Cantidad recibida';
+
+  @override
+  String get transferAmountInvalid => 'Escribe una cantidad mayor que cero.';
+
+  @override
+  String get transferNeedsWallets =>
+      'Necesitas al menos dos monederos activos para realizar una transferencia.';
+
+  @override
+  String get crossCurrencyTransferHint =>
+      'Escribe la cantidad que llegará en la moneda de destino.';
+
+  @override
+  String get useExchangeRate => 'Usar factor de conversión';
+
+  @override
+  String get exchangeRateLabel => 'Factor de conversión';
+
+  @override
+  String get exchangeRateInvalid =>
+      'Escribe un factor de conversión mayor que cero.';
+
+  @override
+  String get approximateExchangeRateWarning =>
+      'Este factor es aproximado y puede estar desactualizado. Verifica que sea correcto antes de guardar.';
+
+  @override
+  String get lastSavedExchangeRate =>
+      'Usamos como referencia el último factor registrado para este par de monedas.';
+
+  @override
+  String get noSavedExchangeRate =>
+      'Aún no hay un factor guardado para este par de monedas.';
+
+  @override
+  String get calculatedDestinationAmount => 'Cantidad calculada';
+
+  @override
+  String get saveTransferError =>
+      'No pudimos guardar la transferencia. Inténtalo nuevamente.';
 
   @override
   String get deleteTransactionTitle => 'Eliminar movimiento';

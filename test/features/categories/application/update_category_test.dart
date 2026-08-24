@@ -1,6 +1,7 @@
 import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_applicability.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,10 +17,12 @@ void main() {
         category: category,
         name: 'Transport',
         color: ArgbColor(0xFF2F80ED),
+        applicability: CategoryApplicability.expense,
       );
 
       expect(updated.name, 'Transport');
       expect(updated.color, ArgbColor(0xFF2F80ED));
+      expect(updated.applicability, CategoryApplicability.expense);
       expect(repository.savedCategory, updated);
     });
 

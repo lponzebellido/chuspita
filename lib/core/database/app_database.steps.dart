@@ -540,9 +540,214 @@ i1.GeneratedColumn<String> _column_18(String aliasedName) =>
       $customConstraints: 'NOT NULL DEFAULT \'both\'',
       defaultValue: const i1.CustomExpression('\'both\''),
     );
+
+final class Schema4 extends i0.VersionedSchema {
+  Schema4({required super.database}) : super(version: 4);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    wallets,
+    categories,
+    transactions,
+    transfers,
+    transactionsWalletDateIdx,
+    transactionsCategoryDateIdx,
+    transfersSourceWalletDateIdx,
+    transfersDestinationWalletDateIdx,
+  ];
+  late final Shape0 wallets = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'wallets',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(length(trim(name)) > 0)',
+        'CHECK(currency_code GLOB \'[A-Z][A-Z][A-Z]\')',
+        'CHECK(is_archived IN (0, 1))',
+        'CHECK(created_at_millis > 0)',
+        'CHECK(updated_at_millis >= created_at_millis)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 categories = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'categories',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(length(trim(name)) > 0)',
+        'CHECK(color_argb BETWEEN 0 AND 4294967295)',
+        'CHECK(applicability IN (\'expense\', \'income\', \'both\'))',
+        'CHECK(is_archived IN (0, 1))',
+        'CHECK(created_at_millis > 0)',
+        'CHECK(updated_at_millis >= created_at_millis)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_7,
+        _column_18,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 transactions = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'transactions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(type IN (\'income\', \'expense\'))',
+        'CHECK(amount_minor > 0)',
+        'CHECK(occurred_on GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\')',
+        'CHECK(occurred_at_minutes BETWEEN 0 AND 1439)',
+        'CHECK(created_at_millis > 0)',
+        'CHECK(updated_at_millis >= created_at_millis)',
+      ],
+      columns: [
+        _column_0,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_19,
+        _column_13,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 transfers = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'transfers',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(source_wallet_id != destination_wallet_id)',
+        'CHECK(source_amount_minor > 0)',
+        'CHECK(destination_amount_minor > 0)',
+        'CHECK(occurred_on GLOB \'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\')',
+        'CHECK(occurred_at_minutes BETWEEN 0 AND 1439)',
+        'CHECK(created_at_millis > 0)',
+        'CHECK(updated_at_millis >= created_at_millis)',
+      ],
+      columns: [
+        _column_0,
+        _column_14,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_12,
+        _column_19,
+        _column_13,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index transactionsWalletDateIdx = i1.Index(
+    'transactions_wallet_date_idx',
+    'CREATE INDEX transactions_wallet_date_idx ON transactions (wallet_id, occurred_on)',
+  );
+  final i1.Index transactionsCategoryDateIdx = i1.Index(
+    'transactions_category_date_idx',
+    'CREATE INDEX transactions_category_date_idx ON transactions (category_id, occurred_on)',
+  );
+  final i1.Index transfersSourceWalletDateIdx = i1.Index(
+    'transfers_source_wallet_date_idx',
+    'CREATE INDEX transfers_source_wallet_date_idx ON transfers (source_wallet_id, occurred_on)',
+  );
+  final i1.Index transfersDestinationWalletDateIdx = i1.Index(
+    'transfers_destination_wallet_date_idx',
+    'CREATE INDEX transfers_destination_wallet_date_idx ON transfers (destination_wallet_id, occurred_on)',
+  );
+}
+
+class Shape5 extends i0.VersionedTable {
+  Shape5({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get type =>
+      columnsByName['type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get amountMinor =>
+      columnsByName['amount_minor']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get walletId =>
+      columnsByName['wallet_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get categoryId =>
+      columnsByName['category_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get occurredOn =>
+      columnsByName['occurred_on']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get occurredAtMinutes =>
+      columnsByName['occurred_at_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAtMillis =>
+      columnsByName['created_at_millis']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAtMillis =>
+      columnsByName['updated_at_millis']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_19(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'occurred_at_minutes',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+
+class Shape6 extends i0.VersionedTable {
+  Shape6({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get sourceWalletId =>
+      columnsByName['source_wallet_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get destinationWalletId =>
+      columnsByName['destination_wallet_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get sourceAmountMinor =>
+      columnsByName['source_amount_minor']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get destinationAmountMinor =>
+      columnsByName['destination_amount_minor']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get occurredOn =>
+      columnsByName['occurred_on']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get occurredAtMinutes =>
+      columnsByName['occurred_at_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAtMillis =>
+      columnsByName['created_at_millis']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAtMillis =>
+      columnsByName['updated_at_millis']! as i1.GeneratedColumn<int>;
+}
+
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
+  required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -556,6 +761,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from2To3(migrator, schema);
         return 3;
+      case 3:
+        final schema = Schema4(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from3To4(migrator, schema);
+        return 4;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -565,6 +775,11 @@ i0.MigrationStepWithVersion migrationSteps({
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
+  required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
+  step: migrationSteps(
+    from1To2: from1To2,
+    from2To3: from2To3,
+    from3To4: from3To4,
+  ),
 );

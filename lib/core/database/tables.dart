@@ -68,6 +68,7 @@ class Transactions extends Table {
       text().references(Categories, #id, onDelete: KeyAction.restrict)();
 
   TextColumn get occurredOn => text()();
+  IntColumn get occurredAtMinutes => integer().withDefault(const Constant(0))();
   TextColumn get note => text().nullable()();
   IntColumn get createdAtMillis => integer()();
   IntColumn get updatedAtMillis => integer()();
@@ -81,6 +82,7 @@ class Transactions extends Table {
     'CHECK (amount_minor > 0)',
     "CHECK (occurred_on GLOB "
         "'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')",
+    'CHECK (occurred_at_minutes BETWEEN 0 AND 1439)',
     'CHECK (created_at_millis > 0)',
     'CHECK (updated_at_millis >= created_at_millis)',
   ];
@@ -109,6 +111,7 @@ class Transfers extends Table {
   IntColumn get sourceAmountMinor => integer()();
   IntColumn get destinationAmountMinor => integer()();
   TextColumn get occurredOn => text()();
+  IntColumn get occurredAtMinutes => integer().withDefault(const Constant(0))();
   TextColumn get note => text().nullable()();
   IntColumn get createdAtMillis => integer()();
   IntColumn get updatedAtMillis => integer()();
@@ -123,6 +126,7 @@ class Transfers extends Table {
     'CHECK (destination_amount_minor > 0)',
     "CHECK (occurred_on GLOB "
         "'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')",
+    'CHECK (occurred_at_minutes BETWEEN 0 AND 1439)',
     'CHECK (created_at_millis > 0)',
     'CHECK (updated_at_millis >= created_at_millis)',
   ];

@@ -506,6 +506,30 @@ abstract class AppLocalizations {
   /// **'Date'**
   String get dateLabel;
 
+  /// No description provided for @timeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get timeLabel;
+
+  /// No description provided for @sortOrderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order'**
+  String get sortOrderLabel;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
+  String get newestFirst;
+
+  /// No description provided for @oldestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
+  String get oldestFirst;
+
   /// No description provided for @noteLabel.
   ///
   /// In en, this message translates to:

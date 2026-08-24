@@ -221,6 +221,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dateLabel => 'Date';
 
   @override
+  String get timeLabel => 'Time';
+
+  @override
+  String get sortOrderLabel => 'Order';
+
+  @override
+  String get newestFirst => 'Newest first';
+
+  @override
+  String get oldestFirst => 'Oldest first';
+
+  @override
   String get noteLabel => 'Optional note';
 
   @override

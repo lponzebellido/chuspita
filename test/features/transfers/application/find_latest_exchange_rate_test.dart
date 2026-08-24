@@ -1,5 +1,6 @@
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/transfers/application/find_latest_exchange_rate.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
@@ -31,6 +32,19 @@ void main() {
     expect(rate!.toInputValue(), '0.25');
   });
 
+  test('uses the time when matching transfers share a date', () {
+    final rate = findLatestExchangeRate(
+      transfers: [
+        buildTransfer(id: 'evening', destinationMinor: 4300, hour: 18),
+        buildTransfer(id: 'morning', destinationMinor: 4100, hour: 8),
+      ],
+      sourceCurrency: Currency.eur,
+      destinationCurrency: Currency.pen,
+    );
+
+    expect(rate!.toInputValue(), '4.3');
+  });
+
   test('returns null when the currency pair has no history', () {
     final rate = findLatestExchangeRate(
       transfers: const [],
@@ -46,6 +60,7 @@ Transfer buildTransfer({
   required String id,
   required int destinationMinor,
   int day = 1,
+  int hour = 0,
 }) {
   return Transfer(
     id: TransferId(id),
@@ -57,5 +72,6 @@ Transfer buildTransfer({
       currency: Currency.pen,
     ),
     occurredOn: LocalDate(year: 2026, month: 8, day: day),
+    occurredAt: LocalTime(hour: hour, minute: 0),
   );
 }

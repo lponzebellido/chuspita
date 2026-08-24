@@ -58,6 +58,11 @@ void main() {
           Currency.eur: const Money(minorUnits: 14500, currency: Currency.eur),
           Currency.usd: const Money(minorUnits: 4300, currency: Currency.usd),
         });
+        expect(summary.walletNames, {
+          WalletId('cash-eur'): 'cash-eur',
+          WalletId('savings-eur'): 'savings-eur',
+          WalletId('cash-usd'): 'cash-usd',
+        });
       } finally {
         await database.close();
       }

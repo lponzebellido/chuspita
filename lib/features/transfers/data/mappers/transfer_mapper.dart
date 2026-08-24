@@ -1,6 +1,7 @@
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_id.dart';
@@ -24,6 +25,7 @@ extension TransferRowMapper on TransferRow {
         currency: destinationCurrency,
       ),
       occurredOn: LocalDate.parse(occurredOn),
+      occurredAt: LocalTime.fromMinutesSinceMidnight(occurredAtMinutes),
       note: note,
     );
   }

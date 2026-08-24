@@ -2,6 +2,7 @@ import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
@@ -57,6 +58,7 @@ void main() {
       expect(restored.walletId, transaction.walletId);
       expect(restored.categoryId, transaction.categoryId);
       expect(restored.occurredOn, transaction.occurredOn);
+      expect(restored.occurredAt, transaction.occurredAt);
       expect(restored.note, 'Lunch');
     });
 
@@ -179,6 +181,7 @@ Transaction buildTransaction({
     walletId: WalletId('wallet-1'),
     categoryId: CategoryId(categoryId),
     occurredOn: LocalDate(year: 2026, month: 8, day: 23),
+    occurredAt: LocalTime(hour: 13, minute: 45),
     note: note,
   );
 }

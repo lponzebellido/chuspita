@@ -114,6 +114,9 @@ final class DriftTransferRepository implements TransferRepository {
                 sourceAmountMinor: transfer.sourceAmount.minorUnits,
                 destinationAmountMinor: transfer.destinationAmount.minorUnits,
                 occurredOn: transfer.occurredOn.toString(),
+                occurredAtMinutes: Value(
+                  transfer.occurredAt.minutesSinceMidnight,
+                ),
                 note: Value(transfer.note),
                 createdAtMillis: now,
                 updatedAtMillis: now,
@@ -136,6 +139,7 @@ final class DriftTransferRepository implements TransferRepository {
           sourceAmountMinor: Value(transfer.sourceAmount.minorUnits),
           destinationAmountMinor: Value(transfer.destinationAmount.minorUnits),
           occurredOn: Value(transfer.occurredOn.toString()),
+          occurredAtMinutes: Value(transfer.occurredAt.minutesSinceMidnight),
           note: Value(transfer.note),
           updatedAtMillis: Value(updatedAtMillis),
         ),

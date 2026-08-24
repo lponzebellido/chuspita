@@ -35,6 +35,7 @@ final class _MovementFilterSheetState extends State<MovementFilterSheet> {
   _PeriodOption _period = _PeriodOption.all;
   LocalDate? _startDate;
   LocalDate? _endDate;
+  late MovementSortOrder _sortOrder;
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ final class _MovementFilterSheetState extends State<MovementFilterSheet> {
     _categoryId = filters.categoryId?.value ?? '';
     _startDate = filters.startDate;
     _endDate = filters.endDate;
+    _sortOrder = filters.sortOrder;
     _period = _periodFor(filters);
   }
 
@@ -139,6 +141,7 @@ final class _MovementFilterSheetState extends State<MovementFilterSheet> {
       _period = _PeriodOption.all;
       _startDate = null;
       _endDate = null;
+      _sortOrder = MovementSortOrder.newestFirst;
     });
   }
 
@@ -172,6 +175,7 @@ final class _MovementFilterSheetState extends State<MovementFilterSheet> {
         categoryId: _categoryId.isEmpty ? null : CategoryId(_categoryId),
         startDate: _startDate,
         endDate: _endDate,
+        sortOrder: _sortOrder,
       ),
     );
   }
@@ -317,6 +321,32 @@ final class _MovementFilterSheetState extends State<MovementFilterSheet> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
+            const SizedBox(height: 24),
+            Text(
+              context.l10n.sortOrderLabel,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ChoiceChip(
+                  label: Text(context.l10n.newestFirst),
+                  selected: _sortOrder == MovementSortOrder.newestFirst,
+                  onSelected: (_) => setState(
+                    () => _sortOrder = MovementSortOrder.newestFirst,
+                  ),
+                ),
+                ChoiceChip(
+                  label: Text(context.l10n.oldestFirst),
+                  selected: _sortOrder == MovementSortOrder.oldestFirst,
+                  onSelected: (_) => setState(
+                    () => _sortOrder = MovementSortOrder.oldestFirst,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 28),
             Row(
               children: [

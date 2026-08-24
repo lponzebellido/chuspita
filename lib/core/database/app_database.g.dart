@@ -1041,6 +1041,18 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _occurredAtMinutesMeta = const VerificationMeta(
+    'occurredAtMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> occurredAtMinutes = GeneratedColumn<int>(
+    'occurred_at_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
   late final GeneratedColumn<String> note = GeneratedColumn<String>(
@@ -1080,6 +1092,7 @@ class $TransactionsTable extends Transactions
     walletId,
     categoryId,
     occurredOn,
+    occurredAtMinutes,
     note,
     createdAtMillis,
     updatedAtMillis,
@@ -1144,6 +1157,15 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_occurredOnMeta);
     }
+    if (data.containsKey('occurred_at_minutes')) {
+      context.handle(
+        _occurredAtMinutesMeta,
+        occurredAtMinutes.isAcceptableOrUnknown(
+          data['occurred_at_minutes']!,
+          _occurredAtMinutesMeta,
+        ),
+      );
+    }
     if (data.containsKey('note')) {
       context.handle(
         _noteMeta,
@@ -1205,6 +1227,10 @@ class $TransactionsTable extends Transactions
         DriftSqlType.string,
         data['${effectivePrefix}occurred_on'],
       )!,
+      occurredAtMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at_minutes'],
+      )!,
       note: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}note'],
@@ -1233,6 +1259,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
   final String walletId;
   final String categoryId;
   final String occurredOn;
+  final int occurredAtMinutes;
   final String? note;
   final int createdAtMillis;
   final int updatedAtMillis;
@@ -1243,6 +1270,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     required this.walletId,
     required this.categoryId,
     required this.occurredOn,
+    required this.occurredAtMinutes,
     this.note,
     required this.createdAtMillis,
     required this.updatedAtMillis,
@@ -1256,6 +1284,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     map['wallet_id'] = Variable<String>(walletId);
     map['category_id'] = Variable<String>(categoryId);
     map['occurred_on'] = Variable<String>(occurredOn);
+    map['occurred_at_minutes'] = Variable<int>(occurredAtMinutes);
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
@@ -1272,6 +1301,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       walletId: Value(walletId),
       categoryId: Value(categoryId),
       occurredOn: Value(occurredOn),
+      occurredAtMinutes: Value(occurredAtMinutes),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       createdAtMillis: Value(createdAtMillis),
       updatedAtMillis: Value(updatedAtMillis),
@@ -1290,6 +1320,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       walletId: serializer.fromJson<String>(json['walletId']),
       categoryId: serializer.fromJson<String>(json['categoryId']),
       occurredOn: serializer.fromJson<String>(json['occurredOn']),
+      occurredAtMinutes: serializer.fromJson<int>(json['occurredAtMinutes']),
       note: serializer.fromJson<String?>(json['note']),
       createdAtMillis: serializer.fromJson<int>(json['createdAtMillis']),
       updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
@@ -1305,6 +1336,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       'walletId': serializer.toJson<String>(walletId),
       'categoryId': serializer.toJson<String>(categoryId),
       'occurredOn': serializer.toJson<String>(occurredOn),
+      'occurredAtMinutes': serializer.toJson<int>(occurredAtMinutes),
       'note': serializer.toJson<String?>(note),
       'createdAtMillis': serializer.toJson<int>(createdAtMillis),
       'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
@@ -1318,6 +1350,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     String? walletId,
     String? categoryId,
     String? occurredOn,
+    int? occurredAtMinutes,
     Value<String?> note = const Value.absent(),
     int? createdAtMillis,
     int? updatedAtMillis,
@@ -1328,6 +1361,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     walletId: walletId ?? this.walletId,
     categoryId: categoryId ?? this.categoryId,
     occurredOn: occurredOn ?? this.occurredOn,
+    occurredAtMinutes: occurredAtMinutes ?? this.occurredAtMinutes,
     note: note.present ? note.value : this.note,
     createdAtMillis: createdAtMillis ?? this.createdAtMillis,
     updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -1346,6 +1380,9 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
       occurredOn: data.occurredOn.present
           ? data.occurredOn.value
           : this.occurredOn,
+      occurredAtMinutes: data.occurredAtMinutes.present
+          ? data.occurredAtMinutes.value
+          : this.occurredAtMinutes,
       note: data.note.present ? data.note.value : this.note,
       createdAtMillis: data.createdAtMillis.present
           ? data.createdAtMillis.value
@@ -1365,6 +1402,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
           ..write('walletId: $walletId, ')
           ..write('categoryId: $categoryId, ')
           ..write('occurredOn: $occurredOn, ')
+          ..write('occurredAtMinutes: $occurredAtMinutes, ')
           ..write('note: $note, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis')
@@ -1380,6 +1418,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
     walletId,
     categoryId,
     occurredOn,
+    occurredAtMinutes,
     note,
     createdAtMillis,
     updatedAtMillis,
@@ -1394,6 +1433,7 @@ class TransactionRow extends DataClass implements Insertable<TransactionRow> {
           other.walletId == this.walletId &&
           other.categoryId == this.categoryId &&
           other.occurredOn == this.occurredOn &&
+          other.occurredAtMinutes == this.occurredAtMinutes &&
           other.note == this.note &&
           other.createdAtMillis == this.createdAtMillis &&
           other.updatedAtMillis == this.updatedAtMillis);
@@ -1406,6 +1446,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
   final Value<String> walletId;
   final Value<String> categoryId;
   final Value<String> occurredOn;
+  final Value<int> occurredAtMinutes;
   final Value<String?> note;
   final Value<int> createdAtMillis;
   final Value<int> updatedAtMillis;
@@ -1417,6 +1458,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
     this.walletId = const Value.absent(),
     this.categoryId = const Value.absent(),
     this.occurredOn = const Value.absent(),
+    this.occurredAtMinutes = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAtMillis = const Value.absent(),
     this.updatedAtMillis = const Value.absent(),
@@ -1429,6 +1471,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
     required String walletId,
     required String categoryId,
     required String occurredOn,
+    this.occurredAtMinutes = const Value.absent(),
     this.note = const Value.absent(),
     required int createdAtMillis,
     required int updatedAtMillis,
@@ -1448,6 +1491,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
     Expression<String>? walletId,
     Expression<String>? categoryId,
     Expression<String>? occurredOn,
+    Expression<int>? occurredAtMinutes,
     Expression<String>? note,
     Expression<int>? createdAtMillis,
     Expression<int>? updatedAtMillis,
@@ -1460,6 +1504,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
       if (walletId != null) 'wallet_id': walletId,
       if (categoryId != null) 'category_id': categoryId,
       if (occurredOn != null) 'occurred_on': occurredOn,
+      if (occurredAtMinutes != null) 'occurred_at_minutes': occurredAtMinutes,
       if (note != null) 'note': note,
       if (createdAtMillis != null) 'created_at_millis': createdAtMillis,
       if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
@@ -1474,6 +1519,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
     Value<String>? walletId,
     Value<String>? categoryId,
     Value<String>? occurredOn,
+    Value<int>? occurredAtMinutes,
     Value<String?>? note,
     Value<int>? createdAtMillis,
     Value<int>? updatedAtMillis,
@@ -1486,6 +1532,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
       walletId: walletId ?? this.walletId,
       categoryId: categoryId ?? this.categoryId,
       occurredOn: occurredOn ?? this.occurredOn,
+      occurredAtMinutes: occurredAtMinutes ?? this.occurredAtMinutes,
       note: note ?? this.note,
       createdAtMillis: createdAtMillis ?? this.createdAtMillis,
       updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -1514,6 +1561,9 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
     if (occurredOn.present) {
       map['occurred_on'] = Variable<String>(occurredOn.value);
     }
+    if (occurredAtMinutes.present) {
+      map['occurred_at_minutes'] = Variable<int>(occurredAtMinutes.value);
+    }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
@@ -1538,6 +1588,7 @@ class TransactionsCompanion extends UpdateCompanion<TransactionRow> {
           ..write('walletId: $walletId, ')
           ..write('categoryId: $categoryId, ')
           ..write('occurredOn: $occurredOn, ')
+          ..write('occurredAtMinutes: $occurredAtMinutes, ')
           ..write('note: $note, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis, ')
@@ -1622,6 +1673,18 @@ class $TransfersTable extends Transfers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _occurredAtMinutesMeta = const VerificationMeta(
+    'occurredAtMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> occurredAtMinutes = GeneratedColumn<int>(
+    'occurred_at_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
   late final GeneratedColumn<String> note = GeneratedColumn<String>(
@@ -1661,6 +1724,7 @@ class $TransfersTable extends Transfers
     sourceAmountMinor,
     destinationAmountMinor,
     occurredOn,
+    occurredAtMinutes,
     note,
     createdAtMillis,
     updatedAtMillis,
@@ -1734,6 +1798,15 @@ class $TransfersTable extends Transfers
     } else if (isInserting) {
       context.missing(_occurredOnMeta);
     }
+    if (data.containsKey('occurred_at_minutes')) {
+      context.handle(
+        _occurredAtMinutesMeta,
+        occurredAtMinutes.isAcceptableOrUnknown(
+          data['occurred_at_minutes']!,
+          _occurredAtMinutesMeta,
+        ),
+      );
+    }
     if (data.containsKey('note')) {
       context.handle(
         _noteMeta,
@@ -1795,6 +1868,10 @@ class $TransfersTable extends Transfers
         DriftSqlType.string,
         data['${effectivePrefix}occurred_on'],
       )!,
+      occurredAtMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at_minutes'],
+      )!,
       note: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}note'],
@@ -1823,6 +1900,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
   final int sourceAmountMinor;
   final int destinationAmountMinor;
   final String occurredOn;
+  final int occurredAtMinutes;
   final String? note;
   final int createdAtMillis;
   final int updatedAtMillis;
@@ -1833,6 +1911,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
     required this.sourceAmountMinor,
     required this.destinationAmountMinor,
     required this.occurredOn,
+    required this.occurredAtMinutes,
     this.note,
     required this.createdAtMillis,
     required this.updatedAtMillis,
@@ -1846,6 +1925,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
     map['source_amount_minor'] = Variable<int>(sourceAmountMinor);
     map['destination_amount_minor'] = Variable<int>(destinationAmountMinor);
     map['occurred_on'] = Variable<String>(occurredOn);
+    map['occurred_at_minutes'] = Variable<int>(occurredAtMinutes);
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
@@ -1862,6 +1942,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
       sourceAmountMinor: Value(sourceAmountMinor),
       destinationAmountMinor: Value(destinationAmountMinor),
       occurredOn: Value(occurredOn),
+      occurredAtMinutes: Value(occurredAtMinutes),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       createdAtMillis: Value(createdAtMillis),
       updatedAtMillis: Value(updatedAtMillis),
@@ -1884,6 +1965,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
         json['destinationAmountMinor'],
       ),
       occurredOn: serializer.fromJson<String>(json['occurredOn']),
+      occurredAtMinutes: serializer.fromJson<int>(json['occurredAtMinutes']),
       note: serializer.fromJson<String?>(json['note']),
       createdAtMillis: serializer.fromJson<int>(json['createdAtMillis']),
       updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
@@ -1899,6 +1981,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
       'sourceAmountMinor': serializer.toJson<int>(sourceAmountMinor),
       'destinationAmountMinor': serializer.toJson<int>(destinationAmountMinor),
       'occurredOn': serializer.toJson<String>(occurredOn),
+      'occurredAtMinutes': serializer.toJson<int>(occurredAtMinutes),
       'note': serializer.toJson<String?>(note),
       'createdAtMillis': serializer.toJson<int>(createdAtMillis),
       'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
@@ -1912,6 +1995,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
     int? sourceAmountMinor,
     int? destinationAmountMinor,
     String? occurredOn,
+    int? occurredAtMinutes,
     Value<String?> note = const Value.absent(),
     int? createdAtMillis,
     int? updatedAtMillis,
@@ -1923,6 +2007,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
     destinationAmountMinor:
         destinationAmountMinor ?? this.destinationAmountMinor,
     occurredOn: occurredOn ?? this.occurredOn,
+    occurredAtMinutes: occurredAtMinutes ?? this.occurredAtMinutes,
     note: note.present ? note.value : this.note,
     createdAtMillis: createdAtMillis ?? this.createdAtMillis,
     updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -1945,6 +2030,9 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
       occurredOn: data.occurredOn.present
           ? data.occurredOn.value
           : this.occurredOn,
+      occurredAtMinutes: data.occurredAtMinutes.present
+          ? data.occurredAtMinutes.value
+          : this.occurredAtMinutes,
       note: data.note.present ? data.note.value : this.note,
       createdAtMillis: data.createdAtMillis.present
           ? data.createdAtMillis.value
@@ -1964,6 +2052,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
           ..write('sourceAmountMinor: $sourceAmountMinor, ')
           ..write('destinationAmountMinor: $destinationAmountMinor, ')
           ..write('occurredOn: $occurredOn, ')
+          ..write('occurredAtMinutes: $occurredAtMinutes, ')
           ..write('note: $note, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis')
@@ -1979,6 +2068,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
     sourceAmountMinor,
     destinationAmountMinor,
     occurredOn,
+    occurredAtMinutes,
     note,
     createdAtMillis,
     updatedAtMillis,
@@ -1993,6 +2083,7 @@ class TransferRow extends DataClass implements Insertable<TransferRow> {
           other.sourceAmountMinor == this.sourceAmountMinor &&
           other.destinationAmountMinor == this.destinationAmountMinor &&
           other.occurredOn == this.occurredOn &&
+          other.occurredAtMinutes == this.occurredAtMinutes &&
           other.note == this.note &&
           other.createdAtMillis == this.createdAtMillis &&
           other.updatedAtMillis == this.updatedAtMillis);
@@ -2005,6 +2096,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
   final Value<int> sourceAmountMinor;
   final Value<int> destinationAmountMinor;
   final Value<String> occurredOn;
+  final Value<int> occurredAtMinutes;
   final Value<String?> note;
   final Value<int> createdAtMillis;
   final Value<int> updatedAtMillis;
@@ -2016,6 +2108,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
     this.sourceAmountMinor = const Value.absent(),
     this.destinationAmountMinor = const Value.absent(),
     this.occurredOn = const Value.absent(),
+    this.occurredAtMinutes = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAtMillis = const Value.absent(),
     this.updatedAtMillis = const Value.absent(),
@@ -2028,6 +2121,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
     required int sourceAmountMinor,
     required int destinationAmountMinor,
     required String occurredOn,
+    this.occurredAtMinutes = const Value.absent(),
     this.note = const Value.absent(),
     required int createdAtMillis,
     required int updatedAtMillis,
@@ -2047,6 +2141,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
     Expression<int>? sourceAmountMinor,
     Expression<int>? destinationAmountMinor,
     Expression<String>? occurredOn,
+    Expression<int>? occurredAtMinutes,
     Expression<String>? note,
     Expression<int>? createdAtMillis,
     Expression<int>? updatedAtMillis,
@@ -2061,6 +2156,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
       if (destinationAmountMinor != null)
         'destination_amount_minor': destinationAmountMinor,
       if (occurredOn != null) 'occurred_on': occurredOn,
+      if (occurredAtMinutes != null) 'occurred_at_minutes': occurredAtMinutes,
       if (note != null) 'note': note,
       if (createdAtMillis != null) 'created_at_millis': createdAtMillis,
       if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
@@ -2075,6 +2171,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
     Value<int>? sourceAmountMinor,
     Value<int>? destinationAmountMinor,
     Value<String>? occurredOn,
+    Value<int>? occurredAtMinutes,
     Value<String?>? note,
     Value<int>? createdAtMillis,
     Value<int>? updatedAtMillis,
@@ -2088,6 +2185,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
       destinationAmountMinor:
           destinationAmountMinor ?? this.destinationAmountMinor,
       occurredOn: occurredOn ?? this.occurredOn,
+      occurredAtMinutes: occurredAtMinutes ?? this.occurredAtMinutes,
       note: note ?? this.note,
       createdAtMillis: createdAtMillis ?? this.createdAtMillis,
       updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -2120,6 +2218,9 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
     if (occurredOn.present) {
       map['occurred_on'] = Variable<String>(occurredOn.value);
     }
+    if (occurredAtMinutes.present) {
+      map['occurred_at_minutes'] = Variable<int>(occurredAtMinutes.value);
+    }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
@@ -2144,6 +2245,7 @@ class TransfersCompanion extends UpdateCompanion<TransferRow> {
           ..write('sourceAmountMinor: $sourceAmountMinor, ')
           ..write('destinationAmountMinor: $destinationAmountMinor, ')
           ..write('occurredOn: $occurredOn, ')
+          ..write('occurredAtMinutes: $occurredAtMinutes, ')
           ..write('note: $note, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis, ')
@@ -3088,6 +3190,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       required String walletId,
       required String categoryId,
       required String occurredOn,
+      Value<int> occurredAtMinutes,
       Value<String?> note,
       required int createdAtMillis,
       required int updatedAtMillis,
@@ -3101,6 +3204,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<String> walletId,
       Value<String> categoryId,
       Value<String> occurredOn,
+      Value<int> occurredAtMinutes,
       Value<String?> note,
       Value<int> createdAtMillis,
       Value<int> updatedAtMillis,
@@ -3172,6 +3276,11 @@ class $$TransactionsTableFilterComposer
 
   ColumnFilters<String> get occurredOn => $composableBuilder(
     column: $table.occurredOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3266,6 +3375,11 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get note => $composableBuilder(
     column: $table.note,
     builder: (column) => ColumnOrderings(column),
@@ -3350,6 +3464,11 @@ class $$TransactionsTableAnnotationComposer
 
   GeneratedColumn<String> get occurredOn => $composableBuilder(
     column: $table.occurredOn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
     builder: (column) => column,
   );
 
@@ -3447,6 +3566,7 @@ class $$TransactionsTableTableManager
                 Value<String> walletId = const Value.absent(),
                 Value<String> categoryId = const Value.absent(),
                 Value<String> occurredOn = const Value.absent(),
+                Value<int> occurredAtMinutes = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<int> createdAtMillis = const Value.absent(),
                 Value<int> updatedAtMillis = const Value.absent(),
@@ -3458,6 +3578,7 @@ class $$TransactionsTableTableManager
                 walletId: walletId,
                 categoryId: categoryId,
                 occurredOn: occurredOn,
+                occurredAtMinutes: occurredAtMinutes,
                 note: note,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,
@@ -3471,6 +3592,7 @@ class $$TransactionsTableTableManager
                 required String walletId,
                 required String categoryId,
                 required String occurredOn,
+                Value<int> occurredAtMinutes = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 required int createdAtMillis,
                 required int updatedAtMillis,
@@ -3482,6 +3604,7 @@ class $$TransactionsTableTableManager
                 walletId: walletId,
                 categoryId: categoryId,
                 occurredOn: occurredOn,
+                occurredAtMinutes: occurredAtMinutes,
                 note: note,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,
@@ -3570,6 +3693,7 @@ typedef $$TransfersTableCreateCompanionBuilder = TransfersCompanion Function({
   required int sourceAmountMinor,
   required int destinationAmountMinor,
   required String occurredOn,
+  Value<int> occurredAtMinutes,
   Value<String?> note,
   required int createdAtMillis,
   required int updatedAtMillis,
@@ -3582,6 +3706,7 @@ typedef $$TransfersTableUpdateCompanionBuilder = TransfersCompanion Function({
   Value<int> sourceAmountMinor,
   Value<int> destinationAmountMinor,
   Value<String> occurredOn,
+  Value<int> occurredAtMinutes,
   Value<String?> note,
   Value<int> createdAtMillis,
   Value<int> updatedAtMillis,
@@ -3653,6 +3778,11 @@ class $$TransfersTableFilterComposer
 
   ColumnFilters<String> get occurredOn => $composableBuilder(
     column: $table.occurredOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3747,6 +3877,11 @@ class $$TransfersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get note => $composableBuilder(
     column: $table.note,
     builder: (column) => ColumnOrderings(column),
@@ -3833,6 +3968,11 @@ class $$TransfersTableAnnotationComposer
 
   GeneratedColumn<String> get occurredOn => $composableBuilder(
     column: $table.occurredOn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get occurredAtMinutes => $composableBuilder(
+    column: $table.occurredAtMinutes,
     builder: (column) => column,
   );
 
@@ -3933,6 +4073,7 @@ class $$TransfersTableTableManager
                 Value<int> sourceAmountMinor = const Value.absent(),
                 Value<int> destinationAmountMinor = const Value.absent(),
                 Value<String> occurredOn = const Value.absent(),
+                Value<int> occurredAtMinutes = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<int> createdAtMillis = const Value.absent(),
                 Value<int> updatedAtMillis = const Value.absent(),
@@ -3944,6 +4085,7 @@ class $$TransfersTableTableManager
                 sourceAmountMinor: sourceAmountMinor,
                 destinationAmountMinor: destinationAmountMinor,
                 occurredOn: occurredOn,
+                occurredAtMinutes: occurredAtMinutes,
                 note: note,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,
@@ -3957,6 +4099,7 @@ class $$TransfersTableTableManager
                 required int sourceAmountMinor,
                 required int destinationAmountMinor,
                 required String occurredOn,
+                Value<int> occurredAtMinutes = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 required int createdAtMillis,
                 required int updatedAtMillis,
@@ -3968,6 +4111,7 @@ class $$TransfersTableTableManager
                 sourceAmountMinor: sourceAmountMinor,
                 destinationAmountMinor: destinationAmountMinor,
                 occurredOn: occurredOn,
+                occurredAtMinutes: occurredAtMinutes,
                 note: note,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,

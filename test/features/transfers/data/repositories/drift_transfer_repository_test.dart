@@ -1,6 +1,7 @@
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
@@ -58,6 +59,7 @@ void main() {
       expect(restored.sourceAmount, transfer.sourceAmount);
       expect(restored.destinationAmount, transfer.destinationAmount);
       expect(restored.occurredOn, transfer.occurredOn);
+      expect(restored.occurredAt, transfer.occurredAt);
       expect(restored.note, 'Currency exchange');
       expect(restored.isCurrencyExchange, isTrue);
     });
@@ -147,6 +149,7 @@ Transfer buildTransfer({
       currency: Currency.usd,
     ),
     occurredOn: LocalDate(year: 2026, month: 8, day: 23),
+    occurredAt: LocalTime(hour: 18, minute: 20),
     note: note,
   );
 }

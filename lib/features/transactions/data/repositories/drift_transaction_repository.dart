@@ -106,6 +106,9 @@ final class DriftTransactionRepository implements TransactionRepository {
                 walletId: transaction.walletId.value,
                 categoryId: transaction.categoryId.value,
                 occurredOn: transaction.occurredOn.toString(),
+                occurredAtMinutes: Value(
+                  transaction.occurredAt.minutesSinceMidnight,
+                ),
                 note: Value(transaction.note),
                 createdAtMillis: now,
                 updatedAtMillis: now,
@@ -128,6 +131,7 @@ final class DriftTransactionRepository implements TransactionRepository {
           walletId: Value(transaction.walletId.value),
           categoryId: Value(transaction.categoryId.value),
           occurredOn: Value(transaction.occurredOn.toString()),
+          occurredAtMinutes: Value(transaction.occurredAt.minutesSinceMidnight),
           note: Value(transaction.note),
           updatedAtMillis: Value(updatedAtMillis),
         ),

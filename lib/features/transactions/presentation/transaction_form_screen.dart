@@ -1,6 +1,7 @@
 import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/parse_money.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
@@ -32,6 +33,7 @@ final class _TransactionFormScreenState
   WalletId? _selectedWalletId;
   CategoryId? _selectedCategoryId;
   late LocalDate _occurredOn;
+  late LocalTime _occurredAt;
   bool _isSaving = false;
   String? _saveError;
 
@@ -52,6 +54,9 @@ final class _TransactionFormScreenState
     _occurredOn =
         transaction?.occurredOn ??
         LocalDate(year: today.year, month: today.month, day: today.day);
+    _occurredAt =
+        transaction?.occurredAt ??
+        LocalTime(hour: today.hour, minute: today.minute);
   }
 
   @override
@@ -84,6 +89,22 @@ final class _TransactionFormScreenState
     }
   }
 
+  Future<void> _selectTime() async {
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: _occurredAt.hour,
+        minute: _occurredAt.minute,
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        _occurredAt = LocalTime(hour: selected.hour, minute: selected.minute);
+      });
+    }
+  }
+
   Future<void> _save(List<Wallet> wallets, List<Category> categories) async {
     FocusScope.of(context).unfocus();
 
@@ -112,6 +133,7 @@ final class _TransactionFormScreenState
               walletId: wallet.id,
               categoryId: category.id,
               occurredOn: _occurredOn,
+              occurredAt: _occurredAt,
               note: _noteController.text,
             );
       } else {
@@ -124,6 +146,7 @@ final class _TransactionFormScreenState
               walletId: wallet.id,
               categoryId: category.id,
               occurredOn: _occurredOn,
+              occurredAt: _occurredAt,
               note: _noteController.text,
             );
       }
@@ -358,6 +381,7 @@ final class _TransactionFormScreenState
           ),
           const SizedBox(height: 24),
           TextFormField(
+            key: const ValueKey('transaction-amount'),
             controller: _amountController,
             autofocus: true,
             enabled: !_isSaving,
@@ -455,8 +479,24 @@ final class _TransactionFormScreenState
             trailing: const Icon(Icons.chevron_right),
             onTap: _isSaving ? null : _selectDate,
           ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+            leading: const Icon(Icons.schedule_outlined),
+            title: Text(context.l10n.timeLabel),
+            subtitle: Text(
+              MaterialLocalizations.of(context).formatTimeOfDay(
+                TimeOfDay(hour: _occurredAt.hour, minute: _occurredAt.minute),
+                alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(
+                  context,
+                ),
+              ),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _isSaving ? null : _selectTime,
+          ),
           const SizedBox(height: 20),
           TextFormField(
+            key: const ValueKey('transaction-note'),
             controller: _noteController,
             enabled: !_isSaving,
             textCapitalization: TextCapitalization.sentences,

@@ -1,5 +1,6 @@
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/movements/presentation/movement_filters.dart';
@@ -84,12 +85,52 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('sorts by date and time in either direction', () {
+    final oldest = TransactionMovementItem(
+      buildTransaction(
+        id: 'oldest',
+        occurredOn: LocalDate(year: 2026, month: 8, day: 14),
+        occurredAt: LocalTime(hour: 23, minute: 30),
+      ),
+    );
+    final morning = TransactionMovementItem(
+      buildTransaction(
+        id: 'morning',
+        occurredOn: LocalDate(year: 2026, month: 8, day: 15),
+        occurredAt: LocalTime(hour: 8, minute: 15),
+      ),
+    );
+    final evening = TransactionMovementItem(
+      buildTransaction(
+        id: 'evening',
+        occurredOn: LocalDate(year: 2026, month: 8, day: 15),
+        occurredAt: LocalTime(hour: 19, minute: 45),
+      ),
+    );
+
+    expect(MovementFilters().apply([morning, oldest, evening]), [
+      evening,
+      morning,
+      oldest,
+    ]);
+    expect(
+      MovementFilters(sortOrder: MovementSortOrder.oldestFirst)
+          .apply([morning, oldest, evening]),
+      [oldest, morning, evening],
+    );
+    expect(
+      MovementFilters(sortOrder: MovementSortOrder.oldestFirst).activeCount,
+      1,
+    );
+  });
 }
 
 Transaction buildTransaction({
   required String id,
   required LocalDate occurredOn,
   TransactionType type = TransactionType.expense,
+  LocalTime occurredAt = LocalTime.midnight,
 }) {
   return Transaction(
     id: TransactionId(id),
@@ -98,6 +139,7 @@ Transaction buildTransaction({
     walletId: WalletId('wallet-1'),
     categoryId: CategoryId('category-1'),
     occurredOn: occurredOn,
+    occurredAt: occurredAt,
   );
 }
 

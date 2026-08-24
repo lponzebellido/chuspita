@@ -10,6 +10,7 @@ import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
+import 'generated/schema_v4.dart' as v4;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -273,6 +274,91 @@ void main() {
           expectedNewTransactionsData,
           await newDb.select(newDb.transactions).get(),
         );
+      },
+    );
+  });
+
+  test('migration from v3 to v4 keeps movements and uses midnight', () async {
+    final oldWalletsData = <v3.WalletsData>[
+      const v3.WalletsData(
+        id: 'wallet-eur',
+        name: 'Euros',
+        currencyCode: 'EUR',
+        initialBalanceMinor: 10000,
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+      const v3.WalletsData(
+        id: 'wallet-usd',
+        name: 'Dollars',
+        currencyCode: 'USD',
+        initialBalanceMinor: 5000,
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final oldCategoriesData = <v3.CategoriesData>[
+      const v3.CategoriesData(
+        id: 'category-food',
+        name: 'Food',
+        colorArgb: 0xFFFF9800,
+        applicability: 'both',
+        isArchived: 0,
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final oldTransactionsData = <v3.TransactionsData>[
+      const v3.TransactionsData(
+        id: 'transaction-1',
+        type: 'expense',
+        amountMinor: 1000,
+        walletId: 'wallet-eur',
+        categoryId: 'category-food',
+        occurredOn: '2026-08-23',
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+    final oldTransfersData = <v3.TransfersData>[
+      const v3.TransfersData(
+        id: 'transfer-1',
+        sourceWalletId: 'wallet-eur',
+        destinationWalletId: 'wallet-usd',
+        sourceAmountMinor: 2000,
+        destinationAmountMinor: 2200,
+        occurredOn: '2026-08-23',
+        createdAtMillis: 1000,
+        updatedAtMillis: 1000,
+      ),
+    ];
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 3,
+      newVersion: 4,
+      createOld: v3.DatabaseAtV3.new,
+      createNew: v4.DatabaseAtV4.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.wallets, oldWalletsData);
+        batch.insertAll(oldDb.categories, oldCategoriesData);
+        batch.insertAll(oldDb.transactions, oldTransactionsData);
+        batch.insertAll(oldDb.transfers, oldTransfersData);
+      },
+      validateItems: (newDb) async {
+        final transactions = await newDb.select(newDb.transactions).get();
+        final transfers = await newDb.select(newDb.transfers).get();
+
+        expect(transactions, hasLength(1));
+        expect(transactions.single.id, 'transaction-1');
+        expect(transactions.single.occurredOn, '2026-08-23');
+        expect(transactions.single.occurredAtMinutes, 0);
+        expect(transfers, hasLength(1));
+        expect(transfers.single.id, 'transfer-1');
+        expect(transfers.single.occurredOn, '2026-08-23');
+        expect(transfers.single.occurredAtMinutes, 0);
       },
     );
   });

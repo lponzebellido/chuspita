@@ -69,14 +69,23 @@ void main() {
           minorUnits: 12530,
           currency: Currency.eur,
         ),
+        WalletId('wallet-eur-savings'): const Money(
+          minorUnits: 5000,
+          currency: Currency.eur,
+        ),
         WalletId('wallet-pen'): const Money(
           minorUnits: 4020,
           currency: Currency.pen,
         ),
       },
       byCurrency: {
-        Currency.eur: const Money(minorUnits: 12530, currency: Currency.eur),
+        Currency.eur: const Money(minorUnits: 17530, currency: Currency.eur),
         Currency.pen: const Money(minorUnits: 4020, currency: Currency.pen),
+      },
+      walletNames: {
+        WalletId('wallet-eur'): 'Tarjeta personal',
+        WalletId('wallet-eur-savings'): 'Cuenta bloqueada',
+        WalletId('wallet-pen'): 'Efectivo',
       },
     );
 
@@ -84,9 +93,13 @@ void main() {
 
     expect(find.text('Balance por moneda'), findsOneWidget);
     expect(find.text('EUR'), findsOneWidget);
+    expect(find.text('175,30'), findsOneWidget);
+    expect(find.text('Tarjeta personal'), findsOneWidget);
     expect(find.text('125,30'), findsOneWidget);
+    expect(find.text('Cuenta bloqueada'), findsOneWidget);
+    expect(find.text('50,00'), findsOneWidget);
     expect(find.text('PEN'), findsOneWidget);
-    expect(find.text('40,20'), findsOneWidget);
+    expect(find.text('40,20'), findsNWidgets(2));
   });
 
   testWidgets('shows the current month income, expenses and net by currency', (

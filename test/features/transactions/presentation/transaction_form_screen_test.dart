@@ -52,8 +52,16 @@ void main() {
     expect(find.text('Gasto'), findsOneWidget);
     expect(find.text('Ingreso'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextFormField).first, '12,50');
-    await tester.enterText(find.byType(TextFormField).last, 'Almuerzo');
+    await tester.enterText(
+      find.byKey(const ValueKey('transaction-amount')),
+      '12,50',
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('transaction-note')),
+      'Almuerzo',
+    );
     await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
     await tester.pumpAndSettle();
 

@@ -1,6 +1,7 @@
 import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/movements/presentation/movement_filter_sheet.dart';
@@ -118,14 +119,7 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
       transactions: transactions.requireValue,
       transfers: transfers.requireValue,
     );
-    final movementValues = _filters.apply(allMovements)
-      ..sort((first, second) {
-        final dateComparison = second.occurredOn.compareTo(first.occurredOn);
-
-        return dateComparison != 0
-            ? dateComparison
-            : second.id.compareTo(first.id);
-      });
+    final movementValues = _filters.apply(allMovements);
     final walletsById = <WalletId, Wallet>{
       for (final wallet in wallets.requireValue) wallet.id: wallet,
     };
@@ -308,7 +302,11 @@ final class _TransactionTile extends StatelessWidget {
       transaction.amount,
       localeName: Localizations.localeOf(context).toString(),
     );
-    final formattedDate = _formatDate(context, transaction.occurredOn);
+    final formattedDate = _formatDateTime(
+      context,
+      transaction.occurredOn,
+      transaction.occurredAt,
+    );
     final details = [
       if (transaction.note != null) transaction.note!,
       walletName,
@@ -369,7 +367,7 @@ final class _TransferTile extends StatelessWidget {
     final details = [
       if (transfer.note != null) transfer.note!,
       '$sourceWalletName → $destinationWalletName',
-      _formatDate(context, transfer.occurredOn),
+      _formatDateTime(context, transfer.occurredOn, transfer.occurredAt),
     ].join(' · ');
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -453,7 +451,13 @@ final class _TransferDetails extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_today_outlined),
               title: Text(context.l10n.dateLabel),
-              subtitle: Text(_formatDate(context, transfer.occurredOn)),
+              subtitle: Text(
+                _formatDateTime(
+                  context,
+                  transfer.occurredOn,
+                  transfer.occurredAt,
+                ),
+              ),
             ),
             if (transfer.note != null)
               ListTile(
@@ -577,4 +581,15 @@ final class _LoadError extends StatelessWidget {
 String _formatDate(BuildContext context, LocalDate date) {
   return MaterialLocalizations.of(context)
       .formatMediumDate(DateTime(date.year, date.month, date.day));
+}
+
+String _formatDateTime(BuildContext context, LocalDate date, LocalTime time) {
+  final localizations = MaterialLocalizations.of(context);
+  final formattedDate = _formatDate(context, date);
+  final formattedTime = localizations.formatTimeOfDay(
+    TimeOfDay(hour: time.hour, minute: time.minute),
+    alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+  );
+
+  return '$formattedDate · $formattedTime';
 }

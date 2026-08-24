@@ -1,6 +1,7 @@
 import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/core/money/parse_money.dart';
 import 'package:chuspita/features/transfers/application/find_latest_exchange_rate.dart';
@@ -29,6 +30,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   WalletId? _sourceWalletId;
   WalletId? _destinationWalletId;
   late LocalDate _occurredOn;
+  late LocalTime _occurredAt;
   bool _useExchangeRate = true;
   bool _hasSuggestedRate = false;
   bool _isSynchronizingRate = false;
@@ -45,6 +47,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
       month: today.month,
       day: today.day,
     );
+    _occurredAt = LocalTime(hour: today.hour, minute: today.minute);
     _sourceAmountController.addListener(_refreshConversionPreview);
     _exchangeRateController.addListener(_refreshConversionPreview);
   }
@@ -101,6 +104,22 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
     }
   }
 
+  Future<void> _selectTime() async {
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(
+        hour: _occurredAt.hour,
+        minute: _occurredAt.minute,
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        _occurredAt = LocalTime(hour: selected.hour, minute: selected.minute);
+      });
+    }
+  }
+
   Future<void> _save(List<Wallet> wallets) async {
     FocusScope.of(context).unfocus();
 
@@ -143,6 +162,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
             sourceAmount: sourceAmount,
             destinationAmount: destinationAmount,
             occurredOn: _occurredOn,
+            occurredAt: _occurredAt,
             note: _noteController.text,
           );
 
@@ -420,6 +440,21 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: _isSaving ? null : _selectDate,
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+            leading: const Icon(Icons.schedule_outlined),
+            title: Text(context.l10n.timeLabel),
+            subtitle: Text(
+              MaterialLocalizations.of(context).formatTimeOfDay(
+                TimeOfDay(hour: _occurredAt.hour, minute: _occurredAt.minute),
+                alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(
+                  context,
+                ),
+              ),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: _isSaving ? null : _selectTime,
           ),
           const SizedBox(height: 20),
           TextFormField(

@@ -3,6 +3,8 @@ import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/movements/presentation/movement_item.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 
+enum MovementSortOrder { newestFirst, oldestFirst }
+
 final class MovementFilters {
   MovementFilters({
     this.type,
@@ -10,6 +12,7 @@ final class MovementFilters {
     this.categoryId,
     this.startDate,
     this.endDate,
+    this.sortOrder = MovementSortOrder.newestFirst,
   }) {
     if ((startDate == null) != (endDate == null)) {
       throw ArgumentError('A date filter requires both start and end dates');
@@ -29,6 +32,7 @@ final class MovementFilters {
   final CategoryId? categoryId;
   final LocalDate? startDate;
   final LocalDate? endDate;
+  final MovementSortOrder sortOrder;
 
   bool get isEmpty => activeCount == 0;
 
@@ -39,6 +43,7 @@ final class MovementFilters {
     if (walletId != null) count++;
     if (categoryId != null) count++;
     if (startDate != null) count++;
+    if (sortOrder != MovementSortOrder.newestFirst) count++;
 
     return count;
   }
@@ -62,7 +67,24 @@ final class MovementFilters {
   }
 
   List<MovementItem> apply(Iterable<MovementItem> movements) {
-    return movements.where(matches).toList(growable: false);
+    final result = movements.where(matches).toList();
+    result.sort(_compare);
+    return result;
+  }
+
+  int _compare(MovementItem first, MovementItem second) {
+    final dateComparison = first.occurredOn.compareTo(second.occurredOn);
+    final timeComparison = first.occurredAt.compareTo(second.occurredAt);
+    final idComparison = first.id.compareTo(second.id);
+    final ascendingComparison = dateComparison != 0
+        ? dateComparison
+        : timeComparison != 0
+        ? timeComparison
+        : idComparison;
+
+    return sortOrder == MovementSortOrder.oldestFirst
+        ? ascendingComparison
+        : -ascendingComparison;
   }
 
   bool _matchesWallet(MovementItem movement) {

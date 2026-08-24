@@ -1,4 +1,5 @@
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 
@@ -8,6 +9,8 @@ sealed class MovementItem {
   const MovementItem();
 
   LocalDate get occurredOn;
+
+  LocalTime get occurredAt;
 
   MovementType get type;
 
@@ -26,6 +29,9 @@ final class TransactionMovementItem extends MovementItem {
   LocalDate get occurredOn => transaction.occurredOn;
 
   @override
+  LocalTime get occurredAt => transaction.occurredAt;
+
+  @override
   MovementType get type => switch (transaction.type) {
     TransactionType.expense => MovementType.expense,
     TransactionType.income => MovementType.income,
@@ -42,6 +48,9 @@ final class TransferMovementItem extends MovementItem {
 
   @override
   LocalDate get occurredOn => transfer.occurredOn;
+
+  @override
+  LocalTime get occurredAt => transfer.occurredAt;
 
   @override
   MovementType get type => MovementType.transfer;

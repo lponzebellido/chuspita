@@ -40,6 +40,10 @@ final class LoadBalanceSummary {
       );
     }
 
-    return BalanceSummary(byWallet: byWallet, byCurrency: byCurrency);
+    return BalanceSummary(
+      byWallet: byWallet,
+      byCurrency: byCurrency,
+      walletNames: {for (final wallet in wallets) wallet.id: wallet.name},
+    );
   }
 }

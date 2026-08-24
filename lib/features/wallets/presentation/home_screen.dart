@@ -184,7 +184,30 @@ final class _BalanceContent extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           for (final balance in balances) ...[
-            _CurrencyBalanceCard(balance: balance.value),
+            _CurrencyBalanceCard(
+              balance: balance.value,
+              walletBalances:
+                  summary.byWallet.entries
+                      .where(
+                        (walletBalance) =>
+                            walletBalance.value.currency == balance.key &&
+                            summary.walletNames.containsKey(walletBalance.key),
+                      )
+                      .map(
+                        (walletBalance) => (
+                          name:
+                              summary.walletNames[walletBalance.key] ??
+                              context.l10n.unknownWallet,
+                          balance: walletBalance.value,
+                        ),
+                      )
+                      .toList()
+                    ..sort(
+                      (first, second) => first.name.toLowerCase().compareTo(
+                        second.name.toLowerCase(),
+                      ),
+                    ),
+            ),
             const SizedBox(height: 12),
           ],
           const SizedBox(height: 8),
@@ -213,9 +236,13 @@ final class _BalanceContent extends StatelessWidget {
 }
 
 final class _CurrencyBalanceCard extends StatelessWidget {
-  const _CurrencyBalanceCard({required this.balance});
+  const _CurrencyBalanceCard({
+    required this.balance,
+    required this.walletBalances,
+  });
 
   final Money balance;
+  final List<({String name, Money balance})> walletBalances;
 
   @override
   Widget build(BuildContext context) {
@@ -224,33 +251,60 @@ final class _CurrencyBalanceCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.payments_outlined,
-                color: colorScheme.onPrimaryContainer,
-              ),
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.payments_outlined,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  balance.currency.code,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const Spacer(),
+                Text(
+                  formatMoneyAmount(
+                    balance,
+                    localeName: Localizations.localeOf(context).toString(),
+                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            Text(
-              balance.currency.code,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const Spacer(),
-            Text(
-              formatMoneyAmount(
-                balance,
-                localeName: Localizations.localeOf(context).toString(),
+            const Divider(height: 32),
+            for (final walletBalance in walletBalances)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        walletBalance.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      formatMoneyAmount(
+                        walletBalance.balance,
+                        localeName: Localizations.localeOf(context).toString(),
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
               ),
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
           ],
         ),
       ),

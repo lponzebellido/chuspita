@@ -1,4 +1,5 @@
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_id.dart';
@@ -20,6 +21,7 @@ final class CreateTransfer {
     required Money sourceAmount,
     required Money destinationAmount,
     required LocalDate occurredOn,
+    LocalTime occurredAt = LocalTime.midnight,
     String? note,
   }) async {
     final transfer = Transfer(
@@ -29,6 +31,7 @@ final class CreateTransfer {
       sourceAmount: sourceAmount,
       destinationAmount: destinationAmount,
       occurredOn: occurredOn,
+      occurredAt: occurredAt,
       note: note,
     );
 

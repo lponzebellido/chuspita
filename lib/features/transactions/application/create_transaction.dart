@@ -1,4 +1,5 @@
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
@@ -21,6 +22,7 @@ final class CreateTransaction {
     required WalletId walletId,
     required CategoryId categoryId,
     required LocalDate occurredOn,
+    LocalTime occurredAt = LocalTime.midnight,
     String? note,
   }) async {
     final transaction = Transaction(
@@ -30,6 +32,7 @@ final class CreateTransaction {
       walletId: walletId,
       categoryId: categoryId,
       occurredOn: occurredOn,
+      occurredAt: occurredAt,
       note: note,
     );
 

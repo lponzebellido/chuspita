@@ -22,8 +22,16 @@ ExchangeRate? findLatestExchangeRate({
       continue;
     }
 
+    final dateComparison = latestTransfer == null
+        ? 1
+        : transfer.occurredOn.compareTo(latestTransfer.occurredOn);
+    final timeComparison = latestTransfer == null
+        ? 1
+        : transfer.occurredAt.compareTo(latestTransfer.occurredAt);
+
     if (latestTransfer == null ||
-        transfer.occurredOn.compareTo(latestTransfer.occurredOn) >= 0) {
+        dateComparison > 0 ||
+        (dateComparison == 0 && timeComparison >= 0)) {
       latestTransfer = transfer;
       latestIsReversed = isReversed;
     }

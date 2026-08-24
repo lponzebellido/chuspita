@@ -1,4 +1,5 @@
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/core/date/local_time.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction_id.dart';
@@ -14,6 +15,7 @@ final class Transaction {
     required WalletId walletId,
     required CategoryId categoryId,
     required LocalDate occurredOn,
+    LocalTime occurredAt = LocalTime.midnight,
     String? note,
   }) {
     if (amount.minorUnits <= 0) {
@@ -33,6 +35,7 @@ final class Transaction {
       walletId: walletId,
       categoryId: categoryId,
       occurredOn: occurredOn,
+      occurredAt: occurredAt,
       note: normalizedNote == null || normalizedNote.isEmpty
           ? null
           : normalizedNote,
@@ -46,6 +49,7 @@ final class Transaction {
     required this.walletId,
     required this.categoryId,
     required this.occurredOn,
+    required this.occurredAt,
     required this.note,
   });
 
@@ -55,6 +59,7 @@ final class Transaction {
   final WalletId walletId;
   final CategoryId categoryId;
   final LocalDate occurredOn;
+  final LocalTime occurredAt;
   final String? note;
 
   Transaction updateDetails({
@@ -63,6 +68,7 @@ final class Transaction {
     required WalletId walletId,
     required CategoryId categoryId,
     required LocalDate occurredOn,
+    LocalTime? occurredAt,
     String? note,
   }) {
     return Transaction(
@@ -72,6 +78,7 @@ final class Transaction {
       walletId: walletId,
       categoryId: categoryId,
       occurredOn: occurredOn,
+      occurredAt: occurredAt ?? this.occurredAt,
       note: note,
     );
   }

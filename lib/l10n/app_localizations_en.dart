@@ -148,6 +148,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentMonth => 'This month';
 
   @override
+  String get currentDay => 'Today';
+
+  @override
+  String get currentWeek => 'This week';
+
+  @override
+  String get currentYear => 'This year';
+
+  @override
+  String get statisticsTitle => 'Statistics';
+
+  @override
+  String get viewStatistics => 'View statistics';
+
+  @override
+  String get loadStatisticsError => 'We couldn\'t load the statistics.';
+
+  @override
   String get monthlyIncome => 'Income';
 
   @override

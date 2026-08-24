@@ -152,13 +152,13 @@ void main() {
     expect(find.text('Este mes'), findsOneWidget);
     expect(find.text('Ingresos'), findsOneWidget);
     expect(find.text('100,00 EUR'), findsOneWidget);
-    expect(find.text('Gastos'), findsNWidgets(2));
-    expect(find.text('41,20 EUR'), findsNWidgets(2));
+    expect(find.text('Gastos'), findsOneWidget);
+    expect(find.text('41,20 EUR'), findsOneWidget);
     expect(find.text('Balance'), findsOneWidget);
     expect(find.text('58,80 EUR'), findsOneWidget);
   });
 
-  testWidgets('shows current month expenses by category', (tester) async {
+  testWidgets('opens current month statistics from home', (tester) async {
     final summary = BalanceSummary(
       byWallet: {
         WalletId('wallet-eur'): const Money(
@@ -192,6 +192,13 @@ void main() {
         occurredOn: LocalDate(year: 2026, month: 8, day: 1),
         categoryId: 'salary',
       ),
+      buildTransaction(
+        id: 'previous-month-food',
+        type: TransactionType.expense,
+        amountMinor: 5000,
+        occurredOn: LocalDate(year: 2026, month: 7, day: 20),
+        categoryId: 'food',
+      ),
     ];
 
     await pumpApp(
@@ -205,9 +212,24 @@ void main() {
       ],
       currentDate: LocalDate(year: 2026, month: 8, day: 24),
     );
-    await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+    await tester.scrollUntilVisible(
+      find.widgetWithText(OutlinedButton, 'Ver estadísticas'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
 
+    expect(find.text('Este mes'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('category-spending-chart-EUR')),
+      findsNothing,
+    );
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Ver estadísticas'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Estadísticas'), findsOneWidget);
+    expect(find.text('Este mes'), findsOneWidget);
     expect(find.text('Gastos por categoría'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('category-spending-chart-EUR')),
@@ -218,6 +240,12 @@ void main() {
     expect(find.text('Transporte'), findsOneWidget);
     expect(find.text('25% · 10,00 EUR'), findsOneWidget);
     expect(find.text('Sueldo'), findsNothing);
+
+    await tester.tap(find.text('Este año'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('89% · 80,00 EUR'), findsOneWidget);
+    expect(find.text('11% · 10,00 EUR'), findsOneWidget);
   });
 
   testWidgets('shows an error state', (tester) async {

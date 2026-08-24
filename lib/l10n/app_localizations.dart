@@ -368,6 +368,42 @@ abstract class AppLocalizations {
   /// **'This month'**
   String get currentMonth;
 
+  /// No description provided for @currentDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get currentDay;
+
+  /// No description provided for @currentWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get currentWeek;
+
+  /// No description provided for @currentYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get currentYear;
+
+  /// No description provided for @statisticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statisticsTitle;
+
+  /// No description provided for @viewStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'View statistics'**
+  String get viewStatistics;
+
+  /// No description provided for @loadStatisticsError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the statistics.'**
+  String get loadStatisticsError;
+
   /// No description provided for @monthlyIncome.
   ///
   /// In en, this message translates to:

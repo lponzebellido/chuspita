@@ -4,8 +4,8 @@ import 'package:chuspita/app/settings/settings_screen.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
-import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
 import 'package:chuspita/features/analytics/presentation/monthly_summary_section.dart';
+import 'package:chuspita/features/analytics/presentation/statistics_screen.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/movements/presentation/movement_list_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
@@ -76,6 +76,12 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openStatistics() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (context) => const StatisticsScreen()),
+      );
+    }
+
     Future<void> refreshHome() {
       return Future.wait<void>([
         ref.refresh(balanceSummaryProvider.future).then((_) {}),
@@ -115,6 +121,7 @@ final class HomeScreen extends ConsumerWidget {
             onAddWallet: openWalletForm,
             onViewTransactions: openTransactionList,
             onTransfer: openTransferForm,
+            onViewStatistics: openStatistics,
             onRefresh: refreshHome,
             onRetryMonthlySummary: () => ref.invalidate(transactionsProvider),
           ),
@@ -140,6 +147,7 @@ final class _BalanceContent extends StatelessWidget {
     required this.onAddWallet,
     required this.onViewTransactions,
     required this.onTransfer,
+    required this.onViewStatistics,
     required this.onRefresh,
     required this.onRetryMonthlySummary,
   });
@@ -149,6 +157,7 @@ final class _BalanceContent extends StatelessWidget {
   final VoidCallback onAddWallet;
   final VoidCallback onViewTransactions;
   final VoidCallback onTransfer;
+  final VoidCallback onViewStatistics;
   final RefreshCallback onRefresh;
   final VoidCallback onRetryMonthlySummary;
 
@@ -227,8 +236,12 @@ final class _BalanceContent extends StatelessWidget {
             summary: currentMonthSummary,
             onRetry: onRetryMonthlySummary,
           ),
-          const SizedBox(height: 24),
-          CategorySpendingSection(summary: currentMonthSummary),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: onViewStatistics,
+            icon: const Icon(Icons.insights_outlined),
+            label: Text(context.l10n.viewStatistics),
+          ),
         ],
       ),
     );

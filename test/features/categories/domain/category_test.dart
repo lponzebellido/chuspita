@@ -33,6 +33,29 @@ void main() {
       expect(archivedCategory.id, activeCategory.id);
     });
 
+    test('updates details while preserving identity and state', () {
+      final category = buildCategory(isArchived: true);
+
+      final updated = category.updateDetails(
+        name: 'Transport',
+        color: ArgbColor(0xFF2196F3),
+      );
+
+      expect(updated.id, category.id);
+      expect(updated.name, 'Transport');
+      expect(updated.color, ArgbColor(0xFF2196F3));
+      expect(updated.isArchived, isTrue);
+    });
+
+    test('restores an archived category', () {
+      final archived = buildCategory(isArchived: true);
+
+      final restored = archived.restore();
+
+      expect(restored.isArchived, isFalse);
+      expect(restored.id, archived.id);
+    });
+
     test('uses entity equality based on its id', () {
       final id = CategoryId('category-1');
       final first = buildCategory(id: id, name: 'Food');

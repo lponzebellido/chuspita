@@ -29,6 +29,40 @@ class AppLocalizationsEs extends AppLocalizations {
   String get manageWallets => 'Gestionar monederos';
 
   @override
+  String get manageCategories => 'Gestionar categorías';
+
+  @override
+  String get categoriesTitle => 'Categorías';
+
+  @override
+  String get addCategory => 'Añadir categoría';
+
+  @override
+  String get newCategoryTitle => 'Nueva categoría';
+
+  @override
+  String get editCategoryTitle => 'Editar categoría';
+
+  @override
+  String get categoryNameLabel => 'Nombre';
+
+  @override
+  String get categoryNameHint => 'Por ejemplo: Alimentación';
+
+  @override
+  String get categoryNameRequired => 'Escribe un nombre para la categoría.';
+
+  @override
+  String get categoryColorLabel => 'Color';
+
+  @override
+  String get noCategoriesTitle => 'Aún no tienes categorías';
+
+  @override
+  String get saveCategoryError =>
+      'No pudimos guardar la categoría. Inténtalo nuevamente.';
+
+  @override
   String get walletsTitle => 'Monederos';
 
   @override

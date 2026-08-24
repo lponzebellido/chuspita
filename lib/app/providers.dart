@@ -1,6 +1,11 @@
 import 'dart:async';
 
 import 'package:chuspita/core/database/app_database.dart';
+import 'package:chuspita/features/categories/application/create_category.dart';
+import 'package:chuspita/features/categories/application/update_category.dart';
+import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
+import 'package:chuspita/features/categories/domain/category.dart';
+import 'package:chuspita/features/categories/domain/category_repository.dart';
 import 'package:chuspita/features/transactions/data/repositories/drift_transaction_repository.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
@@ -24,6 +29,34 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
 
   return database;
 });
+
+final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
+  return DriftCategoryRepository(ref.watch(appDatabaseProvider));
+});
+
+final categoryIdGeneratorProvider = Provider<String Function()>((ref) {
+  final uuid = Uuid();
+
+  return () => uuid.v4();
+});
+
+final createCategoryProvider = Provider<CreateCategory>((ref) {
+  return CreateCategory(
+    categoryRepository: ref.watch(categoryRepositoryProvider),
+    idGenerator: ref.watch(categoryIdGeneratorProvider),
+  );
+});
+
+final updateCategoryProvider = Provider<UpdateCategory>((ref) {
+  return UpdateCategory(
+    categoryRepository: ref.watch(categoryRepositoryProvider),
+  );
+});
+
+final categoriesProvider = FutureProvider<List<Category>>(
+  (ref) => ref.watch(categoryRepositoryProvider).getAll(),
+  retry: (retryCount, error) => null,
+);
 
 final walletRepositoryProvider = Provider<WalletRepository>((ref) {
   return DriftWalletRepository(ref.watch(appDatabaseProvider));

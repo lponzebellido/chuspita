@@ -29,6 +29,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manageWallets => 'Manage wallets';
 
   @override
+  String get manageCategories => 'Manage categories';
+
+  @override
+  String get categoriesTitle => 'Categories';
+
+  @override
+  String get addCategory => 'Add category';
+
+  @override
+  String get newCategoryTitle => 'New category';
+
+  @override
+  String get editCategoryTitle => 'Edit category';
+
+  @override
+  String get categoryNameLabel => 'Name';
+
+  @override
+  String get categoryNameHint => 'For example: Food';
+
+  @override
+  String get categoryNameRequired => 'Enter a category name.';
+
+  @override
+  String get categoryColorLabel => 'Color';
+
+  @override
+  String get noCategoriesTitle => 'You don\'t have any categories yet';
+
+  @override
+  String get saveCategoryError =>
+      'We couldn\'t save the category. Please try again.';
+
+  @override
   String get walletsTitle => 'Wallets';
 
   @override

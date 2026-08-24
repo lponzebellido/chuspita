@@ -2,6 +2,7 @@ import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
+import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_list_screen.dart';
@@ -29,10 +30,27 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openCategoryList() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const CategoryListScreen(),
+        ),
+      );
+    }
+
+    Future<void> refreshBalance() {
+      return ref.refresh(balanceSummaryProvider.future).then((_) {});
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const AppLogo(),
         actions: [
+          IconButton(
+            tooltip: l10n.manageCategories,
+            onPressed: openCategoryList,
+            icon: const Icon(Icons.category_outlined),
+          ),
           IconButton(
             tooltip: l10n.manageWallets,
             onPressed: openWalletList,
@@ -42,8 +60,11 @@ final class HomeScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         child: summary.when(
-          data: (value) =>
-              _BalanceContent(summary: value, onAddWallet: openWalletForm),
+          data: (value) => _BalanceContent(
+            summary: value,
+            onAddWallet: openWalletForm,
+            onRefresh: refreshBalance,
+          ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => _ErrorContent(
             onRetry: () => ref.invalidate(balanceSummaryProvider),
@@ -60,33 +81,53 @@ final class HomeScreen extends ConsumerWidget {
 }
 
 final class _BalanceContent extends StatelessWidget {
-  const _BalanceContent({required this.summary, required this.onAddWallet});
+  const _BalanceContent({
+    required this.summary,
+    required this.onAddWallet,
+    required this.onRefresh,
+  });
 
   final BalanceSummary summary;
   final VoidCallback onAddWallet;
+  final RefreshCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
     if (summary.byWallet.isEmpty) {
-      return _EmptyContent(onAddWallet: onAddWallet);
+      return RefreshIndicator(
+        onRefresh: onRefresh,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _EmptyContent(onAddWallet: onAddWallet),
+            ),
+          ],
+        ),
+      );
     }
 
     final balances = summary.byCurrency.entries.toList(growable: false)
       ..sort((first, second) => first.key.code.compareTo(second.key.code));
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-      children: [
-        Text(
-          context.l10n.balanceByCurrency,
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 20),
-        for (final balance in balances) ...[
-          _CurrencyBalanceCard(balance: balance.value),
-          const SizedBox(height: 12),
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+        children: [
+          Text(
+            context.l10n.balanceByCurrency,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 20),
+          for (final balance in balances) ...[
+            _CurrencyBalanceCard(balance: balance.value),
+            const SizedBox(height: 12),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

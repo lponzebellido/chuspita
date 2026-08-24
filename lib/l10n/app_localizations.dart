@@ -134,6 +134,72 @@ abstract class AppLocalizations {
   /// **'Manage wallets'**
   String get manageWallets;
 
+  /// No description provided for @manageCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage categories'**
+  String get manageCategories;
+
+  /// No description provided for @categoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categoriesTitle;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add category'**
+  String get addCategory;
+
+  /// No description provided for @newCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get newCategoryTitle;
+
+  /// No description provided for @editCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get editCategoryTitle;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoryNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Food'**
+  String get categoryNameHint;
+
+  /// No description provided for @categoryNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a category name.'**
+  String get categoryNameRequired;
+
+  /// No description provided for @categoryColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get categoryColorLabel;
+
+  /// No description provided for @noCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any categories yet'**
+  String get noCategoriesTitle;
+
+  /// No description provided for @saveCategoryError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save the category. Please try again.'**
+  String get saveCategoryError;
+
   /// No description provided for @walletsTitle.
   ///
   /// In en, this message translates to:

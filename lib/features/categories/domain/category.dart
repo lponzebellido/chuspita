@@ -34,12 +34,24 @@ final class Category {
   final ArgbColor color;
   final bool isArchived;
 
+  Category updateDetails({required String name, required ArgbColor color}) {
+    return Category(id: id, name: name, color: color, isArchived: isArchived);
+  }
+
   Category archive() {
     if (isArchived) {
       return this;
     }
 
     return Category._(id: id, name: name, color: color, isArchived: true);
+  }
+
+  Category restore() {
+    if (!isArchived) {
+      return this;
+    }
+
+    return Category._(id: id, name: name, color: color, isArchived: false);
   }
 
   @override

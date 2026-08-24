@@ -1,1 +1,3 @@
 # chuspita
+
+Gestor financiero personal.

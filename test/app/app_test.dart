@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chuspita/app/app.dart';
+import 'package:chuspita/app/branding/app_branding.dart';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
@@ -32,6 +33,18 @@ void main() {
     await pumpApp(tester, summary);
 
     expect(find.text('Aún no tienes monederos'), findsOneWidget);
+  });
+
+  testWidgets('shows the brand logo in the home app bar', (tester) async {
+    final summary = BalanceSummary(byWallet: const {}, byCurrency: const {});
+
+    await pumpApp(tester, summary);
+
+    final logo = tester.widget<Image>(
+      find.byKey(const ValueKey('chuspita-logo')),
+    );
+    expect(logo.image, isA<AssetImage>());
+    expect((logo.image as AssetImage).assetName, AppBranding.logoAsset);
   });
 
   testWidgets('supports English', (tester) async {

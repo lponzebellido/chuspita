@@ -173,6 +173,94 @@ void main() {
     expect(find.text('Ahorros'), findsOneWidget);
     expect(find.text('Cambio de moneda'), findsOneWidget);
   });
+
+  testWidgets('groups movements by date in both sort orders', (tester) async {
+    final currentDate = LocalDate(year: 2026, month: 8, day: 24);
+    final yesterday = LocalDate(year: 2026, month: 8, day: 23);
+    final olderDate = LocalDate(year: 2026, month: 8, day: 20);
+    final sourceWallet = buildWallet();
+    final destinationWallet = buildWallet(
+      id: 'wallet-2',
+      name: 'Ahorros',
+      currency: Currency.pen,
+    );
+    final repository = FakeTransactionRepository([
+      buildTransaction(id: 'today', note: 'Compra de hoy'),
+      buildTransaction(
+        id: 'yesterday',
+        note: 'Compra de ayer',
+        occurredOn: yesterday,
+      ),
+      buildTransaction(
+        id: 'older',
+        note: 'Compra anterior',
+        occurredOn: olderDate,
+      ),
+    ]);
+    final transfer = Transfer(
+      id: TransferId('yesterday-transfer'),
+      sourceWalletId: sourceWallet.id,
+      destinationWalletId: destinationWallet.id,
+      sourceAmount: const Money(minorUnits: 1000, currency: Currency.eur),
+      destinationAmount: const Money(minorUnits: 4000, currency: Currency.pen),
+      occurredOn: yesterday,
+      note: 'Transferencia de ayer',
+    );
+
+    await pumpApp(
+      tester,
+      repository: repository,
+      wallets: [sourceWallet, destinationWallet],
+      transfers: [transfer],
+      currentDate: currentDate,
+    );
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
+    await tester.pumpAndSettle();
+
+    final todayHeader = find.byKey(
+      const ValueKey('movement-date-header-2026-08-24'),
+    );
+    final yesterdayHeader = find.byKey(
+      const ValueKey('movement-date-header-2026-08-23'),
+    );
+    final olderHeader = find.byKey(
+      const ValueKey('movement-date-header-2026-08-20'),
+    );
+
+    expect(find.text('Hoy'), findsOneWidget);
+    expect(find.text('Ayer'), findsOneWidget);
+    expect(todayHeader, findsOneWidget);
+    expect(yesterdayHeader, findsOneWidget);
+    expect(olderHeader, findsOneWidget);
+    expect(find.text('Transferencia'), findsOneWidget);
+    expect(
+      tester.getTopLeft(todayHeader).dy,
+      lessThan(tester.getTopLeft(yesterdayHeader).dy),
+    );
+    expect(
+      tester.getTopLeft(yesterdayHeader).dy,
+      lessThan(tester.getTopLeft(olderHeader).dy),
+    );
+
+    await tester.tap(find.byTooltip('Filtrar movimientos'));
+    await tester.pumpAndSettle();
+    final oldestFirst = find.widgetWithText(ChoiceChip, 'Más antiguos primero');
+    await tester.ensureVisible(oldestFirst);
+    await tester.pumpAndSettle();
+    await tester.tap(oldestFirst);
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getTopLeft(olderHeader).dy,
+      lessThan(tester.getTopLeft(yesterdayHeader).dy),
+    );
+    expect(
+      tester.getTopLeft(yesterdayHeader).dy,
+      lessThan(tester.getTopLeft(todayHeader).dy),
+    );
+  });
 }
 
 Future<void> pumpApp(
@@ -180,6 +268,7 @@ Future<void> pumpApp(
   required FakeTransactionRepository repository,
   List<Wallet>? wallets,
   List<Transfer> transfers = const [],
+  LocalDate? currentDate,
 }) async {
   final walletValues = wallets ?? [buildWallet()];
   final category = buildCategory();
@@ -202,6 +291,9 @@ Future<void> pumpApp(
           AsyncData(repository.transactions),
         ),
         transfersProvider.overrideWithValue(AsyncData(transfers)),
+        currentDateProvider.overrideWithValue(
+          currentDate ?? LocalDate(year: 2026, month: 8, day: 24),
+        ),
         transactionRepositoryProvider.overrideWithValue(repository),
       ],
       child: const ChuspitaApp(locale: Locale('es')),
@@ -235,6 +327,7 @@ Transaction buildTransaction({
   TransactionType type = TransactionType.expense,
   int amountMinor = 1250,
   String note = 'Almuerzo',
+  LocalDate? occurredOn,
 }) {
   return Transaction(
     id: TransactionId(id),
@@ -242,7 +335,7 @@ Transaction buildTransaction({
     amount: Money(minorUnits: amountMinor, currency: Currency.eur),
     walletId: WalletId('wallet-1'),
     categoryId: CategoryId('category-1'),
-    occurredOn: LocalDate(year: 2026, month: 8, day: 24),
+    occurredOn: occurredOn ?? LocalDate(year: 2026, month: 8, day: 24),
     note: note,
   );
 }

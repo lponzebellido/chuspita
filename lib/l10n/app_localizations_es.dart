@@ -151,6 +151,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get currentDay => 'Hoy';
 
   @override
+  String get yesterday => 'Ayer';
+
+  @override
   String get currentWeek => 'Esta semana';
 
   @override

@@ -38,6 +38,7 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
     final transfers = ref.watch(transfersProvider);
     final wallets = ref.watch(walletsProvider);
     final categories = ref.watch(categoriesProvider);
+    final currentDate = ref.watch(currentDateProvider);
 
     Future<void> refresh() {
       return Future.wait<void>([
@@ -80,6 +81,7 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
         transfers: transfers,
         wallets: wallets,
         categories: categories,
+        currentDate: currentDate,
         onRefresh: refresh,
       ),
     );
@@ -92,6 +94,7 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
     required AsyncValue<List<Transfer>> transfers,
     required AsyncValue<List<Wallet>> wallets,
     required AsyncValue<List<Category>> categories,
+    required LocalDate currentDate,
     required RefreshCallback onRefresh,
   }) {
     if (transactions.isLoading ||
@@ -181,9 +184,23 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
 
           final movementIndex = index - (_filters.isEmpty ? 0 : 1);
           final movement = movementValues[movementIndex];
+          final beginsDateGroup =
+              movementIndex == 0 ||
+              movementValues[movementIndex - 1].occurredOn !=
+                  movement.occurredOn;
+          final continuesDateGroup =
+              movementIndex < movementValues.length - 1 &&
+              movementValues[movementIndex + 1].occurredOn ==
+                  movement.occurredOn;
 
           return Column(
             children: [
+              if (beginsDateGroup)
+                _MovementDateHeader(
+                  date: movement.occurredOn,
+                  currentDate: currentDate,
+                  isFirst: movementIndex == 0,
+                ),
               switch (movement) {
                 TransactionMovementItem(:final transaction) => _TransactionTile(
                   transaction: transaction,
@@ -220,8 +237,7 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
                   ),
                 ),
               },
-              if (movementIndex < movementValues.length - 1)
-                const Divider(height: 1),
+              if (continuesDateGroup) const Divider(height: 1),
             ],
           );
         },
@@ -270,6 +286,39 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
         transfer: transfer,
         sourceWalletName: sourceWalletName,
         destinationWalletName: destinationWalletName,
+      ),
+    );
+  }
+}
+
+final class _MovementDateHeader extends StatelessWidget {
+  const _MovementDateHeader({
+    required this.date,
+    required this.currentDate,
+    required this.isFirst,
+  });
+
+  final LocalDate date;
+  final LocalDate currentDate;
+  final bool isFirst;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      key: ValueKey('movement-date-header-$date'),
+      padding: EdgeInsets.fromLTRB(8, isFirst ? 4 : 24, 8, 6),
+      child: Row(
+        children: [
+          Text(
+            _formatMovementDateHeader(context, date, currentDate),
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(color: colorScheme.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Divider(color: colorScheme.outlineVariant)),
+        ],
       ),
     );
   }
@@ -581,6 +630,34 @@ final class _LoadError extends StatelessWidget {
 String _formatDate(BuildContext context, LocalDate date) {
   return MaterialLocalizations.of(context)
       .formatMediumDate(DateTime(date.year, date.month, date.day));
+}
+
+String _formatMovementDateHeader(
+  BuildContext context,
+  LocalDate date,
+  LocalDate currentDate,
+) {
+  if (date == currentDate) {
+    return context.l10n.currentDay;
+  }
+
+  final yesterdayValue = DateTime.utc(
+    currentDate.year,
+    currentDate.month,
+    currentDate.day,
+  ).subtract(const Duration(days: 1));
+  final yesterday = LocalDate(
+    year: yesterdayValue.year,
+    month: yesterdayValue.month,
+    day: yesterdayValue.day,
+  );
+
+  if (date == yesterday) {
+    return context.l10n.yesterday;
+  }
+
+  return MaterialLocalizations.of(context)
+      .formatFullDate(DateTime(date.year, date.month, date.day));
 }
 
 String _formatDateTime(BuildContext context, LocalDate date, LocalTime time) {

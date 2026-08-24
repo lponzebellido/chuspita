@@ -63,6 +63,51 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save the category. Please try again.';
 
   @override
+  String get addTransaction => 'Add transaction';
+
+  @override
+  String get newTransactionTitle => 'New transaction';
+
+  @override
+  String get expense => 'Expense';
+
+  @override
+  String get income => 'Income';
+
+  @override
+  String get amountLabel => 'Amount';
+
+  @override
+  String get walletLabel => 'Wallet';
+
+  @override
+  String get categoryLabel => 'Category';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get noteLabel => 'Optional note';
+
+  @override
+  String get noteHint => 'For example: Lunch';
+
+  @override
+  String get transactionAmountInvalid => 'Enter an amount greater than zero.';
+
+  @override
+  String get transactionNeedsWallet =>
+      'You need at least one active wallet to record a transaction.';
+
+  @override
+  String get transactionNeedsCategory =>
+      'You need at least one active category to record a transaction.';
+
+  @override
+  String get saveTransactionError =>
+      'We couldn\'t save the transaction. Please try again.';
+
+  @override
   String get walletsTitle => 'Wallets';
 
   @override

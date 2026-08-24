@@ -6,7 +6,9 @@ import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
+import 'package:chuspita/features/transactions/application/create_transaction.dart';
 import 'package:chuspita/features/transactions/data/repositories/drift_transaction_repository.dart';
+import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
 import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
@@ -87,6 +89,24 @@ final walletsProvider = FutureProvider<List<Wallet>>(
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return DriftTransactionRepository(ref.watch(appDatabaseProvider));
 });
+
+final transactionIdGeneratorProvider = Provider<String Function()>((ref) {
+  final uuid = Uuid();
+
+  return () => uuid.v4();
+});
+
+final createTransactionProvider = Provider<CreateTransaction>((ref) {
+  return CreateTransaction(
+    transactionRepository: ref.watch(transactionRepositoryProvider),
+    idGenerator: ref.watch(transactionIdGeneratorProvider),
+  );
+});
+
+final transactionsProvider = FutureProvider<List<Transaction>>(
+  (ref) => ref.watch(transactionRepositoryProvider).getAll(),
+  retry: (retryCount, error) => null,
+);
 
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return DriftTransferRepository(ref.watch(appDatabaseProvider));

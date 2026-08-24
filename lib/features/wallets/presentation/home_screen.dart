@@ -3,6 +3,7 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
+import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_list_screen.dart';
@@ -38,9 +39,19 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openTransactionForm() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const TransactionFormScreen(),
+        ),
+      );
+    }
+
     Future<void> refreshBalance() {
       return ref.refresh(balanceSummaryProvider.future).then((_) {});
     }
+
+    final hasWallets = summary.asData?.value.byWallet.isNotEmpty ?? false;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,9 +83,9 @@ final class HomeScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: openWalletForm,
+        onPressed: hasWallets ? openTransactionForm : openWalletForm,
         icon: const Icon(Icons.add),
-        label: Text(l10n.addWallet),
+        label: Text(hasWallets ? l10n.addTransaction : l10n.addWallet),
       ),
     );
   }

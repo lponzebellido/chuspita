@@ -63,6 +63,51 @@ class AppLocalizationsEs extends AppLocalizations {
       'No pudimos guardar la categoría. Inténtalo nuevamente.';
 
   @override
+  String get addTransaction => 'Añadir movimiento';
+
+  @override
+  String get newTransactionTitle => 'Nuevo movimiento';
+
+  @override
+  String get expense => 'Gasto';
+
+  @override
+  String get income => 'Ingreso';
+
+  @override
+  String get amountLabel => 'Cantidad';
+
+  @override
+  String get walletLabel => 'Monedero';
+
+  @override
+  String get categoryLabel => 'Categoría';
+
+  @override
+  String get dateLabel => 'Fecha';
+
+  @override
+  String get noteLabel => 'Nota opcional';
+
+  @override
+  String get noteHint => 'Por ejemplo: Almuerzo';
+
+  @override
+  String get transactionAmountInvalid => 'Escribe una cantidad mayor que cero.';
+
+  @override
+  String get transactionNeedsWallet =>
+      'Necesitas al menos un monedero activo para registrar un movimiento.';
+
+  @override
+  String get transactionNeedsCategory =>
+      'Necesitas al menos una categoría activa para registrar un movimiento.';
+
+  @override
+  String get saveTransactionError =>
+      'No pudimos guardar el movimiento. Inténtalo nuevamente.';
+
+  @override
   String get walletsTitle => 'Monederos';
 
   @override

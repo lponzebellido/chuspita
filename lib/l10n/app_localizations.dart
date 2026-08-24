@@ -200,6 +200,90 @@ abstract class AppLocalizations {
   /// **'We couldn\'t save the category. Please try again.'**
   String get saveCategoryError;
 
+  /// No description provided for @addTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add transaction'**
+  String get addTransaction;
+
+  /// No description provided for @newTransactionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New transaction'**
+  String get newTransactionTitle;
+
+  /// No description provided for @expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expense;
+
+  /// No description provided for @income.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get income;
+
+  /// No description provided for @amountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amountLabel;
+
+  /// No description provided for @walletLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get walletLabel;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get categoryLabel;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// No description provided for @noteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional note'**
+  String get noteLabel;
+
+  /// No description provided for @noteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Lunch'**
+  String get noteHint;
+
+  /// No description provided for @transactionAmountInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount greater than zero.'**
+  String get transactionAmountInvalid;
+
+  /// No description provided for @transactionNeedsWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least one active wallet to record a transaction.'**
+  String get transactionNeedsWallet;
+
+  /// No description provided for @transactionNeedsCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least one active category to record a transaction.'**
+  String get transactionNeedsCategory;
+
+  /// No description provided for @saveTransactionError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save the transaction. Please try again.'**
+  String get saveTransactionError;
+
   /// No description provided for @walletsTitle.
   ///
   /// In en, this message translates to:

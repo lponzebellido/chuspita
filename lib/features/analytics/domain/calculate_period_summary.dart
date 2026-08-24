@@ -16,6 +16,8 @@ PeriodSummary calculatePeriodSummary({
 
   final incomeTotals = <Currency, int>{};
   final expenseTotals = <Currency, int>{};
+  final expenseCounts = <Currency, int>{};
+  final largestExpenseTotals = <Currency, int>{};
   final expenseTotalsByCategory = <Currency, Map<CategoryId, int>>{};
 
   for (final transaction in transactions) {
@@ -35,6 +37,18 @@ PeriodSummary calculatePeriodSummary({
     );
 
     if (transaction.type == TransactionType.expense) {
+      expenseCounts.update(
+        transaction.amount.currency,
+        (current) => current + 1,
+        ifAbsent: () => 1,
+      );
+      largestExpenseTotals.update(
+        transaction.amount.currency,
+        (current) => current > transaction.amount.minorUnits
+            ? current
+            : transaction.amount.minorUnits,
+        ifAbsent: () => transaction.amount.minorUnits,
+      );
       final totalsByCategory = expenseTotalsByCategory.putIfAbsent(
         transaction.amount.currency,
         () => <CategoryId, int>{},
@@ -59,6 +73,11 @@ PeriodSummary calculatePeriodSummary({
       ),
       expenses: Money(
         minorUnits: expenseTotals[currency] ?? 0,
+        currency: currency,
+      ),
+      expenseCount: expenseCounts[currency] ?? 0,
+      largestExpense: Money(
+        minorUnits: largestExpenseTotals[currency] ?? 0,
         currency: currency,
       ),
       expensesByCategory: {

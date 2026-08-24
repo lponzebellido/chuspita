@@ -172,6 +172,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noPeriodActivity => 'No hay ingresos ni gastos en este periodo.';
 
   @override
+  String get spendingMetricsTitle => 'Métricas de gasto';
+
+  @override
+  String get noExpenseMetrics => 'No hay gastos que analizar en este periodo.';
+
+  @override
+  String get expenseCountMetric => 'Gastos registrados';
+
+  @override
+  String get averageExpenseMetric => 'Promedio por gasto';
+
+  @override
+  String get largestExpenseMetric => 'Mayor gasto';
+
+  @override
+  String get topCategoryMetric => 'Categoría principal';
+
+  @override
   String get monthlyIncome => 'Ingresos';
 
   @override

@@ -173,6 +173,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'There is no income or expense activity in this period.';
 
   @override
+  String get spendingMetricsTitle => 'Spending metrics';
+
+  @override
+  String get noExpenseMetrics =>
+      'There are no expenses to analyze in this period.';
+
+  @override
+  String get expenseCountMetric => 'Recorded expenses';
+
+  @override
+  String get averageExpenseMetric => 'Average per expense';
+
+  @override
+  String get largestExpenseMetric => 'Largest expense';
+
+  @override
+  String get topCategoryMetric => 'Top category';
+
+  @override
   String get monthlyIncome => 'Income';
 
   @override

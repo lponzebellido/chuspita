@@ -416,6 +416,42 @@ abstract class AppLocalizations {
   /// **'There is no income or expense activity in this period.'**
   String get noPeriodActivity;
 
+  /// No description provided for @spendingMetricsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending metrics'**
+  String get spendingMetricsTitle;
+
+  /// No description provided for @noExpenseMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no expenses to analyze in this period.'**
+  String get noExpenseMetrics;
+
+  /// No description provided for @expenseCountMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded expenses'**
+  String get expenseCountMetric;
+
+  /// No description provided for @averageExpenseMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Average per expense'**
+  String get averageExpenseMetric;
+
+  /// No description provided for @largestExpenseMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest expense'**
+  String get largestExpenseMetric;
+
+  /// No description provided for @topCategoryMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Top category'**
+  String get topCategoryMetric;
+
   /// No description provided for @monthlyIncome.
   ///
   /// In en, this message translates to:

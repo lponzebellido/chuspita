@@ -235,18 +235,86 @@ void main() {
       find.byKey(const ValueKey('income-expense-chart-EUR')),
       findsOneWidget,
     );
+    expect(find.text('Métricas de gasto'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('expense-count-metric-EUR')),
+        matching: find.text('2'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('average-expense-metric-EUR')),
+        matching: find.text('20,00 EUR'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('largest-expense-metric-EUR')),
+        matching: find.text('30,00 EUR'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('top-category-metric-EUR')),
+        matching: find.text('Alimentación'),
+      ),
+      findsOneWidget,
+    );
+    final statisticsList = find.byType(ListView).first;
+    final statisticsScrollable = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(
+      find.text('Gastos por categoría'),
+      250,
+      scrollable: statisticsScrollable,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('Gastos por categoría'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('category-spending-chart-EUR')),
       findsOneWidget,
     );
-    expect(find.text('Alimentación'), findsOneWidget);
+    expect(find.text('Alimentación'), findsNWidgets(2));
     expect(find.text('75% · 30,00 EUR'), findsOneWidget);
     expect(find.text('Transporte'), findsOneWidget);
     expect(find.text('25% · 10,00 EUR'), findsOneWidget);
     expect(find.text('Sueldo'), findsNothing);
 
+    await tester.drag(statisticsList, const Offset(0, 1000));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Este año'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('expense-count-metric-EUR')),
+        matching: find.text('3'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('average-expense-metric-EUR')),
+        matching: find.text('30,00 EUR'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('largest-expense-metric-EUR')),
+        matching: find.text('50,00 EUR'),
+      ),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.text('Gastos por categoría'),
+      250,
+      scrollable: statisticsScrollable,
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('89% · 80,00 EUR'), findsOneWidget);

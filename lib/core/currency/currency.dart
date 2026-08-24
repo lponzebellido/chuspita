@@ -12,6 +12,19 @@ final class Currency {
   static const jpy = Currency._(code: 'JPY', minorUnitDigits: 0);
   static const kwd = Currency._(code: 'KWD', minorUnitDigits: 3);
 
+  static const supported = <Currency>[
+    eur,
+    pen,
+    usd,
+    pln,
+    brl,
+    clp,
+    gbp,
+    chf,
+    jpy,
+    kwd,
+  ];
+
   static const _byCode = <String, Currency>{
     'EUR': eur,
     'PEN': pen,

@@ -14,6 +14,11 @@ void main() {
       expect(Currency.fromCode(' eur '), Currency.eur);
     });
 
+    test('exposes the supported currency catalog', () {
+      expect(Currency.supported, containsAll([Currency.eur, Currency.pen]));
+      expect(() => Currency.supported.clear(), throwsUnsupportedError);
+    });
+
     test('rejects unsupported currency codes', () {
       expect(() => Currency.fromCode('ZZZ'), throwsArgumentError);
     });

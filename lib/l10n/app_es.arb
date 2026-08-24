@@ -1,0 +1,20 @@
+{
+  "@@locale": "es",
+  "appName": "Chuspita",
+  "balanceByCurrency": "Balance por moneda",
+  "noWalletsTitle": "Aún no tienes monederos",
+  "noWalletsBody": "Tu balance aparecerá aquí cuando crees el primero.",
+  "addWallet": "Añadir monedero",
+  "loadDataError": "No pudimos cargar tus datos.",
+  "retry": "Reintentar",
+  "newWalletTitle": "Nuevo monedero",
+  "walletNameLabel": "Nombre",
+  "walletNameHint": "Por ejemplo: Efectivo",
+  "currencyLabel": "Moneda",
+  "initialBalanceLabel": "Saldo inicial",
+  "walletColorLabel": "Color",
+  "save": "Guardar",
+  "walletNameRequired": "Escribe un nombre para el monedero.",
+  "initialBalanceInvalid": "Escribe una cantidad válida para esta moneda.",
+  "saveWalletError": "No pudimos guardar el monedero. Inténtalo nuevamente."
+}

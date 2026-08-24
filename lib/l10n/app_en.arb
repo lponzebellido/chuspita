@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appName": "Chuspita",
+  "@appName": {
+    "description": "Application name"
+  },
+  "balanceByCurrency": "Balance by currency",
+  "noWalletsTitle": "You don't have any wallets yet",
+  "noWalletsBody": "Your balance will appear here after you create the first one.",
+  "addWallet": "Add wallet",
+  "loadDataError": "We couldn't load your data.",
+  "retry": "Retry",
+  "newWalletTitle": "New wallet",
+  "walletNameLabel": "Name",
+  "walletNameHint": "For example: Cash",
+  "currencyLabel": "Currency",
+  "initialBalanceLabel": "Initial balance",
+  "walletColorLabel": "Color",
+  "save": "Save",
+  "walletNameRequired": "Enter a wallet name.",
+  "initialBalanceInvalid": "Enter a valid amount for this currency.",
+  "saveWalletError": "We couldn't save the wallet. Please try again."
+}

@@ -26,7 +26,6 @@ void main() {
     final repository = FakeTransactionRepository([transaction]);
 
     await pumpApp(tester, repository: repository);
-    await scrollToMovementHistory(tester);
     await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
     await tester.pumpAndSettle();
 
@@ -58,7 +57,6 @@ void main() {
     final repository = FakeTransactionRepository([transaction]);
 
     await pumpApp(tester, repository: repository);
-    await scrollToMovementHistory(tester);
     await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Alimentación'));
@@ -92,7 +90,6 @@ void main() {
     final repository = FakeTransactionRepository([expense, income]);
 
     await pumpApp(tester, repository: repository);
-    await scrollToMovementHistory(tester);
     await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
     await tester.pumpAndSettle();
 
@@ -145,7 +142,6 @@ void main() {
       wallets: [sourceWallet, destinationWallet],
       transfers: [transfer],
     );
-    await scrollToMovementHistory(tester);
     await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
     await tester.pumpAndSettle();
 
@@ -177,11 +173,6 @@ void main() {
     expect(find.text('Ahorros'), findsOneWidget);
     expect(find.text('Cambio de moneda'), findsOneWidget);
   });
-}
-
-Future<void> scrollToMovementHistory(WidgetTester tester) async {
-  await tester.drag(find.byType(ListView).first, const Offset(0, -400));
-  await tester.pumpAndSettle();
 }
 
 Future<void> pumpApp(

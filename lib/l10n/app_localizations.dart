@@ -398,6 +398,24 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load this month\'s summary.'**
   String get loadMonthlySummaryError;
 
+  /// No description provided for @categorySpendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending by category'**
+  String get categorySpendingTitle;
+
+  /// No description provided for @noCategorySpending.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses recorded this month.'**
+  String get noCategorySpending;
+
+  /// No description provided for @loadCategorySpendingError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load spending by category.'**
+  String get loadCategorySpendingError;
+
   /// No description provided for @customRange.
   ///
   /// In en, this message translates to:

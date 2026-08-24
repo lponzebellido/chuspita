@@ -164,6 +164,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t load this month\'s summary.';
 
   @override
+  String get categorySpendingTitle => 'Spending by category';
+
+  @override
+  String get noCategorySpending => 'No expenses recorded this month.';
+
+  @override
+  String get loadCategorySpendingError =>
+      'We couldn\'t load spending by category.';
+
+  @override
   String get customRange => 'Custom';
 
   @override

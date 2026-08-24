@@ -165,6 +165,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'No pudimos cargar el resumen de este mes.';
 
   @override
+  String get categorySpendingTitle => 'Gastos por categoría';
+
+  @override
+  String get noCategorySpending => 'Aún no registraste gastos este mes.';
+
+  @override
+  String get loadCategorySpendingError =>
+      'No pudimos cargar los gastos por categoría.';
+
+  @override
   String get customRange => 'Personalizado';
 
   @override

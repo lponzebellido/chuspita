@@ -2,6 +2,7 @@ import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
+import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 
 PeriodSummary calculatePeriodSummary({
@@ -15,6 +16,7 @@ PeriodSummary calculatePeriodSummary({
 
   final incomeTotals = <Currency, int>{};
   final expenseTotals = <Currency, int>{};
+  final expenseTotalsByCategory = <Currency, Map<CategoryId, int>>{};
 
   for (final transaction in transactions) {
     if (transaction.occurredOn.compareTo(startDate) < 0 ||
@@ -31,6 +33,19 @@ PeriodSummary calculatePeriodSummary({
       (current) => current + transaction.amount.minorUnits,
       ifAbsent: () => transaction.amount.minorUnits,
     );
+
+    if (transaction.type == TransactionType.expense) {
+      final totalsByCategory = expenseTotalsByCategory.putIfAbsent(
+        transaction.amount.currency,
+        () => <CategoryId, int>{},
+      );
+
+      totalsByCategory.update(
+        transaction.categoryId,
+        (current) => current + transaction.amount.minorUnits,
+        ifAbsent: () => transaction.amount.minorUnits,
+      );
+    }
   }
 
   final currencies = <Currency>{...incomeTotals.keys, ...expenseTotals.keys};
@@ -46,6 +61,12 @@ PeriodSummary calculatePeriodSummary({
         minorUnits: expenseTotals[currency] ?? 0,
         currency: currency,
       ),
+      expensesByCategory: {
+        for (final entry
+            in (expenseTotalsByCategory[currency] ?? const <CategoryId, int>{})
+                .entries)
+          entry.key: Money(minorUnits: entry.value, currency: currency),
+      },
     );
   }
 

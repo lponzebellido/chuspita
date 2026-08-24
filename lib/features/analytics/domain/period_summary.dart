@@ -1,6 +1,7 @@
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/money.dart';
+import 'package:chuspita/features/categories/domain/category_id.dart';
 
 final class PeriodSummary {
   PeriodSummary({
@@ -27,7 +28,11 @@ final class PeriodSummary {
 }
 
 final class CurrencyPeriodSummary {
-  CurrencyPeriodSummary({required this.income, required this.expenses}) {
+  CurrencyPeriodSummary({
+    required this.income,
+    required this.expenses,
+    required Map<CategoryId, Money> expensesByCategory,
+  }) : expensesByCategory = Map.unmodifiable(expensesByCategory) {
     if (income.currency != expenses.currency) {
       throw ArgumentError('Income and expenses must use the same currency');
     }
@@ -35,12 +40,33 @@ final class CurrencyPeriodSummary {
     if (income.minorUnits < 0 || expenses.minorUnits < 0) {
       throw ArgumentError('Income and expenses cannot be negative');
     }
+
+    var categorizedExpenses = 0;
+
+    for (final amount in expensesByCategory.values) {
+      if (amount.currency != expenses.currency) {
+        throw ArgumentError('Category expenses must use the summary currency');
+      }
+
+      if (amount.minorUnits <= 0) {
+        throw ArgumentError('Category expenses must be greater than zero');
+      }
+
+      categorizedExpenses += amount.minorUnits;
+    }
+
+    if (categorizedExpenses != expenses.minorUnits) {
+      throw ArgumentError('Category expenses must add up to the expense total');
+    }
   }
 
   final Money income;
   final Money expenses;
+  final Map<CategoryId, Money> expensesByCategory;
 
   Currency get currency => income.currency;
 
   Money get net => income - expenses;
+
+  bool get hasExpenses => expenses.minorUnits > 0;
 }

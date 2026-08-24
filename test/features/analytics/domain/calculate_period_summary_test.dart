@@ -23,12 +23,21 @@ void main() {
           type: TransactionType.expense,
           amount: const Money(minorUnits: 2500, currency: Currency.eur),
           occurredOn: LocalDate(year: 2026, month: 8, day: 31),
+          categoryId: 'food',
+        ),
+        buildTransaction(
+          id: 'second-eur-expense',
+          type: TransactionType.expense,
+          amount: const Money(minorUnits: 500, currency: Currency.eur),
+          occurredOn: LocalDate(year: 2026, month: 8, day: 20),
+          categoryId: 'transport',
         ),
         buildTransaction(
           id: 'pen-expense',
           type: TransactionType.expense,
           amount: const Money(minorUnits: 4000, currency: Currency.pen),
           occurredOn: LocalDate(year: 2026, month: 8, day: 15),
+          categoryId: 'food',
         ),
         buildTransaction(
           id: 'outside-period',
@@ -47,12 +56,19 @@ void main() {
     );
     expect(
       summary.byCurrency[Currency.eur]!.expenses,
-      const Money(minorUnits: 2500, currency: Currency.eur),
+      const Money(minorUnits: 3000, currency: Currency.eur),
     );
     expect(
       summary.byCurrency[Currency.eur]!.net,
-      const Money(minorUnits: 7500, currency: Currency.eur),
+      const Money(minorUnits: 7000, currency: Currency.eur),
     );
+    expect(summary.byCurrency[Currency.eur]!.expensesByCategory, {
+      CategoryId('food'): const Money(minorUnits: 2500, currency: Currency.eur),
+      CategoryId('transport'): const Money(
+        minorUnits: 500,
+        currency: Currency.eur,
+      ),
+    });
     expect(
       summary.byCurrency[Currency.pen]!.income,
       const Money(minorUnits: 0, currency: Currency.pen),
@@ -65,6 +81,9 @@ void main() {
       summary.byCurrency[Currency.pen]!.net,
       const Money(minorUnits: -4000, currency: Currency.pen),
     );
+    expect(summary.byCurrency[Currency.pen]!.expensesByCategory, {
+      CategoryId('food'): const Money(minorUnits: 4000, currency: Currency.pen),
+    });
   });
 
   test('returns an empty summary when the period has no transactions', () {
@@ -94,13 +113,14 @@ Transaction buildTransaction({
   required TransactionType type,
   required Money amount,
   required LocalDate occurredOn,
+  String categoryId = 'category-1',
 }) {
   return Transaction(
     id: TransactionId(id),
     type: type,
     amount: amount,
     walletId: WalletId('wallet-${amount.currency.code}'),
-    categoryId: CategoryId('category-1'),
+    categoryId: CategoryId(categoryId),
     occurredOn: occurredOn,
   );
 }

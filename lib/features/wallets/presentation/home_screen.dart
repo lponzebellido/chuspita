@@ -4,6 +4,7 @@ import 'package:chuspita/app/settings/settings_screen.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
+import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
 import 'package:chuspita/features/analytics/presentation/monthly_summary_section.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/movements/presentation/movement_list_screen.dart';
@@ -79,6 +80,7 @@ final class HomeScreen extends ConsumerWidget {
       return Future.wait<void>([
         ref.refresh(balanceSummaryProvider.future).then((_) {}),
         ref.refresh(transactionsProvider.future).then((_) {}),
+        ref.refresh(categoriesProvider.future).then((_) {}),
       ]);
     }
 
@@ -185,12 +187,7 @@ final class _BalanceContent extends StatelessWidget {
             _CurrencyBalanceCard(balance: balance.value),
             const SizedBox(height: 12),
           ],
-          const SizedBox(height: 16),
-          MonthlySummarySection(
-            summary: currentMonthSummary,
-            onRetry: onRetryMonthlySummary,
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           FilledButton.tonalIcon(
             onPressed: onTransfer,
             icon: const Icon(Icons.swap_horiz),
@@ -202,6 +199,13 @@ final class _BalanceContent extends StatelessWidget {
             icon: const Icon(Icons.receipt_long_outlined),
             label: Text(context.l10n.viewTransactions),
           ),
+          const SizedBox(height: 24),
+          MonthlySummarySection(
+            summary: currentMonthSummary,
+            onRetry: onRetryMonthlySummary,
+          ),
+          const SizedBox(height: 24),
+          CategorySpendingSection(summary: currentMonthSummary),
         ],
       ),
     );

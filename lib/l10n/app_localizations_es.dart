@@ -109,6 +109,49 @@ class AppLocalizationsEs extends AppLocalizations {
   String get viewTransactions => 'Ver movimientos';
 
   @override
+  String get filterTransactionsTitle => 'Filtrar movimientos';
+
+  @override
+  String get transactionTypeFilter => 'Tipo';
+
+  @override
+  String get allOption => 'Todos';
+
+  @override
+  String get allWallets => 'Todos los monederos';
+
+  @override
+  String get allCategories => 'Todas las categorías';
+
+  @override
+  String get periodFilter => 'Periodo';
+
+  @override
+  String get allTime => 'Todo el tiempo';
+
+  @override
+  String get currentMonth => 'Este mes';
+
+  @override
+  String get customRange => 'Personalizado';
+
+  @override
+  String get resetFilters => 'Restablecer';
+
+  @override
+  String get applyFilters => 'Aplicar';
+
+  @override
+  String get clearFilters => 'Quitar filtros';
+
+  @override
+  String get noFilteredTransactionsTitle => 'Ningún movimiento coincide';
+
+  @override
+  String get noFilteredTransactionsBody =>
+      'Prueba cambiando o quitando algunos filtros.';
+
+  @override
   String get noTransactionsTitle => 'Aún no tienes movimientos';
 
   @override

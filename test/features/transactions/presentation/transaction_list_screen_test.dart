@@ -23,7 +23,7 @@ void main() {
     final transaction = buildTransaction();
     final repository = FakeTransactionRepository([transaction]);
 
-    await pumpApp(tester, repository: repository, transaction: transaction);
+    await pumpApp(tester, repository: repository);
     await tester.tap(find.text('Ver movimientos'));
     await tester.pumpAndSettle();
 
@@ -54,7 +54,7 @@ void main() {
     final transaction = buildTransaction();
     final repository = FakeTransactionRepository([transaction]);
 
-    await pumpApp(tester, repository: repository, transaction: transaction);
+    await pumpApp(tester, repository: repository);
     await tester.tap(find.text('Ver movimientos'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Alimentación'));
@@ -76,12 +76,48 @@ void main() {
 
     expect(repository.deletedId, transaction.id);
   });
+
+  testWidgets('filters transaction history by type', (tester) async {
+    final expense = buildTransaction();
+    final income = buildTransaction(
+      id: 'transaction-2',
+      type: TransactionType.income,
+      amountMinor: 3000,
+      note: 'Sueldo',
+    );
+    final repository = FakeTransactionRepository([expense, income]);
+
+    await pumpApp(tester, repository: repository);
+    await tester.tap(find.text('Ver movimientos'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('-12,50 EUR'), findsOneWidget);
+    expect(find.text('+30,00 EUR'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Filtrar movimientos'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Filtrar movimientos'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Ingreso'));
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('-12,50 EUR'), findsNothing);
+    expect(find.text('+30,00 EUR'), findsOneWidget);
+    expect(find.text('Quitar filtros'), findsOneWidget);
+
+    await tester.tap(find.text('Quitar filtros'));
+    await tester.pump();
+
+    expect(find.text('-12,50 EUR'), findsOneWidget);
+    expect(find.text('+30,00 EUR'), findsOneWidget);
+  });
 }
 
 Future<void> pumpApp(
   WidgetTester tester, {
   required FakeTransactionRepository repository,
-  required Transaction transaction,
 }) async {
   final wallet = buildWallet();
   final category = buildCategory();
@@ -96,7 +132,9 @@ Future<void> pumpApp(
         balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
         walletsProvider.overrideWithValue(AsyncData([wallet])),
         categoriesProvider.overrideWithValue(AsyncData([category])),
-        transactionsProvider.overrideWithValue(AsyncData([transaction])),
+        transactionsProvider.overrideWithValue(
+          AsyncData(repository.transactions),
+        ),
         transactionRepositoryProvider.overrideWithValue(repository),
       ],
       child: const ChuspitaApp(locale: Locale('es')),
@@ -121,15 +159,20 @@ Category buildCategory() {
   );
 }
 
-Transaction buildTransaction() {
+Transaction buildTransaction({
+  String id = 'transaction-1',
+  TransactionType type = TransactionType.expense,
+  int amountMinor = 1250,
+  String note = 'Almuerzo',
+}) {
   return Transaction(
-    id: TransactionId('transaction-1'),
-    type: TransactionType.expense,
-    amount: const Money(minorUnits: 1250, currency: Currency.eur),
+    id: TransactionId(id),
+    type: type,
+    amount: Money(minorUnits: amountMinor, currency: Currency.eur),
     walletId: WalletId('wallet-1'),
     categoryId: CategoryId('category-1'),
     occurredOn: LocalDate(year: 2026, month: 8, day: 24),
-    note: 'Almuerzo',
+    note: note,
   );
 }
 

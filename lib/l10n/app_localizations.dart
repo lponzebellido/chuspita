@@ -290,6 +290,90 @@ abstract class AppLocalizations {
   /// **'View transactions'**
   String get viewTransactions;
 
+  /// No description provided for @filterTransactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter transactions'**
+  String get filterTransactionsTitle;
+
+  /// No description provided for @transactionTypeFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get transactionTypeFilter;
+
+  /// No description provided for @allOption.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allOption;
+
+  /// No description provided for @allWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'All wallets'**
+  String get allWallets;
+
+  /// No description provided for @allCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All categories'**
+  String get allCategories;
+
+  /// No description provided for @periodFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get periodFilter;
+
+  /// No description provided for @allTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get allTime;
+
+  /// No description provided for @currentMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get currentMonth;
+
+  /// No description provided for @customRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customRange;
+
+  /// No description provided for @resetFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetFilters;
+
+  /// No description provided for @applyFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyFilters;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get clearFilters;
+
+  /// No description provided for @noFilteredTransactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions match'**
+  String get noFilteredTransactionsTitle;
+
+  /// No description provided for @noFilteredTransactionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try changing or clearing some filters.'**
+  String get noFilteredTransactionsBody;
+
   /// No description provided for @noTransactionsTitle.
   ///
   /// In en, this message translates to:

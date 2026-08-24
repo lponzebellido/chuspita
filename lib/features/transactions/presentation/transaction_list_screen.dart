@@ -3,6 +3,8 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
+import 'package:chuspita/features/transactions/presentation/transaction_filter_sheet.dart';
+import 'package:chuspita/features/transactions/presentation/transaction_filters.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
@@ -10,11 +12,26 @@ import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final class TransactionListScreen extends ConsumerWidget {
+final class TransactionListScreen extends ConsumerStatefulWidget {
   const TransactionListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TransactionListScreen> createState() =>
+      _TransactionListScreenState();
+}
+
+final class _TransactionListScreenState
+    extends ConsumerState<TransactionListScreen> {
+  late TransactionFilters _filters;
+
+  @override
+  void initState() {
+    super.initState();
+    _filters = TransactionFilters();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
     final wallets = ref.watch(walletsProvider);
     final categories = ref.watch(categoriesProvider);
@@ -31,6 +48,20 @@ final class TransactionListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(context.l10n.transactionsTitle),
         actions: [
+          IconButton(
+            tooltip: context.l10n.filterTransactionsTitle,
+            onPressed: wallets.hasValue && categories.hasValue
+                ? () => _openFilters(
+                    wallets.requireValue,
+                    categories.requireValue,
+                  )
+                : null,
+            icon: Badge(
+              isLabelVisible: !_filters.isEmpty,
+              label: Text('${_filters.activeCount}'),
+              child: const Icon(Icons.filter_list),
+            ),
+          ),
           IconButton(
             tooltip: context.l10n.addTransaction,
             onPressed: () => _openForm(context),
@@ -71,7 +102,8 @@ final class TransactionListScreen extends ConsumerWidget {
       );
     }
 
-    final transactionValues = transactions.requireValue.toList()
+    final allTransactions = transactions.requireValue;
+    final transactionValues = _filters.apply(allTransactions)
       ..sort((first, second) => second.occurredOn.compareTo(first.occurredOn));
     final walletsById = <WalletId, Wallet>{
       for (final wallet in wallets.requireValue) wallet.id: wallet,
@@ -80,7 +112,7 @@ final class TransactionListScreen extends ConsumerWidget {
       for (final category in categories.requireValue) category.id: category,
     };
 
-    if (transactionValues.isEmpty) {
+    if (allTransactions.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
         child: CustomScrollView(
@@ -95,30 +127,85 @@ final class TransactionListScreen extends ConsumerWidget {
       );
     }
 
+    if (transactionValues.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: onRefresh,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _EmptyFilteredTransactions(
+                onClear: () => setState(() => _filters = TransactionFilters()),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: ListView.separated(
+      child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        itemCount: transactionValues.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        itemCount: transactionValues.length + (_filters.isEmpty ? 0 : 1),
         itemBuilder: (context, index) {
-          final transaction = transactionValues[index];
+          if (!_filters.isEmpty && index == 0) {
+            return Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () =>
+                    setState(() => _filters = TransactionFilters()),
+                icon: const Icon(Icons.filter_list_off),
+                label: Text(context.l10n.clearFilters),
+              ),
+            );
+          }
+
+          final transactionIndex = index - (_filters.isEmpty ? 0 : 1);
+          final transaction = transactionValues[transactionIndex];
           final wallet = walletsById[transaction.walletId];
           final category = categoriesById[transaction.categoryId];
 
-          return _TransactionTile(
-            transaction: transaction,
-            walletName: wallet?.name ?? context.l10n.unknownWallet,
-            categoryName: category?.name ?? context.l10n.unknownCategory,
-            categoryColor: category == null
-                ? Theme.of(context).colorScheme.outline
-                : Color(category.color.value),
-            onTap: () => _openForm(context, transaction: transaction),
+          return Column(
+            children: [
+              _TransactionTile(
+                transaction: transaction,
+                walletName: wallet?.name ?? context.l10n.unknownWallet,
+                categoryName: category?.name ?? context.l10n.unknownCategory,
+                categoryColor: category == null
+                    ? Theme.of(context).colorScheme.outline
+                    : Color(category.color.value),
+                onTap: () => _openForm(context, transaction: transaction),
+              ),
+              if (transactionIndex < transactionValues.length - 1)
+                const Divider(height: 1),
+            ],
           );
         },
       ),
     );
+  }
+
+  Future<void> _openFilters(
+    List<Wallet> wallets,
+    List<Category> categories,
+  ) async {
+    final selected = await showModalBottomSheet<TransactionFilters>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => TransactionFilterSheet(
+        initialFilters: _filters,
+        wallets: wallets,
+        categories: categories,
+      ),
+    );
+
+    if (selected != null && mounted) {
+      setState(() => _filters = selected);
+    }
   }
 
   void _openForm(BuildContext context, {Transaction? transaction}) {
@@ -228,6 +315,47 @@ final class _EmptyTransactions extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add),
               label: Text(context.l10n.addTransaction),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final class _EmptyFilteredTransactions extends StatelessWidget {
+  const _EmptyFilteredTransactions({required this.onClear});
+
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.filter_list_off,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              context.l10n.noFilteredTransactionsTitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              context.l10n.noFilteredTransactionsBody,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: onClear,
+              child: Text(context.l10n.clearFilters),
             ),
           ],
         ),

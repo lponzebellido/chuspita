@@ -109,6 +109,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewTransactions => 'View transactions';
 
   @override
+  String get filterTransactionsTitle => 'Filter transactions';
+
+  @override
+  String get transactionTypeFilter => 'Type';
+
+  @override
+  String get allOption => 'All';
+
+  @override
+  String get allWallets => 'All wallets';
+
+  @override
+  String get allCategories => 'All categories';
+
+  @override
+  String get periodFilter => 'Period';
+
+  @override
+  String get allTime => 'All time';
+
+  @override
+  String get currentMonth => 'This month';
+
+  @override
+  String get customRange => 'Custom';
+
+  @override
+  String get resetFilters => 'Reset';
+
+  @override
+  String get applyFilters => 'Apply';
+
+  @override
+  String get clearFilters => 'Clear filters';
+
+  @override
+  String get noFilteredTransactionsTitle => 'No transactions match';
+
+  @override
+  String get noFilteredTransactionsBody =>
+      'Try changing or clearing some filters.';
+
+  @override
   String get noTransactionsTitle => 'You don\'t have any transactions yet';
 
   @override

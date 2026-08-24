@@ -311,19 +311,19 @@ abstract class AppLocalizations {
   /// No description provided for @transactionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Transactions'**
+  /// **'Movements'**
   String get transactionsTitle;
 
   /// No description provided for @viewTransactions.
   ///
   /// In en, this message translates to:
-  /// **'View transactions'**
+  /// **'View movements'**
   String get viewTransactions;
 
   /// No description provided for @filterTransactionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Filter transactions'**
+  /// **'Filter movements'**
   String get filterTransactionsTitle;
 
   /// No description provided for @transactionTypeFilter.
@@ -395,7 +395,7 @@ abstract class AppLocalizations {
   /// No description provided for @noFilteredTransactionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'No transactions match'**
+  /// **'No movements match'**
   String get noFilteredTransactionsTitle;
 
   /// No description provided for @noFilteredTransactionsBody.
@@ -407,13 +407,13 @@ abstract class AppLocalizations {
   /// No description provided for @noTransactionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'You don\'t have any transactions yet'**
+  /// **'You don\'t have any movements yet'**
   String get noTransactionsTitle;
 
   /// No description provided for @noTransactionsBody.
   ///
   /// In en, this message translates to:
-  /// **'The expenses and income you record will appear here.'**
+  /// **'The expenses, income, and transfers you record will appear here.'**
   String get noTransactionsBody;
 
   /// No description provided for @expense.
@@ -427,6 +427,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Income'**
   String get income;
+
+  /// No description provided for @transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get transfer;
 
   /// No description provided for @amountLabel.
   ///

@@ -4,8 +4,8 @@ import 'package:chuspita/app/settings/settings_screen.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
+import 'package:chuspita/features/movements/presentation/movement_list_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
-import 'package:chuspita/features/transactions/presentation/transaction_list_screen.dart';
 import 'package:chuspita/features/transfers/presentation/transfer_form_screen.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
@@ -59,7 +59,7 @@ final class HomeScreen extends ConsumerWidget {
     void openTransactionList() {
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (context) => const TransactionListScreen(),
+          builder: (context) => const MovementListScreen(),
         ),
       );
     }

@@ -9,6 +9,8 @@ import 'package:chuspita/features/categories/domain/category_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
+import 'package:chuspita/features/transfers/domain/transfer.dart';
+import 'package:chuspita/features/transfers/domain/transfer_id.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
@@ -113,28 +115,93 @@ void main() {
     expect(find.text('-12,50 EUR'), findsOneWidget);
     expect(find.text('+30,00 EUR'), findsOneWidget);
   });
+
+  testWidgets('shows and filters a transfer as a neutral movement', (
+    tester,
+  ) async {
+    final sourceWallet = buildWallet();
+    final destinationWallet = buildWallet(
+      id: 'wallet-2',
+      name: 'Ahorros',
+      currency: Currency.pen,
+    );
+    final repository = FakeTransactionRepository([buildTransaction()]);
+    final transfer = Transfer(
+      id: TransferId('transfer-1'),
+      sourceWalletId: sourceWallet.id,
+      destinationWalletId: destinationWallet.id,
+      sourceAmount: const Money(minorUnits: 1000, currency: Currency.eur),
+      destinationAmount: const Money(minorUnits: 4000, currency: Currency.pen),
+      occurredOn: LocalDate(year: 2026, month: 8, day: 24),
+      note: 'Cambio de moneda',
+    );
+
+    await pumpApp(
+      tester,
+      repository: repository,
+      wallets: [sourceWallet, destinationWallet],
+      transfers: [transfer],
+    );
+    await tester.tap(find.text('Ver movimientos'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Transferencia'), findsOneWidget);
+    expect(
+      find.textContaining('Cambio de moneda · Efectivo → Ahorros'),
+      findsOneWidget,
+    );
+    expect(find.text('−10,00 EUR'), findsOneWidget);
+    expect(find.text('+40,00 PEN'), findsOneWidget);
+    expect(find.text('-12,50 EUR'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Filtrar movimientos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Transferencia'));
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Aplicar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Transferencia'), findsOneWidget);
+    expect(find.text('-12,50 EUR'), findsNothing);
+
+    await tester.tap(find.text('Transferencia'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Monedero de origen'), findsOneWidget);
+    expect(find.text('Monedero de destino'), findsOneWidget);
+    expect(find.text('Efectivo'), findsOneWidget);
+    expect(find.text('Ahorros'), findsOneWidget);
+    expect(find.text('Cambio de moneda'), findsOneWidget);
+  });
 }
 
 Future<void> pumpApp(
   WidgetTester tester, {
   required FakeTransactionRepository repository,
+  List<Wallet>? wallets,
+  List<Transfer> transfers = const [],
 }) async {
-  final wallet = buildWallet();
+  final walletValues = wallets ?? [buildWallet()];
   final category = buildCategory();
   final summary = BalanceSummary(
-    byWallet: {wallet.id: wallet.initialBalance},
-    byCurrency: {wallet.currency: wallet.initialBalance},
+    byWallet: {
+      for (final wallet in walletValues) wallet.id: wallet.initialBalance,
+    },
+    byCurrency: {
+      for (final wallet in walletValues) wallet.currency: wallet.initialBalance,
+    },
   );
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
-        walletsProvider.overrideWithValue(AsyncData([wallet])),
+        walletsProvider.overrideWithValue(AsyncData(walletValues)),
         categoriesProvider.overrideWithValue(AsyncData([category])),
         transactionsProvider.overrideWithValue(
           AsyncData(repository.transactions),
         ),
+        transfersProvider.overrideWithValue(AsyncData(transfers)),
         transactionRepositoryProvider.overrideWithValue(repository),
       ],
       child: const ChuspitaApp(locale: Locale('es')),
@@ -143,11 +210,15 @@ Future<void> pumpApp(
   await tester.pump();
 }
 
-Wallet buildWallet() {
+Wallet buildWallet({
+  String id = 'wallet-1',
+  String name = 'Efectivo',
+  Currency currency = Currency.eur,
+}) {
   return Wallet(
-    id: WalletId('wallet-1'),
-    name: 'Efectivo',
-    initialBalance: const Money(minorUnits: 0, currency: Currency.eur),
+    id: WalletId(id),
+    name: name,
+    initialBalance: Money(minorUnits: 0, currency: currency),
   );
 }
 

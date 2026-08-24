@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
-import 'package:chuspita/features/transactions/domain/transaction.dart';
-import 'package:chuspita/features/transactions/presentation/transaction_filters.dart';
+import 'package:chuspita/features/movements/presentation/movement_filters.dart';
+import 'package:chuspita/features/movements/presentation/movement_item.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
@@ -12,24 +12,24 @@ import 'package:flutter/material.dart';
 
 enum _PeriodOption { all, currentMonth, custom }
 
-final class TransactionFilterSheet extends StatefulWidget {
-  const TransactionFilterSheet({
+final class MovementFilterSheet extends StatefulWidget {
+  const MovementFilterSheet({
     super.key,
     required this.initialFilters,
     required this.wallets,
     required this.categories,
   });
 
-  final TransactionFilters initialFilters;
+  final MovementFilters initialFilters;
   final List<Wallet> wallets;
   final List<Category> categories;
 
   @override
-  State<TransactionFilterSheet> createState() => _TransactionFilterSheetState();
+  State<MovementFilterSheet> createState() => _MovementFilterSheetState();
 }
 
-final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
-  TransactionType? _type;
+final class _MovementFilterSheetState extends State<MovementFilterSheet> {
+  MovementType? _type;
   String _walletId = '';
   String _categoryId = '';
   _PeriodOption _period = _PeriodOption.all;
@@ -48,7 +48,7 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
     _period = _periodFor(filters);
   }
 
-  _PeriodOption _periodFor(TransactionFilters filters) {
+  _PeriodOption _periodFor(MovementFilters filters) {
     if (filters.startDate == null) {
       return _PeriodOption.all;
     }
@@ -142,10 +142,12 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
     });
   }
 
-  void _selectType(TransactionType? type) {
+  void _selectType(MovementType? type) {
     var categoryId = _categoryId;
 
-    if (type != null && categoryId.isNotEmpty) {
+    if (type == MovementType.transfer) {
+      categoryId = '';
+    } else if (type != null && categoryId.isNotEmpty) {
       final selectedCategory = widget.categories
           .where((category) => category.id.value == categoryId)
           .firstOrNull;
@@ -164,7 +166,7 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
 
   void _apply() {
     Navigator.of(context).pop(
-      TransactionFilters(
+      MovementFilters(
         type: _type,
         walletId: _walletId.isEmpty ? null : WalletId(_walletId),
         categoryId: _categoryId.isEmpty ? null : CategoryId(_categoryId),
@@ -213,6 +215,7 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: [
                 ChoiceChip(
                   label: Text(context.l10n.allOption),
@@ -221,13 +224,18 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
                 ),
                 ChoiceChip(
                   label: Text(context.l10n.expense),
-                  selected: _type == TransactionType.expense,
-                  onSelected: (_) => _selectType(TransactionType.expense),
+                  selected: _type == MovementType.expense,
+                  onSelected: (_) => _selectType(MovementType.expense),
                 ),
                 ChoiceChip(
                   label: Text(context.l10n.income),
-                  selected: _type == TransactionType.income,
-                  onSelected: (_) => _selectType(TransactionType.income),
+                  selected: _type == MovementType.income,
+                  onSelected: (_) => _selectType(MovementType.income),
+                ),
+                ChoiceChip(
+                  label: Text(context.l10n.transfer),
+                  selected: _type == MovementType.transfer,
+                  onSelected: (_) => _selectType(MovementType.transfer),
                 ),
               ],
             ),
@@ -252,27 +260,29 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
               ],
               onChanged: (value) => setState(() => _walletId = value ?? ''),
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              key: ValueKey('category-$_categoryId'),
-              initialValue: _categoryId,
-              decoration: InputDecoration(
-                labelText: context.l10n.categoryLabel,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: '',
-                  child: Text(context.l10n.allCategories),
+            if (_type != MovementType.transfer) ...[
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                key: ValueKey('category-$_categoryId'),
+                initialValue: _categoryId,
+                decoration: InputDecoration(
+                  labelText: context.l10n.categoryLabel,
+                  border: const OutlineInputBorder(),
                 ),
-                for (final category in categories)
+                items: [
                   DropdownMenuItem(
-                    value: category.id.value,
-                    child: Text(category.name),
+                    value: '',
+                    child: Text(context.l10n.allCategories),
                   ),
-              ],
-              onChanged: (value) => setState(() => _categoryId = value ?? ''),
-            ),
+                  for (final category in categories)
+                    DropdownMenuItem(
+                      value: category.id.value,
+                      child: Text(category.name),
+                    ),
+                ],
+                onChanged: (value) => setState(() => _categoryId = value ?? ''),
+              ),
+            ],
             const SizedBox(height: 24),
             Text(
               context.l10n.periodFilter,
@@ -340,9 +350,10 @@ final class _TransactionFilterSheetState extends State<TransactionFilterSheet> {
   }
 }
 
-bool _categoryAllowsType(Category category, TransactionType type) {
+bool _categoryAllowsType(Category category, MovementType type) {
   return switch (type) {
-    TransactionType.expense => category.applicability.allowsExpenses,
-    TransactionType.income => category.applicability.allowsIncome,
+    MovementType.expense => category.applicability.allowsExpenses,
+    MovementType.income => category.applicability.allowsIncome,
+    MovementType.transfer => false,
   };
 }

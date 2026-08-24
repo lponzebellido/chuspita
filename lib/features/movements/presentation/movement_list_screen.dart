@@ -1,44 +1,47 @@
 import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
+import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
+import 'package:chuspita/features/movements/presentation/movement_filter_sheet.dart';
+import 'package:chuspita/features/movements/presentation/movement_filters.dart';
+import 'package:chuspita/features/movements/presentation/movement_item.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
-import 'package:chuspita/features/transactions/presentation/transaction_filter_sheet.dart';
-import 'package:chuspita/features/transactions/presentation/transaction_filters.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
+import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final class TransactionListScreen extends ConsumerStatefulWidget {
-  const TransactionListScreen({super.key});
+final class MovementListScreen extends ConsumerStatefulWidget {
+  const MovementListScreen({super.key});
 
   @override
-  ConsumerState<TransactionListScreen> createState() =>
-      _TransactionListScreenState();
+  ConsumerState<MovementListScreen> createState() => _MovementListScreenState();
 }
 
-final class _TransactionListScreenState
-    extends ConsumerState<TransactionListScreen> {
-  late TransactionFilters _filters;
+final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
+  late MovementFilters _filters;
 
   @override
   void initState() {
     super.initState();
-    _filters = TransactionFilters();
+    _filters = MovementFilters();
   }
 
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
+    final transfers = ref.watch(transfersProvider);
     final wallets = ref.watch(walletsProvider);
     final categories = ref.watch(categoriesProvider);
 
     Future<void> refresh() {
       return Future.wait<void>([
         ref.refresh(transactionsProvider.future).then((_) {}),
+        ref.refresh(transfersProvider.future).then((_) {}),
         ref.refresh(walletsProvider.future).then((_) {}),
         ref.refresh(categoriesProvider.future).then((_) {}),
       ]);
@@ -64,7 +67,7 @@ final class _TransactionListScreenState
           ),
           IconButton(
             tooltip: context.l10n.addTransaction,
-            onPressed: () => _openForm(context),
+            onPressed: () => _openTransactionForm(context),
             icon: const Icon(Icons.add),
           ),
         ],
@@ -73,6 +76,7 @@ final class _TransactionListScreenState
         context: context,
         ref: ref,
         transactions: transactions,
+        transfers: transfers,
         wallets: wallets,
         categories: categories,
         onRefresh: refresh,
@@ -84,27 +88,44 @@ final class _TransactionListScreenState
     required BuildContext context,
     required WidgetRef ref,
     required AsyncValue<List<Transaction>> transactions,
+    required AsyncValue<List<Transfer>> transfers,
     required AsyncValue<List<Wallet>> wallets,
     required AsyncValue<List<Category>> categories,
     required RefreshCallback onRefresh,
   }) {
-    if (transactions.isLoading || wallets.isLoading || categories.isLoading) {
+    if (transactions.isLoading ||
+        transfers.isLoading ||
+        wallets.isLoading ||
+        categories.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (transactions.hasError || wallets.hasError || categories.hasError) {
+    if (transactions.hasError ||
+        transfers.hasError ||
+        wallets.hasError ||
+        categories.hasError) {
       return _LoadError(
         onRetry: () {
           ref.invalidate(transactionsProvider);
+          ref.invalidate(transfersProvider);
           ref.invalidate(walletsProvider);
           ref.invalidate(categoriesProvider);
         },
       );
     }
 
-    final allTransactions = transactions.requireValue;
-    final transactionValues = _filters.apply(allTransactions)
-      ..sort((first, second) => second.occurredOn.compareTo(first.occurredOn));
+    final allMovements = combineMovements(
+      transactions: transactions.requireValue,
+      transfers: transfers.requireValue,
+    );
+    final movementValues = _filters.apply(allMovements)
+      ..sort((first, second) {
+        final dateComparison = second.occurredOn.compareTo(first.occurredOn);
+
+        return dateComparison != 0
+            ? dateComparison
+            : second.id.compareTo(first.id);
+      });
     final walletsById = <WalletId, Wallet>{
       for (final wallet in wallets.requireValue) wallet.id: wallet,
     };
@@ -112,7 +133,7 @@ final class _TransactionListScreenState
       for (final category in categories.requireValue) category.id: category,
     };
 
-    if (allTransactions.isEmpty) {
+    if (allMovements.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
         child: CustomScrollView(
@@ -120,14 +141,16 @@ final class _TransactionListScreenState
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
-              child: _EmptyTransactions(onAdd: () => _openForm(context)),
+              child: _EmptyMovements(
+                onAdd: () => _openTransactionForm(context),
+              ),
             ),
           ],
         ),
       );
     }
 
-    if (transactionValues.isEmpty) {
+    if (movementValues.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
         child: CustomScrollView(
@@ -135,8 +158,8 @@ final class _TransactionListScreenState
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
-              child: _EmptyFilteredTransactions(
-                onClear: () => setState(() => _filters = TransactionFilters()),
+              child: _EmptyFilteredMovements(
+                onClear: () => setState(() => _filters = MovementFilters()),
               ),
             ),
           ],
@@ -149,37 +172,61 @@ final class _TransactionListScreenState
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        itemCount: transactionValues.length + (_filters.isEmpty ? 0 : 1),
+        itemCount: movementValues.length + (_filters.isEmpty ? 0 : 1),
         itemBuilder: (context, index) {
           if (!_filters.isEmpty && index == 0) {
             return Align(
               alignment: Alignment.centerRight,
               child: TextButton.icon(
-                onPressed: () =>
-                    setState(() => _filters = TransactionFilters()),
+                onPressed: () => setState(() => _filters = MovementFilters()),
                 icon: const Icon(Icons.filter_list_off),
                 label: Text(context.l10n.clearFilters),
               ),
             );
           }
 
-          final transactionIndex = index - (_filters.isEmpty ? 0 : 1);
-          final transaction = transactionValues[transactionIndex];
-          final wallet = walletsById[transaction.walletId];
-          final category = categoriesById[transaction.categoryId];
+          final movementIndex = index - (_filters.isEmpty ? 0 : 1);
+          final movement = movementValues[movementIndex];
 
           return Column(
             children: [
-              _TransactionTile(
-                transaction: transaction,
-                walletName: wallet?.name ?? context.l10n.unknownWallet,
-                categoryName: category?.name ?? context.l10n.unknownCategory,
-                categoryColor: category == null
-                    ? Theme.of(context).colorScheme.outline
-                    : Color(category.color.value),
-                onTap: () => _openForm(context, transaction: transaction),
-              ),
-              if (transactionIndex < transactionValues.length - 1)
+              switch (movement) {
+                TransactionMovementItem(:final transaction) => _TransactionTile(
+                  transaction: transaction,
+                  walletName:
+                      walletsById[transaction.walletId]?.name ??
+                      context.l10n.unknownWallet,
+                  categoryName:
+                      categoriesById[transaction.categoryId]?.name ??
+                      context.l10n.unknownCategory,
+                  categoryColor: categoriesById[transaction.categoryId] == null
+                      ? Theme.of(context).colorScheme.outline
+                      : Color(
+                          categoriesById[transaction.categoryId]!.color.value,
+                        ),
+                  onTap: () =>
+                      _openTransactionForm(context, transaction: transaction),
+                ),
+                TransferMovementItem(:final transfer) => _TransferTile(
+                  transfer: transfer,
+                  sourceWalletName:
+                      walletsById[transfer.sourceWalletId]?.name ??
+                      context.l10n.unknownWallet,
+                  destinationWalletName:
+                      walletsById[transfer.destinationWalletId]?.name ??
+                      context.l10n.unknownWallet,
+                  onTap: () => _openTransferDetails(
+                    transfer: transfer,
+                    sourceWalletName:
+                        walletsById[transfer.sourceWalletId]?.name ??
+                        context.l10n.unknownWallet,
+                    destinationWalletName:
+                        walletsById[transfer.destinationWalletId]?.name ??
+                        context.l10n.unknownWallet,
+                  ),
+                ),
+              },
+              if (movementIndex < movementValues.length - 1)
                 const Divider(height: 1),
             ],
           );
@@ -192,11 +239,11 @@ final class _TransactionListScreenState
     List<Wallet> wallets,
     List<Category> categories,
   ) async {
-    final selected = await showModalBottomSheet<TransactionFilters>(
+    final selected = await showModalBottomSheet<MovementFilters>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (context) => TransactionFilterSheet(
+      builder: (context) => MovementFilterSheet(
         initialFilters: _filters,
         wallets: wallets,
         categories: categories,
@@ -208,10 +255,27 @@ final class _TransactionListScreenState
     }
   }
 
-  void _openForm(BuildContext context, {Transaction? transaction}) {
+  void _openTransactionForm(BuildContext context, {Transaction? transaction}) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => TransactionFormScreen(transaction: transaction),
+      ),
+    );
+  }
+
+  void _openTransferDetails({
+    required Transfer transfer,
+    required String sourceWalletName,
+    required String destinationWalletName,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => _TransferDetails(
+        transfer: transfer,
+        sourceWalletName: sourceWalletName,
+        destinationWalletName: destinationWalletName,
       ),
     );
   }
@@ -244,13 +308,7 @@ final class _TransactionTile extends StatelessWidget {
       transaction.amount,
       localeName: Localizations.localeOf(context).toString(),
     );
-    final formattedDate = MaterialLocalizations.of(context).formatMediumDate(
-      DateTime(
-        transaction.occurredOn.year,
-        transaction.occurredOn.month,
-        transaction.occurredOn.day,
-      ),
-    );
+    final formattedDate = _formatDate(context, transaction.occurredOn);
     final details = [
       if (transaction.note != null) transaction.note!,
       walletName,
@@ -284,8 +342,135 @@ final class _TransactionTile extends StatelessWidget {
   }
 }
 
-final class _EmptyTransactions extends StatelessWidget {
-  const _EmptyTransactions({required this.onAdd});
+final class _TransferTile extends StatelessWidget {
+  const _TransferTile({
+    required this.transfer,
+    required this.sourceWalletName,
+    required this.destinationWalletName,
+    required this.onTap,
+  });
+
+  final Transfer transfer;
+  final String sourceWalletName;
+  final String destinationWalletName;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final localeName = Localizations.localeOf(context).toString();
+    final sourceAmount = formatMoneyAmount(
+      transfer.sourceAmount,
+      localeName: localeName,
+    );
+    final destinationAmount = formatMoneyAmount(
+      transfer.destinationAmount,
+      localeName: localeName,
+    );
+    final details = [
+      if (transfer.note != null) transfer.note!,
+      '$sourceWalletName → $destinationWalletName',
+      _formatDate(context, transfer.occurredOn),
+    ].join(' · ');
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      leading: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: colorScheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(Icons.swap_horiz, color: colorScheme.onSecondaryContainer),
+      ),
+      title: Text(context.l10n.transfer),
+      subtitle: Text(details, maxLines: 2, overflow: TextOverflow.ellipsis),
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text('−$sourceAmount ${transfer.sourceAmount.currency.code}'),
+          Text(
+            '+$destinationAmount ${transfer.destinationAmount.currency.code}',
+          ),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+final class _TransferDetails extends StatelessWidget {
+  const _TransferDetails({
+    required this.transfer,
+    required this.sourceWalletName,
+    required this.destinationWalletName,
+  });
+
+  final Transfer transfer;
+  final String sourceWalletName;
+  final String destinationWalletName;
+
+  @override
+  Widget build(BuildContext context) {
+    final localeName = Localizations.localeOf(context).toString();
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              context.l10n.transfer,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.call_made),
+              title: Text(context.l10n.sourceWalletLabel),
+              subtitle: Text(sourceWalletName),
+              trailing: Text(
+                '${formatMoneyAmount(transfer.sourceAmount, localeName: localeName)} '
+                '${transfer.sourceAmount.currency.code}',
+              ),
+            ),
+            const Center(child: Icon(Icons.arrow_downward)),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.call_received),
+              title: Text(context.l10n.destinationWalletLabel),
+              subtitle: Text(destinationWalletName),
+              trailing: Text(
+                '${formatMoneyAmount(transfer.destinationAmount, localeName: localeName)} '
+                '${transfer.destinationAmount.currency.code}',
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_today_outlined),
+              title: Text(context.l10n.dateLabel),
+              subtitle: Text(_formatDate(context, transfer.occurredOn)),
+            ),
+            if (transfer.note != null)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.notes),
+                title: Text(context.l10n.noteLabel),
+                subtitle: Text(transfer.note!),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final class _EmptyMovements extends StatelessWidget {
+  const _EmptyMovements({required this.onAdd});
 
   final VoidCallback onAdd;
 
@@ -323,8 +508,8 @@ final class _EmptyTransactions extends StatelessWidget {
   }
 }
 
-final class _EmptyFilteredTransactions extends StatelessWidget {
-  const _EmptyFilteredTransactions({required this.onClear});
+final class _EmptyFilteredMovements extends StatelessWidget {
+  const _EmptyFilteredMovements({required this.onClear});
 
   final VoidCallback onClear;
 
@@ -387,4 +572,9 @@ final class _LoadError extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatDate(BuildContext context, LocalDate date) {
+  return MaterialLocalizations.of(context)
+      .formatMediumDate(DateTime(date.year, date.month, date.day));
 }

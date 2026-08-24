@@ -118,13 +118,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editTransactionTitle => 'Edit transaction';
 
   @override
-  String get transactionsTitle => 'Transactions';
+  String get transactionsTitle => 'Movements';
 
   @override
-  String get viewTransactions => 'View transactions';
+  String get viewTransactions => 'View movements';
 
   @override
-  String get filterTransactionsTitle => 'Filter transactions';
+  String get filterTransactionsTitle => 'Filter movements';
 
   @override
   String get transactionTypeFilter => 'Type';
@@ -160,24 +160,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearFilters => 'Clear filters';
 
   @override
-  String get noFilteredTransactionsTitle => 'No transactions match';
+  String get noFilteredTransactionsTitle => 'No movements match';
 
   @override
   String get noFilteredTransactionsBody =>
       'Try changing or clearing some filters.';
 
   @override
-  String get noTransactionsTitle => 'You don\'t have any transactions yet';
+  String get noTransactionsTitle => 'You don\'t have any movements yet';
 
   @override
   String get noTransactionsBody =>
-      'The expenses and income you record will appear here.';
+      'The expenses, income, and transfers you record will appear here.';
 
   @override
   String get expense => 'Expense';
 
   @override
   String get income => 'Income';
+
+  @override
+  String get transfer => 'Transfer';
 
   @override
   String get amountLabel => 'Amount';

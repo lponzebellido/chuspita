@@ -171,13 +171,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noTransactionsBody =>
-      'Los gastos e ingresos que registres aparecerán aquí.';
+      'Los gastos, ingresos y transferencias que registres aparecerán aquí.';
 
   @override
   String get expense => 'Gasto';
 
   @override
   String get income => 'Ingreso';
+
+  @override
+  String get transfer => 'Transferencia';
 
   @override
   String get amountLabel => 'Cantidad';

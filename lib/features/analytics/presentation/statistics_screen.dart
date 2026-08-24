@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/features/analytics/domain/analytics_period.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
 import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
 import 'package:chuspita/features/analytics/presentation/expense_trend_section.dart';
 import 'package:chuspita/features/analytics/presentation/income_expense_section.dart';
+import 'package:chuspita/features/analytics/presentation/period_comparison_section.dart';
 import 'package:chuspita/features/analytics/presentation/spending_metrics_section.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-enum _StatisticsPeriod { day, week, month, year, custom }
 
 final class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
@@ -21,21 +21,21 @@ final class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
-  late _StatisticsPeriod _period;
+  late AnalyticsPeriod _period;
   late LocalDate _startDate;
   late LocalDate _endDate;
 
   @override
   void initState() {
     super.initState();
-    _period = _StatisticsPeriod.month;
+    _period = AnalyticsPeriod.month;
     final range = _rangeFor(_period, ref.read(currentDateProvider));
     _startDate = range.$1;
     _endDate = range.$2;
   }
 
   (LocalDate, LocalDate) _rangeFor(
-    _StatisticsPeriod period,
+    AnalyticsPeriod period,
     LocalDate currentDate,
   ) {
     final today = DateTime(
@@ -45,14 +45,14 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     );
 
     return switch (period) {
-      _StatisticsPeriod.day => (currentDate, currentDate),
-      _StatisticsPeriod.week => () {
+      AnalyticsPeriod.day => (currentDate, currentDate),
+      AnalyticsPeriod.week => () {
         final start = today.subtract(Duration(days: today.weekday - 1));
         final end = start.add(const Duration(days: 6));
 
         return (_toLocalDate(start), _toLocalDate(end));
       }(),
-      _StatisticsPeriod.month => (
+      AnalyticsPeriod.month => (
         LocalDate(year: currentDate.year, month: currentDate.month, day: 1),
         LocalDate(
           year: currentDate.year,
@@ -60,11 +60,11 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           day: DateTime(currentDate.year, currentDate.month + 1, 0).day,
         ),
       ),
-      _StatisticsPeriod.year => (
+      AnalyticsPeriod.year => (
         LocalDate(year: currentDate.year, month: 1, day: 1),
         LocalDate(year: currentDate.year, month: 12, day: 31),
       ),
-      _StatisticsPeriod.custom => (_startDate, _endDate),
+      AnalyticsPeriod.custom => (_startDate, _endDate),
     };
   }
 
@@ -72,8 +72,8 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     return LocalDate(year: value.year, month: value.month, day: value.day);
   }
 
-  void _selectPeriod(_StatisticsPeriod period) {
-    if (period == _StatisticsPeriod.custom) {
+  void _selectPeriod(AnalyticsPeriod period) {
+    if (period == AnalyticsPeriod.custom) {
       unawaited(_selectCustomRange());
       return;
     }
@@ -100,7 +100,7 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
     if (selected != null && mounted) {
       setState(() {
-        _period = _StatisticsPeriod.custom;
+        _period = AnalyticsPeriod.custom;
         _startDate = _toLocalDate(selected.start);
         _endDate = _toLocalDate(selected.end);
       });
@@ -109,15 +109,26 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final summary = ref
-        .watch(transactionsProvider)
-        .whenData(
-          (transactions) => calculatePeriodSummary(
-            transactions: transactions,
-            startDate: _startDate,
-            endDate: _endDate,
-          ),
-        );
+    final transactions = ref.watch(transactionsProvider);
+    final previousPeriod = previousEquivalentPeriod(
+      period: _period,
+      startDate: _startDate,
+      endDate: _endDate,
+    );
+    final summaries = transactions.whenData(
+      (transactions) => (
+        current: calculatePeriodSummary(
+          transactions: transactions,
+          startDate: _startDate,
+          endDate: _endDate,
+        ),
+        previous: calculatePeriodSummary(
+          transactions: transactions,
+          startDate: previousPeriod.startDate,
+          endDate: previousPeriod.endDate,
+        ),
+      ),
+    );
 
     Future<void> refresh() {
       return Future.wait<void>([
@@ -129,8 +140,8 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.statisticsTitle)),
       body: SafeArea(
-        child: switch (summary) {
-          AsyncData() => RefreshIndicator(
+        child: switch (summaries) {
+          AsyncData(:final value) => RefreshIndicator(
             onRefresh: refresh,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -147,29 +158,28 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   children: [
                     ChoiceChip(
                       label: Text(context.l10n.currentDay),
-                      selected: _period == _StatisticsPeriod.day,
-                      onSelected: (_) => _selectPeriod(_StatisticsPeriod.day),
+                      selected: _period == AnalyticsPeriod.day,
+                      onSelected: (_) => _selectPeriod(AnalyticsPeriod.day),
                     ),
                     ChoiceChip(
                       label: Text(context.l10n.currentWeek),
-                      selected: _period == _StatisticsPeriod.week,
-                      onSelected: (_) => _selectPeriod(_StatisticsPeriod.week),
+                      selected: _period == AnalyticsPeriod.week,
+                      onSelected: (_) => _selectPeriod(AnalyticsPeriod.week),
                     ),
                     ChoiceChip(
                       label: Text(context.l10n.currentMonth),
-                      selected: _period == _StatisticsPeriod.month,
-                      onSelected: (_) => _selectPeriod(_StatisticsPeriod.month),
+                      selected: _period == AnalyticsPeriod.month,
+                      onSelected: (_) => _selectPeriod(AnalyticsPeriod.month),
                     ),
                     ChoiceChip(
                       label: Text(context.l10n.currentYear),
-                      selected: _period == _StatisticsPeriod.year,
-                      onSelected: (_) => _selectPeriod(_StatisticsPeriod.year),
+                      selected: _period == AnalyticsPeriod.year,
+                      onSelected: (_) => _selectPeriod(AnalyticsPeriod.year),
                     ),
                     ChoiceChip(
                       label: Text(context.l10n.customRange),
-                      selected: _period == _StatisticsPeriod.custom,
-                      onSelected: (_) =>
-                          _selectPeriod(_StatisticsPeriod.custom),
+                      selected: _period == AnalyticsPeriod.custom,
+                      onSelected: (_) => _selectPeriod(AnalyticsPeriod.custom),
                     ),
                   ],
                 ),
@@ -179,16 +189,21 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 28),
-                IncomeExpenseSection(summary: summary.requireValue),
+                IncomeExpenseSection(summary: value.current),
                 const SizedBox(height: 28),
                 SpendingMetricsSection(
-                  summary: summary.requireValue,
+                  summary: value.current,
                   categories: ref.watch(categoriesProvider).asData?.value ?? [],
                 ),
                 const SizedBox(height: 28),
-                ExpenseTrendSection(summary: summary.requireValue),
+                PeriodComparisonSection(
+                  current: value.current,
+                  previous: value.previous,
+                ),
                 const SizedBox(height: 28),
-                CategorySpendingSection(summary: summary),
+                ExpenseTrendSection(summary: value.current),
+                const SizedBox(height: 28),
+                CategorySpendingSection(summary: AsyncData(value.current)),
               ],
             ),
           ),

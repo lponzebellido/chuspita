@@ -192,6 +192,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get topCategoryMetric => 'Top category';
 
   @override
+  String get periodComparisonTitle => 'Compared with the previous period';
+
+  @override
+  String get previousPeriod => 'Previous period';
+
+  @override
+  String get noPeriodComparison =>
+      'There is no activity to compare in these periods.';
+
+  @override
+  String get noPreviousReference => 'No previous reference';
+
+  @override
+  String get unchangedFromPrevious => 'No change';
+
+  @override
+  String get moreThanPrevious => 'more';
+
+  @override
+  String get lessThanPrevious => 'less';
+
+  @override
   String get expenseTrendTitle => 'Spending over time';
 
   @override

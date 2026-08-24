@@ -199,6 +199,13 @@ void main() {
         occurredOn: LocalDate(year: 2026, month: 7, day: 20),
         categoryId: 'food',
       ),
+      buildTransaction(
+        id: 'previous-month-income',
+        type: TransactionType.income,
+        amountMinor: 5000,
+        occurredOn: LocalDate(year: 2026, month: 7, day: 5),
+        categoryId: 'salary',
+      ),
     ];
 
     await pumpApp(
@@ -264,8 +271,28 @@ void main() {
       ),
       findsOneWidget,
     );
-    final statisticsList = find.byType(ListView).first;
     final statisticsScrollable = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(
+      find.text('Comparación con el periodo anterior'),
+      250,
+      scrollable: statisticsScrollable,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('income-comparison-EUR')),
+        matching: find.text('100% más'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('expense-comparison-EUR')),
+        matching: find.text('20% menos'),
+      ),
+      findsOneWidget,
+    );
     await tester.scrollUntilVisible(
       find.text('Evolución del gasto'),
       250,
@@ -296,7 +323,11 @@ void main() {
     expect(find.text('25% · 10,00 EUR'), findsOneWidget);
     expect(find.text('Sueldo'), findsNothing);
 
-    await tester.drag(statisticsList, const Offset(0, 1000));
+    await tester.scrollUntilVisible(
+      find.text('Este año'),
+      -500,
+      scrollable: statisticsScrollable,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Este año'));
     await tester.pumpAndSettle();

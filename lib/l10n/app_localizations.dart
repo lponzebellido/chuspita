@@ -452,6 +452,48 @@ abstract class AppLocalizations {
   /// **'Top category'**
   String get topCategoryMetric;
 
+  /// No description provided for @periodComparisonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compared with the previous period'**
+  String get periodComparisonTitle;
+
+  /// No description provided for @previousPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous period'**
+  String get previousPeriod;
+
+  /// No description provided for @noPeriodComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no activity to compare in these periods.'**
+  String get noPeriodComparison;
+
+  /// No description provided for @noPreviousReference.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous reference'**
+  String get noPreviousReference;
+
+  /// No description provided for @unchangedFromPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'No change'**
+  String get unchangedFromPrevious;
+
+  /// No description provided for @moreThanPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get moreThanPrevious;
+
+  /// No description provided for @lessThanPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'less'**
+  String get lessThanPrevious;
+
   /// No description provided for @expenseTrendTitle.
   ///
   /// In en, this message translates to:

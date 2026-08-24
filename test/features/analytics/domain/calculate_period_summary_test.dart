@@ -82,6 +82,16 @@ void main() {
         currency: Currency.eur,
       ),
     });
+    expect(summary.byCurrency[Currency.eur]!.expensesByDate, {
+      LocalDate(year: 2026, month: 8, day: 31): const Money(
+        minorUnits: 2500,
+        currency: Currency.eur,
+      ),
+      LocalDate(year: 2026, month: 8, day: 20): const Money(
+        minorUnits: 500,
+        currency: Currency.eur,
+      ),
+    });
     expect(
       summary.byCurrency[Currency.pen]!.income,
       const Money(minorUnits: 0, currency: Currency.pen),
@@ -105,6 +115,12 @@ void main() {
     );
     expect(summary.byCurrency[Currency.pen]!.expensesByCategory, {
       CategoryId('food'): const Money(minorUnits: 4000, currency: Currency.pen),
+    });
+    expect(summary.byCurrency[Currency.pen]!.expensesByDate, {
+      LocalDate(year: 2026, month: 8, day: 15): const Money(
+        minorUnits: 4000,
+        currency: Currency.pen,
+      ),
     });
   });
 
@@ -169,6 +185,7 @@ void main() {
       const Money(minorUnits: 0, currency: Currency.eur),
     );
     expect(currencySummary.topExpenseCategory, isNull);
+    expect(currencySummary.expensesByDate, isEmpty);
   });
 
   test('rejects an inverted period', () {

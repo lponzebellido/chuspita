@@ -267,6 +267,18 @@ void main() {
     final statisticsList = find.byType(ListView).first;
     final statisticsScrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(
+      find.text('Evolución del gasto'),
+      250,
+      scrollable: statisticsScrollable,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('expense-trend-chart-EUR')),
+      findsOneWidget,
+    );
+    expect(find.text('Agrupado por día'), findsOneWidget);
+    await tester.scrollUntilVisible(
       find.text('Gastos por categoría'),
       250,
       scrollable: statisticsScrollable,
@@ -278,7 +290,7 @@ void main() {
       find.byKey(const ValueKey('category-spending-chart-EUR')),
       findsOneWidget,
     );
-    expect(find.text('Alimentación'), findsNWidgets(2));
+    expect(find.text('Alimentación'), findsOneWidget);
     expect(find.text('75% · 30,00 EUR'), findsOneWidget);
     expect(find.text('Transporte'), findsOneWidget);
     expect(find.text('25% · 10,00 EUR'), findsOneWidget);
@@ -310,6 +322,18 @@ void main() {
       ),
       findsOneWidget,
     );
+    await tester.scrollUntilVisible(
+      find.text('Evolución del gasto'),
+      250,
+      scrollable: statisticsScrollable,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('expense-trend-chart-EUR')),
+      findsOneWidget,
+    );
+    expect(find.text('Agrupado por mes'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Gastos por categoría'),
       250,

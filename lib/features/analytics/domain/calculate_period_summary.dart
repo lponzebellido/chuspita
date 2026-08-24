@@ -19,6 +19,7 @@ PeriodSummary calculatePeriodSummary({
   final expenseCounts = <Currency, int>{};
   final largestExpenseTotals = <Currency, int>{};
   final expenseTotalsByCategory = <Currency, Map<CategoryId, int>>{};
+  final expenseTotalsByDate = <Currency, Map<LocalDate, int>>{};
 
   for (final transaction in transactions) {
     if (transaction.occurredOn.compareTo(startDate) < 0 ||
@@ -59,6 +60,17 @@ PeriodSummary calculatePeriodSummary({
         (current) => current + transaction.amount.minorUnits,
         ifAbsent: () => transaction.amount.minorUnits,
       );
+
+      final totalsByDate = expenseTotalsByDate.putIfAbsent(
+        transaction.amount.currency,
+        () => <LocalDate, int>{},
+      );
+
+      totalsByDate.update(
+        transaction.occurredOn,
+        (current) => current + transaction.amount.minorUnits,
+        ifAbsent: () => transaction.amount.minorUnits,
+      );
     }
   }
 
@@ -83,6 +95,12 @@ PeriodSummary calculatePeriodSummary({
       expensesByCategory: {
         for (final entry
             in (expenseTotalsByCategory[currency] ?? const <CategoryId, int>{})
+                .entries)
+          entry.key: Money(minorUnits: entry.value, currency: currency),
+      },
+      expensesByDate: {
+        for (final entry
+            in (expenseTotalsByDate[currency] ?? const <LocalDate, int>{})
                 .entries)
           entry.key: Money(minorUnits: entry.value, currency: currency),
       },

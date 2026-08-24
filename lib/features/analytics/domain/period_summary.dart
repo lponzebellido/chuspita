@@ -17,6 +17,14 @@ final class PeriodSummary {
       if (entry.key != entry.value.currency) {
         throw ArgumentError('The summary currency must match its map key');
       }
+
+      for (final date in entry.value.expensesByDate.keys) {
+        if (date.compareTo(startDate) < 0 || date.compareTo(endDate) > 0) {
+          throw ArgumentError(
+            'Expense dates must be inside the summary period',
+          );
+        }
+      }
     }
   }
 
@@ -34,7 +42,9 @@ final class CurrencyPeriodSummary {
     required this.expenseCount,
     required this.largestExpense,
     required Map<CategoryId, Money> expensesByCategory,
-  }) : expensesByCategory = Map.unmodifiable(expensesByCategory) {
+    required Map<LocalDate, Money> expensesByDate,
+  }) : expensesByCategory = Map.unmodifiable(expensesByCategory),
+       expensesByDate = Map.unmodifiable(expensesByDate) {
     if (income.currency != expenses.currency) {
       throw ArgumentError('Income and expenses must use the same currency');
     }
@@ -78,6 +88,24 @@ final class CurrencyPeriodSummary {
     if (categorizedExpenses != expenses.minorUnits) {
       throw ArgumentError('Category expenses must add up to the expense total');
     }
+
+    var datedExpenses = 0;
+
+    for (final amount in expensesByDate.values) {
+      if (amount.currency != expenses.currency) {
+        throw ArgumentError('Dated expenses must use the summary currency');
+      }
+
+      if (amount.minorUnits <= 0) {
+        throw ArgumentError('Dated expenses must be greater than zero');
+      }
+
+      datedExpenses += amount.minorUnits;
+    }
+
+    if (datedExpenses != expenses.minorUnits) {
+      throw ArgumentError('Dated expenses must add up to the expense total');
+    }
   }
 
   final Money income;
@@ -85,6 +113,7 @@ final class CurrencyPeriodSummary {
   final int expenseCount;
   final Money largestExpense;
   final Map<CategoryId, Money> expensesByCategory;
+  final Map<LocalDate, Money> expensesByDate;
 
   Currency get currency => income.currency;
 

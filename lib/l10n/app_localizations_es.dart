@@ -190,6 +190,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get topCategoryMetric => 'Categoría principal';
 
   @override
+  String get expenseTrendTitle => 'Evolución del gasto';
+
+  @override
+  String get noExpenseTrend => 'No hay gastos que mostrar en este periodo.';
+
+  @override
+  String get expenseTrendGroupedByDay => 'Agrupado por día';
+
+  @override
+  String get expenseTrendGroupedByWeek => 'Agrupado por semana';
+
+  @override
+  String get expenseTrendGroupedByMonth => 'Agrupado por mes';
+
+  @override
   String get monthlyIncome => 'Ingresos';
 
   @override

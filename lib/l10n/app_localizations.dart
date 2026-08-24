@@ -452,6 +452,36 @@ abstract class AppLocalizations {
   /// **'Top category'**
   String get topCategoryMetric;
 
+  /// No description provided for @expenseTrendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending over time'**
+  String get expenseTrendTitle;
+
+  /// No description provided for @noExpenseTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no expenses to chart in this period.'**
+  String get noExpenseTrend;
+
+  /// No description provided for @expenseTrendGroupedByDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Grouped by day'**
+  String get expenseTrendGroupedByDay;
+
+  /// No description provided for @expenseTrendGroupedByWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Grouped by week'**
+  String get expenseTrendGroupedByWeek;
+
+  /// No description provided for @expenseTrendGroupedByMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Grouped by month'**
+  String get expenseTrendGroupedByMonth;
+
   /// No description provided for @monthlyIncome.
   ///
   /// In en, this message translates to:

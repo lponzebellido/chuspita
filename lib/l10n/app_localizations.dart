@@ -368,6 +368,36 @@ abstract class AppLocalizations {
   /// **'This month'**
   String get currentMonth;
 
+  /// No description provided for @monthlyIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get monthlyIncome;
+
+  /// No description provided for @monthlyExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get monthlyExpenses;
+
+  /// No description provided for @monthlyNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get monthlyNet;
+
+  /// No description provided for @noMonthlyActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No income or expenses recorded this month.'**
+  String get noMonthlyActivity;
+
+  /// No description provided for @loadMonthlySummaryError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load this month\'s summary.'**
+  String get loadMonthlySummaryError;
+
   /// No description provided for @customRange.
   ///
   /// In en, this message translates to:

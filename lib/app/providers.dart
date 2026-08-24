@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:chuspita/core/database/app_database.dart';
+import 'package:chuspita/core/date/local_date.dart';
+import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
+import 'package:chuspita/features/analytics/domain/period_summary.dart';
 import 'package:chuspita/features/categories/application/create_category.dart';
 import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
@@ -123,6 +126,37 @@ final transactionsProvider = FutureProvider<List<Transaction>>(
   (ref) => ref.watch(transactionRepositoryProvider).getAll(),
   retry: (retryCount, error) => null,
 );
+
+final currentDateProvider = Provider<LocalDate>((ref) {
+  final now = DateTime.now();
+
+  return LocalDate(year: now.year, month: now.month, day: now.day);
+});
+
+final currentMonthSummaryProvider = Provider<AsyncValue<PeriodSummary>>((ref) {
+  final currentDate = ref.watch(currentDateProvider);
+  final lastDay = DateTime(currentDate.year, currentDate.month + 1, 0).day;
+  final startDate = LocalDate(
+    year: currentDate.year,
+    month: currentDate.month,
+    day: 1,
+  );
+  final endDate = LocalDate(
+    year: currentDate.year,
+    month: currentDate.month,
+    day: lastDay,
+  );
+
+  return ref
+      .watch(transactionsProvider)
+      .whenData(
+        (transactions) => calculatePeriodSummary(
+          transactions: transactions,
+          startDate: startDate,
+          endDate: endDate,
+        ),
+      );
+});
 
 final transferRepositoryProvider = Provider<TransferRepository>((ref) {
   return DriftTransferRepository(ref.watch(appDatabaseProvider));

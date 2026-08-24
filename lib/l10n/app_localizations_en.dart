@@ -148,6 +148,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentMonth => 'This month';
 
   @override
+  String get monthlyIncome => 'Income';
+
+  @override
+  String get monthlyExpenses => 'Expenses';
+
+  @override
+  String get monthlyNet => 'Net';
+
+  @override
+  String get noMonthlyActivity => 'No income or expenses recorded this month.';
+
+  @override
+  String get loadMonthlySummaryError =>
+      'We couldn\'t load this month\'s summary.';
+
+  @override
   String get customRange => 'Custom';
 
   @override

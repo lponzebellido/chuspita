@@ -212,6 +212,7 @@ Future<void> pumpTransferApp(
             ),
           ),
         ),
+        transactionsProvider.overrideWithValue(const AsyncData([])),
         walletsProvider.overrideWithValue(AsyncData(wallets)),
         transferRepositoryProvider.overrideWithValue(repository),
         transferIdGeneratorProvider.overrideWithValue(

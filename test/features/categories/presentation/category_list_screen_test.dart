@@ -64,6 +64,7 @@ Future<void> pumpApp(
         balanceSummaryProvider.overrideWithValue(
           AsyncData(BalanceSummary(byWallet: const {}, byCurrency: const {})),
         ),
+        transactionsProvider.overrideWithValue(const AsyncData([])),
         categoriesProvider.overrideWithValue(AsyncData([category])),
         categoryRepositoryProvider.overrideWithValue(repository),
       ],

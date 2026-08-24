@@ -3,6 +3,8 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/app/settings/settings_screen.dart';
 import 'package:chuspita/app/widgets/app_logo.dart';
 import 'package:chuspita/core/money/money.dart';
+import 'package:chuspita/features/analytics/domain/period_summary.dart';
+import 'package:chuspita/features/analytics/presentation/monthly_summary_section.dart';
 import 'package:chuspita/features/categories/presentation/category_list_screen.dart';
 import 'package:chuspita/features/movements/presentation/movement_list_screen.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
@@ -20,6 +22,7 @@ final class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summary = ref.watch(balanceSummaryProvider);
+    final currentMonthSummary = ref.watch(currentMonthSummaryProvider);
     final l10n = context.l10n;
 
     void openWalletForm() {
@@ -72,8 +75,11 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
-    Future<void> refreshBalance() {
-      return ref.refresh(balanceSummaryProvider.future).then((_) {});
+    Future<void> refreshHome() {
+      return Future.wait<void>([
+        ref.refresh(balanceSummaryProvider.future).then((_) {}),
+        ref.refresh(transactionsProvider.future).then((_) {}),
+      ]);
     }
 
     final hasWallets = summary.asData?.value.byWallet.isNotEmpty ?? false;
@@ -103,10 +109,12 @@ final class HomeScreen extends ConsumerWidget {
         child: summary.when(
           data: (value) => _BalanceContent(
             summary: value,
+            currentMonthSummary: currentMonthSummary,
             onAddWallet: openWalletForm,
             onViewTransactions: openTransactionList,
             onTransfer: openTransferForm,
-            onRefresh: refreshBalance,
+            onRefresh: refreshHome,
+            onRetryMonthlySummary: () => ref.invalidate(transactionsProvider),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => _ErrorContent(
@@ -126,17 +134,21 @@ final class HomeScreen extends ConsumerWidget {
 final class _BalanceContent extends StatelessWidget {
   const _BalanceContent({
     required this.summary,
+    required this.currentMonthSummary,
     required this.onAddWallet,
     required this.onViewTransactions,
     required this.onTransfer,
     required this.onRefresh,
+    required this.onRetryMonthlySummary,
   });
 
   final BalanceSummary summary;
+  final AsyncValue<PeriodSummary> currentMonthSummary;
   final VoidCallback onAddWallet;
   final VoidCallback onViewTransactions;
   final VoidCallback onTransfer;
   final RefreshCallback onRefresh;
+  final VoidCallback onRetryMonthlySummary;
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +185,12 @@ final class _BalanceContent extends StatelessWidget {
             _CurrencyBalanceCard(balance: balance.value),
             const SizedBox(height: 12),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
+          MonthlySummarySection(
+            summary: currentMonthSummary,
+            onRetry: onRetryMonthlySummary,
+          ),
+          const SizedBox(height: 24),
           FilledButton.tonalIcon(
             onPressed: onTransfer,
             icon: const Icon(Icons.swap_horiz),

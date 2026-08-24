@@ -30,6 +30,7 @@ void main() {
       ProviderScope(
         overrides: [
           balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
+          transactionsProvider.overrideWithValue(const AsyncData([])),
           walletsProvider.overrideWithValue(AsyncData([wallet])),
           categoriesProvider.overrideWithValue(AsyncData([category])),
           transactionRepositoryProvider.overrideWithValue(repository),
@@ -84,6 +85,7 @@ void main() {
       ProviderScope(
         overrides: [
           balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
+          transactionsProvider.overrideWithValue(const AsyncData([])),
           walletsProvider.overrideWithValue(AsyncData([wallet])),
           categoriesProvider.overrideWithValue(const AsyncData([])),
         ],
@@ -132,6 +134,7 @@ void main() {
               ),
             ),
           ),
+          transactionsProvider.overrideWithValue(const AsyncData([])),
           walletsProvider.overrideWithValue(AsyncData([wallet])),
           categoriesProvider.overrideWithValue(
             AsyncData([expenseCategory, incomeCategory]),

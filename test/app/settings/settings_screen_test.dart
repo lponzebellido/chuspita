@@ -21,6 +21,7 @@ void main() {
           balanceSummaryProvider.overrideWithValue(
             AsyncData(BalanceSummary(byWallet: const {}, byCurrency: const {})),
           ),
+          transactionsProvider.overrideWithValue(const AsyncData([])),
         ],
         child: const ChuspitaApp(),
       ),

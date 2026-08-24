@@ -22,6 +22,7 @@ void main() {
       ProviderScope(
         overrides: [
           balanceSummaryProvider.overrideWithValue(AsyncData(emptySummary)),
+          transactionsProvider.overrideWithValue(const AsyncData([])),
           walletRepositoryProvider.overrideWithValue(repository),
           walletIdGeneratorProvider.overrideWithValue(
             () => 'generated-wallet-id',

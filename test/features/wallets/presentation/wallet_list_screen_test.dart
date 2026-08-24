@@ -66,6 +66,7 @@ Future<void> pumpApp(
     ProviderScope(
       overrides: [
         balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
+        transactionsProvider.overrideWithValue(const AsyncData([])),
         walletsProvider.overrideWithValue(AsyncData([wallet])),
         walletRepositoryProvider.overrideWithValue(repository),
       ],

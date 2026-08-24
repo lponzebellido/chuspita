@@ -178,6 +178,8 @@ final class _ExpenseTrendPainter extends CustomPainter {
       return;
     }
 
+    // Holiiiii
+
     final slotWidth = size.width / values.length;
     final barWidth = math.min(28.0, math.max(2.0, slotWidth * 0.68));
     final barPaint = Paint()..color = barColor;

@@ -60,6 +60,14 @@ final class DriftWalletRepository implements WalletRepository {
       return;
     }
 
+    final isChangingCurrency = existingRow.currencyCode != wallet.currency.code;
+
+    if (isChangingCurrency && await _hasFinancialMovements(wallet.id)) {
+      throw StateError(
+        'Wallet currency cannot change after financial movements exist',
+      );
+    }
+
     final updatedAtMillis = now < existingRow.createdAtMillis
         ? existingRow.createdAtMillis
         : now;
@@ -76,5 +84,25 @@ final class DriftWalletRepository implements WalletRepository {
         updatedAtMillis: Value(updatedAtMillis),
       ),
     );
+  }
+
+  Future<bool> _hasFinancialMovements(WalletId id) async {
+    final transactionQuery = _database.select(_database.transactions)
+      ..where((table) => table.walletId.equals(id.value))
+      ..limit(1);
+
+    if (await transactionQuery.getSingleOrNull() != null) {
+      return true;
+    }
+
+    final transferQuery = _database.select(_database.transfers)
+      ..where(
+        (table) =>
+            table.sourceWalletId.equals(id.value) |
+            table.destinationWalletId.equals(id.value),
+      )
+      ..limit(1);
+
+    return await transferQuery.getSingleOrNull() != null;
   }
 }

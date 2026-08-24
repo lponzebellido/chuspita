@@ -74,6 +74,78 @@ void main() {
         WalletId('wallet-2'),
       });
     });
+
+    test('allows changing currency before financial movements exist', () async {
+      final wallet = buildWallet();
+      await repository.save(wallet);
+
+      currentTime = 2000;
+      await repository.save(buildWallet(currency: Currency.usd));
+
+      final restored = await repository.getById(wallet.id);
+      expect(restored!.currency, Currency.usd);
+    });
+
+    test('prevents changing currency after a transaction exists', () async {
+      final wallet = buildWallet();
+      await repository.save(wallet);
+      await database
+          .into(database.categories)
+          .insert(
+            CategoriesCompanion.insert(
+              id: 'category-1',
+              name: 'Food',
+              colorArgb: 0xFFFF9800,
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+      await database
+          .into(database.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              id: 'transaction-1',
+              type: 'expense',
+              amountMinor: 1000,
+              walletId: wallet.id.value,
+              categoryId: 'category-1',
+              occurredOn: '2026-08-23',
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+
+      expect(
+        () => repository.save(buildWallet(currency: Currency.usd)),
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('prevents changing currency after a transfer exists', () async {
+      final sourceWallet = buildWallet();
+      final destinationWallet = buildWallet(id: 'wallet-2');
+      await repository.save(sourceWallet);
+      await repository.save(destinationWallet);
+      await database
+          .into(database.transfers)
+          .insert(
+            TransfersCompanion.insert(
+              id: 'transfer-1',
+              sourceWalletId: sourceWallet.id.value,
+              destinationWalletId: destinationWallet.id.value,
+              sourceAmountMinor: 1000,
+              destinationAmountMinor: 1000,
+              occurredOn: '2026-08-23',
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+
+      expect(
+        () => repository.save(buildWallet(currency: Currency.usd)),
+        throwsA(isA<StateError>()),
+      );
+    });
   });
 
   test('persists a wallet after closing and reopening SQLite', () async {
@@ -117,11 +189,11 @@ Selectable<WalletRow> _databaseWalletQuery(AppDatabase database, WalletId id) {
     ..where((table) => table.id.equals(id.value));
 }
 
-Wallet buildWallet({String id = 'wallet-1'}) {
+Wallet buildWallet({String id = 'wallet-1', Currency currency = Currency.eur}) {
   return Wallet(
     id: WalletId(id),
     name: 'Cash',
-    initialBalance: const Money(minorUnits: 12500, currency: Currency.eur),
+    initialBalance: Money(minorUnits: 12500, currency: currency),
     color: ArgbColor(0xFF3366CC),
   );
 }

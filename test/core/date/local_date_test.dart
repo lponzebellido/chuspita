@@ -38,5 +38,16 @@ void main() {
       expect(first.hashCode, second.hashCode);
       expect(first.toString(), '2026-08-23');
     });
+
+    test('parses an ISO date', () {
+      final date = LocalDate.parse('2026-08-23');
+
+      expect(date, LocalDate(year: 2026, month: 8, day: 23));
+    });
+
+    test('rejects invalid ISO dates', () {
+      expect(() => LocalDate.parse('23/08/2026'), throwsArgumentError);
+      expect(() => LocalDate.parse('2026-02-30'), throwsArgumentError);
+    });
   });
 }

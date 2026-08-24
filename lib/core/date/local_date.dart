@@ -1,4 +1,6 @@
 final class LocalDate implements Comparable<LocalDate> {
+  static final _isoPattern = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$');
+
   factory LocalDate({required int year, required int month, required int day}) {
     if (year < 1 || year > 9999) {
       throw ArgumentError.value(
@@ -15,6 +17,24 @@ final class LocalDate implements Comparable<LocalDate> {
     }
 
     return LocalDate._(year: year, month: month, day: day);
+  }
+
+  factory LocalDate.parse(String value) {
+    final match = _isoPattern.firstMatch(value);
+
+    if (match == null) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'Local date must use the YYYY-MM-DD format',
+      );
+    }
+
+    return LocalDate(
+      year: int.parse(match.group(1)!),
+      month: int.parse(match.group(2)!),
+      day: int.parse(match.group(3)!),
+    );
   }
 
   const LocalDate._({

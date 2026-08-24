@@ -1,3 +1,4 @@
+import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
@@ -15,7 +16,7 @@ void main() {
         wallet.initialBalance,
         const Money(minorUnits: 1000, currency: Currency.eur),
       );
-      expect(wallet.colorValue, 0xFF3366CC);
+      expect(wallet.color, ArgbColor(0xFF3366CC));
       expect(wallet.isArchived, isFalse);
     });
 
@@ -27,11 +28,6 @@ void main() {
 
     test('rejects an empty name', () {
       expect(() => buildWallet(name: '   '), throwsArgumentError);
-    });
-
-    test('rejects colors outside the 32-bit ARGB range', () {
-      expect(() => buildWallet(colorValue: -1), throwsArgumentError);
-      expect(() => buildWallet(colorValue: 0x100000000), throwsArgumentError);
     });
 
     test('archives immutably', () {
@@ -59,14 +55,14 @@ Wallet buildWallet({
   WalletId? id,
   String name = 'Cash',
   Money initialBalance = const Money(minorUnits: 1000, currency: Currency.eur),
-  int colorValue = 0xFF3366CC,
+  ArgbColor? color,
   bool isArchived = false,
 }) {
   return Wallet(
     id: id ?? WalletId('wallet-1'),
     name: name,
     initialBalance: initialBalance,
-    colorValue: colorValue,
+    color: color ?? ArgbColor(0xFF3366CC),
     isArchived: isArchived,
   );
 }

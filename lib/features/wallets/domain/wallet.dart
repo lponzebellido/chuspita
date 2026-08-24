@@ -1,3 +1,4 @@
+import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
@@ -7,7 +8,7 @@ final class Wallet {
     required WalletId id,
     required String name,
     required Money initialBalance,
-    required int colorValue,
+    required ArgbColor color,
     bool isArchived = false,
   }) {
     final normalizedName = name.trim();
@@ -16,19 +17,11 @@ final class Wallet {
       throw ArgumentError.value(name, 'name', 'Wallet name cannot be empty');
     }
 
-    if (colorValue < 0 || colorValue > 0xFFFFFFFF) {
-      throw ArgumentError.value(
-        colorValue,
-        'colorValue',
-        'Color must be a 32-bit ARGB value',
-      );
-    }
-
     return Wallet._(
       id: id,
       name: normalizedName,
       initialBalance: initialBalance,
-      colorValue: colorValue,
+      color: color,
       isArchived: isArchived,
     );
   }
@@ -37,14 +30,14 @@ final class Wallet {
     required this.id,
     required this.name,
     required this.initialBalance,
-    required this.colorValue,
+    required this.color,
     required this.isArchived,
   });
 
   final WalletId id;
   final String name;
   final Money initialBalance;
-  final int colorValue;
+  final ArgbColor color;
   final bool isArchived;
 
   Currency get currency => initialBalance.currency;
@@ -58,7 +51,7 @@ final class Wallet {
       id: id,
       name: name,
       initialBalance: initialBalance,
-      colorValue: colorValue,
+      color: color,
       isArchived: true,
     );
   }

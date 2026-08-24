@@ -404,6 +404,18 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load the statistics.'**
   String get loadStatisticsError;
 
+  /// No description provided for @incomeVsExpensesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Income vs. expenses'**
+  String get incomeVsExpensesTitle;
+
+  /// No description provided for @noPeriodActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no income or expense activity in this period.'**
+  String get noPeriodActivity;
+
   /// No description provided for @monthlyIncome.
   ///
   /// In en, this message translates to:

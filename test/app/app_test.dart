@@ -230,6 +230,11 @@ void main() {
 
     expect(find.text('Estadísticas'), findsOneWidget);
     expect(find.text('Este mes'), findsOneWidget);
+    expect(find.text('Ingresos vs. gastos'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('income-expense-chart-EUR')),
+      findsOneWidget,
+    );
     expect(find.text('Gastos por categoría'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('category-spending-chart-EUR')),

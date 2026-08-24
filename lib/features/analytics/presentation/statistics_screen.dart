@@ -4,6 +4,7 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
 import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
+import 'package:chuspita/features/analytics/presentation/income_expense_section.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -175,6 +176,8 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   _formatRange(context),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                const SizedBox(height: 28),
+                IncomeExpenseSection(summary: summary.requireValue),
                 const SizedBox(height: 28),
                 CategorySpendingSection(summary: summary),
               ],

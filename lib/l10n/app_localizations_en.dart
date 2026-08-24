@@ -166,6 +166,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadStatisticsError => 'We couldn\'t load the statistics.';
 
   @override
+  String get incomeVsExpensesTitle => 'Income vs. expenses';
+
+  @override
+  String get noPeriodActivity =>
+      'There is no income or expense activity in this period.';
+
+  @override
   String get monthlyIncome => 'Income';
 
   @override

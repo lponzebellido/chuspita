@@ -51,6 +51,8 @@
   "statisticsTitle": "Estadísticas",
   "viewStatistics": "Ver estadísticas",
   "loadStatisticsError": "No pudimos cargar las estadísticas.",
+  "incomeVsExpensesTitle": "Ingresos vs. gastos",
+  "noPeriodActivity": "No hay ingresos ni gastos en este periodo.",
   "monthlyIncome": "Ingresos",
   "monthlyExpenses": "Gastos",
   "monthlyNet": "Balance",

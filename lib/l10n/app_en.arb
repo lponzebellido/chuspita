@@ -54,6 +54,8 @@
   "statisticsTitle": "Statistics",
   "viewStatistics": "View statistics",
   "loadStatisticsError": "We couldn't load the statistics.",
+  "incomeVsExpensesTitle": "Income vs. expenses",
+  "noPeriodActivity": "There is no income or expense activity in this period.",
   "monthlyIncome": "Income",
   "monthlyExpenses": "Expenses",
   "monthlyNet": "Net",

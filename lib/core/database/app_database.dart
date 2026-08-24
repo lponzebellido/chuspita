@@ -3,6 +3,8 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:chuspita/core/database/tables.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'app_database.steps.dart';
+
 part 'app_database.g.dart';
 
 @DriftDatabase(tables: [Wallets, Categories, Transactions, Transfers])
@@ -10,7 +12,7 @@ final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -18,6 +20,11 @@ final class AppDatabase extends _$AppDatabase {
       onCreate: (migrator) async {
         await migrator.createAll();
       },
+      onUpgrade: stepByStep(
+        from1To2: (migrator, schema) async {
+          await migrator.alterTable(TableMigration(schema.wallets));
+        },
+      ),
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
       },

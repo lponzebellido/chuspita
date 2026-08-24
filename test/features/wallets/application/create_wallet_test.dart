@@ -1,4 +1,3 @@
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/application/create_wallet.dart';
@@ -18,7 +17,6 @@ void main() {
     final wallet = await createWallet(
       name: ' Cash ',
       initialBalance: const Money(minorUnits: 1250, currency: Currency.eur),
-      color: ArgbColor(0xFF5B5BD6),
     );
 
     expect(wallet.id, WalletId('generated-wallet-id'));

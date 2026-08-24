@@ -26,6 +26,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addWallet => 'Add wallet';
 
   @override
+  String get manageWallets => 'Manage wallets';
+
+  @override
+  String get walletsTitle => 'Wallets';
+
+  @override
+  String get editWalletTitle => 'Edit wallet';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get archived => 'Archived';
+
+  @override
+  String get walletCurrencyChangeNotAllowed =>
+      'The currency can\'t change because this wallet already has financial movements.';
+
+  @override
   String get loadDataError => 'We couldn\'t load your data.';
 
   @override
@@ -45,9 +70,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get initialBalanceLabel => 'Initial balance';
-
-  @override
-  String get walletColorLabel => 'Color';
 
   @override
   String get save => 'Save';

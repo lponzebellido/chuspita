@@ -47,17 +47,6 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, WalletRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _colorArgbMeta = const VerificationMeta(
-    'colorArgb',
-  );
-  @override
-  late final GeneratedColumn<int> colorArgb = GeneratedColumn<int>(
-    'color_argb',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _isArchivedMeta = const VerificationMeta(
     'isArchived',
   );
@@ -101,7 +90,6 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, WalletRow> {
     name,
     currencyCode,
     initialBalanceMinor,
-    colorArgb,
     isArchived,
     createdAtMillis,
     updatedAtMillis,
@@ -152,14 +140,6 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, WalletRow> {
       );
     } else if (isInserting) {
       context.missing(_initialBalanceMinorMeta);
-    }
-    if (data.containsKey('color_argb')) {
-      context.handle(
-        _colorArgbMeta,
-        colorArgb.isAcceptableOrUnknown(data['color_argb']!, _colorArgbMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_colorArgbMeta);
     }
     if (data.containsKey('is_archived')) {
       context.handle(
@@ -214,10 +194,6 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, WalletRow> {
         DriftSqlType.int,
         data['${effectivePrefix}initial_balance_minor'],
       )!,
-      colorArgb: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}color_argb'],
-      )!,
       isArchived: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_archived'],
@@ -244,7 +220,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
   final String name;
   final String currencyCode;
   final int initialBalanceMinor;
-  final int colorArgb;
   final bool isArchived;
   final int createdAtMillis;
   final int updatedAtMillis;
@@ -253,7 +228,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
     required this.name,
     required this.currencyCode,
     required this.initialBalanceMinor,
-    required this.colorArgb,
     required this.isArchived,
     required this.createdAtMillis,
     required this.updatedAtMillis,
@@ -265,7 +239,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
     map['name'] = Variable<String>(name);
     map['currency_code'] = Variable<String>(currencyCode);
     map['initial_balance_minor'] = Variable<int>(initialBalanceMinor);
-    map['color_argb'] = Variable<int>(colorArgb);
     map['is_archived'] = Variable<bool>(isArchived);
     map['created_at_millis'] = Variable<int>(createdAtMillis);
     map['updated_at_millis'] = Variable<int>(updatedAtMillis);
@@ -278,7 +251,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
       name: Value(name),
       currencyCode: Value(currencyCode),
       initialBalanceMinor: Value(initialBalanceMinor),
-      colorArgb: Value(colorArgb),
       isArchived: Value(isArchived),
       createdAtMillis: Value(createdAtMillis),
       updatedAtMillis: Value(updatedAtMillis),
@@ -297,7 +269,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
       initialBalanceMinor: serializer.fromJson<int>(
         json['initialBalanceMinor'],
       ),
-      colorArgb: serializer.fromJson<int>(json['colorArgb']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       createdAtMillis: serializer.fromJson<int>(json['createdAtMillis']),
       updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
@@ -311,7 +282,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
       'name': serializer.toJson<String>(name),
       'currencyCode': serializer.toJson<String>(currencyCode),
       'initialBalanceMinor': serializer.toJson<int>(initialBalanceMinor),
-      'colorArgb': serializer.toJson<int>(colorArgb),
       'isArchived': serializer.toJson<bool>(isArchived),
       'createdAtMillis': serializer.toJson<int>(createdAtMillis),
       'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
@@ -323,7 +293,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
     String? name,
     String? currencyCode,
     int? initialBalanceMinor,
-    int? colorArgb,
     bool? isArchived,
     int? createdAtMillis,
     int? updatedAtMillis,
@@ -332,7 +301,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
     name: name ?? this.name,
     currencyCode: currencyCode ?? this.currencyCode,
     initialBalanceMinor: initialBalanceMinor ?? this.initialBalanceMinor,
-    colorArgb: colorArgb ?? this.colorArgb,
     isArchived: isArchived ?? this.isArchived,
     createdAtMillis: createdAtMillis ?? this.createdAtMillis,
     updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -347,7 +315,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
       initialBalanceMinor: data.initialBalanceMinor.present
           ? data.initialBalanceMinor.value
           : this.initialBalanceMinor,
-      colorArgb: data.colorArgb.present ? data.colorArgb.value : this.colorArgb,
       isArchived: data.isArchived.present
           ? data.isArchived.value
           : this.isArchived,
@@ -367,7 +334,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
           ..write('name: $name, ')
           ..write('currencyCode: $currencyCode, ')
           ..write('initialBalanceMinor: $initialBalanceMinor, ')
-          ..write('colorArgb: $colorArgb, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis')
@@ -381,7 +347,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
     name,
     currencyCode,
     initialBalanceMinor,
-    colorArgb,
     isArchived,
     createdAtMillis,
     updatedAtMillis,
@@ -394,7 +359,6 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
           other.name == this.name &&
           other.currencyCode == this.currencyCode &&
           other.initialBalanceMinor == this.initialBalanceMinor &&
-          other.colorArgb == this.colorArgb &&
           other.isArchived == this.isArchived &&
           other.createdAtMillis == this.createdAtMillis &&
           other.updatedAtMillis == this.updatedAtMillis);
@@ -405,7 +369,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
   final Value<String> name;
   final Value<String> currencyCode;
   final Value<int> initialBalanceMinor;
-  final Value<int> colorArgb;
   final Value<bool> isArchived;
   final Value<int> createdAtMillis;
   final Value<int> updatedAtMillis;
@@ -415,7 +378,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
     this.name = const Value.absent(),
     this.currencyCode = const Value.absent(),
     this.initialBalanceMinor = const Value.absent(),
-    this.colorArgb = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAtMillis = const Value.absent(),
     this.updatedAtMillis = const Value.absent(),
@@ -426,7 +388,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
     required String name,
     required String currencyCode,
     required int initialBalanceMinor,
-    required int colorArgb,
     this.isArchived = const Value.absent(),
     required int createdAtMillis,
     required int updatedAtMillis,
@@ -435,7 +396,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
        name = Value(name),
        currencyCode = Value(currencyCode),
        initialBalanceMinor = Value(initialBalanceMinor),
-       colorArgb = Value(colorArgb),
        createdAtMillis = Value(createdAtMillis),
        updatedAtMillis = Value(updatedAtMillis);
   static Insertable<WalletRow> custom({
@@ -443,7 +403,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
     Expression<String>? name,
     Expression<String>? currencyCode,
     Expression<int>? initialBalanceMinor,
-    Expression<int>? colorArgb,
     Expression<bool>? isArchived,
     Expression<int>? createdAtMillis,
     Expression<int>? updatedAtMillis,
@@ -455,7 +414,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
       if (currencyCode != null) 'currency_code': currencyCode,
       if (initialBalanceMinor != null)
         'initial_balance_minor': initialBalanceMinor,
-      if (colorArgb != null) 'color_argb': colorArgb,
       if (isArchived != null) 'is_archived': isArchived,
       if (createdAtMillis != null) 'created_at_millis': createdAtMillis,
       if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
@@ -468,7 +426,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
     Value<String>? name,
     Value<String>? currencyCode,
     Value<int>? initialBalanceMinor,
-    Value<int>? colorArgb,
     Value<bool>? isArchived,
     Value<int>? createdAtMillis,
     Value<int>? updatedAtMillis,
@@ -479,7 +436,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
       name: name ?? this.name,
       currencyCode: currencyCode ?? this.currencyCode,
       initialBalanceMinor: initialBalanceMinor ?? this.initialBalanceMinor,
-      colorArgb: colorArgb ?? this.colorArgb,
       isArchived: isArchived ?? this.isArchived,
       createdAtMillis: createdAtMillis ?? this.createdAtMillis,
       updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
@@ -501,9 +457,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
     }
     if (initialBalanceMinor.present) {
       map['initial_balance_minor'] = Variable<int>(initialBalanceMinor.value);
-    }
-    if (colorArgb.present) {
-      map['color_argb'] = Variable<int>(colorArgb.value);
     }
     if (isArchived.present) {
       map['is_archived'] = Variable<bool>(isArchived.value);
@@ -527,7 +480,6 @@ class WalletsCompanion extends UpdateCompanion<WalletRow> {
           ..write('name: $name, ')
           ..write('currencyCode: $currencyCode, ')
           ..write('initialBalanceMinor: $initialBalanceMinor, ')
-          ..write('colorArgb: $colorArgb, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAtMillis: $createdAtMillis, ')
           ..write('updatedAtMillis: $updatedAtMillis, ')
@@ -2194,7 +2146,6 @@ typedef $$WalletsTableCreateCompanionBuilder = WalletsCompanion Function({
   required String name,
   required String currencyCode,
   required int initialBalanceMinor,
-  required int colorArgb,
   Value<bool> isArchived,
   required int createdAtMillis,
   required int updatedAtMillis,
@@ -2205,7 +2156,6 @@ typedef $$WalletsTableUpdateCompanionBuilder = WalletsCompanion Function({
   Value<String> name,
   Value<String> currencyCode,
   Value<int> initialBalanceMinor,
-  Value<int> colorArgb,
   Value<bool> isArchived,
   Value<int> createdAtMillis,
   Value<int> updatedAtMillis,
@@ -2296,11 +2246,6 @@ class $$WalletsTableFilterComposer
 
   ColumnFilters<int> get initialBalanceMinor => $composableBuilder(
     column: $table.initialBalanceMinor,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get colorArgb => $composableBuilder(
-    column: $table.colorArgb,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2424,11 +2369,6 @@ class $$WalletsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get colorArgb => $composableBuilder(
-    column: $table.colorArgb,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
     builder: (column) => ColumnOrderings(column),
@@ -2469,9 +2409,6 @@ class $$WalletsTableAnnotationComposer
     column: $table.initialBalanceMinor,
     builder: (column) => column,
   );
-
-  GeneratedColumn<int> get colorArgb =>
-      $composableBuilder(column: $table.colorArgb, builder: (column) => column);
 
   GeneratedColumn<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
@@ -2600,7 +2537,6 @@ class $$WalletsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> currencyCode = const Value.absent(),
                 Value<int> initialBalanceMinor = const Value.absent(),
-                Value<int> colorArgb = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> createdAtMillis = const Value.absent(),
                 Value<int> updatedAtMillis = const Value.absent(),
@@ -2610,7 +2546,6 @@ class $$WalletsTableTableManager
                 name: name,
                 currencyCode: currencyCode,
                 initialBalanceMinor: initialBalanceMinor,
-                colorArgb: colorArgb,
                 isArchived: isArchived,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,
@@ -2622,7 +2557,6 @@ class $$WalletsTableTableManager
                 required String name,
                 required String currencyCode,
                 required int initialBalanceMinor,
-                required int colorArgb,
                 Value<bool> isArchived = const Value.absent(),
                 required int createdAtMillis,
                 required int updatedAtMillis,
@@ -2632,7 +2566,6 @@ class $$WalletsTableTableManager
                 name: name,
                 currencyCode: currencyCode,
                 initialBalanceMinor: initialBalanceMinor,
-                colorArgb: colorArgb,
                 isArchived: isArchived,
                 createdAtMillis: createdAtMillis,
                 updatedAtMillis: updatedAtMillis,

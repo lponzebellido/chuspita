@@ -128,6 +128,54 @@ abstract class AppLocalizations {
   /// **'Add wallet'**
   String get addWallet;
 
+  /// No description provided for @manageWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage wallets'**
+  String get manageWallets;
+
+  /// No description provided for @walletsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsTitle;
+
+  /// No description provided for @editWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit wallet'**
+  String get editWalletTitle;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @archive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archive;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @archived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get archived;
+
+  /// No description provided for @walletCurrencyChangeNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'The currency can\'t change because this wallet already has financial movements.'**
+  String get walletCurrencyChangeNotAllowed;
+
   /// No description provided for @loadDataError.
   ///
   /// In en, this message translates to:
@@ -169,12 +217,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Initial balance'**
   String get initialBalanceLabel;
-
-  /// No description provided for @walletColorLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Color'**
-  String get walletColorLabel;
 
   /// No description provided for @save.
   ///

@@ -152,7 +152,6 @@ Wallet buildWallet(String id, Currency currency, int initialBalanceMinor) {
     id: WalletId(id),
     name: id,
     initialBalance: Money(minorUnits: initialBalanceMinor, currency: currency),
-    color: ArgbColor(0xFF3366CC),
   );
 }
 

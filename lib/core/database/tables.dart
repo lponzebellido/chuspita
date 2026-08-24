@@ -6,7 +6,6 @@ class Wallets extends Table {
   TextColumn get name => text()();
   TextColumn get currencyCode => text()();
   IntColumn get initialBalanceMinor => integer()();
-  IntColumn get colorArgb => integer()();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   IntColumn get createdAtMillis => integer()();
   IntColumn get updatedAtMillis => integer()();
@@ -18,7 +17,6 @@ class Wallets extends Table {
   List<String> get customConstraints => [
     'CHECK (length(trim(name)) > 0)',
     "CHECK (currency_code GLOB '[A-Z][A-Z][A-Z]')",
-    'CHECK (color_argb BETWEEN 0 AND 4294967295)',
     'CHECK (is_archived IN (0, 1))',
     'CHECK (created_at_millis > 0)',
     'CHECK (updated_at_millis >= created_at_millis)',

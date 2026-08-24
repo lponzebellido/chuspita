@@ -1,35 +1,42 @@
+import 'package:chuspita/app/formatters/money_formatter.dart';
 import 'package:chuspita/app/providers.dart';
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/parse_money.dart';
+import 'package:chuspita/features/wallets/domain/wallet.dart';
+import 'package:chuspita/features/wallets/domain/wallet_currency_change_not_allowed.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final class WalletFormScreen extends ConsumerStatefulWidget {
-  const WalletFormScreen({super.key});
+  const WalletFormScreen({super.key, this.wallet});
+
+  final Wallet? wallet;
 
   @override
   ConsumerState<WalletFormScreen> createState() => _WalletFormScreenState();
 }
 
 final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
-  static const _colors = <int>[
-    0xFF5B5BD6,
-    0xFF2E7D32,
-    0xFF00838F,
-    0xFFF57C00,
-    0xFFC62828,
-    0xFF6A1B9A,
-  ];
-
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _initialBalanceController = TextEditingController(text: '0');
-  Currency _currency = Currency.eur;
-  int _colorValue = _colors.first;
+  late final TextEditingController _nameController;
+  late final TextEditingController _initialBalanceController;
+  late Currency _currency;
   bool _isSaving = false;
   String? _saveError;
+
+  @override
+  void initState() {
+    super.initState();
+    final wallet = widget.wallet;
+    _nameController = TextEditingController(text: wallet?.name);
+    _initialBalanceController = TextEditingController(
+      text: wallet == null
+          ? '0'
+          : formatMoneyAmount(wallet.initialBalance, localeName: 'en'),
+    );
+    _currency = wallet?.currency ?? Currency.eur;
+  }
 
   @override
   void dispose() {
@@ -51,20 +58,38 @@ final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
     });
 
     try {
-      await ref
-          .read(createWalletProvider)
-          .call(
-            name: _nameController.text,
-            initialBalance: parseMoney(
-              _initialBalanceController.text,
-              _currency,
-            ),
-            color: ArgbColor(_colorValue),
-          );
+      final initialBalance = parseMoney(
+        _initialBalanceController.text,
+        _currency,
+      );
+      final wallet = widget.wallet;
+
+      if (wallet == null) {
+        await ref
+            .read(createWalletProvider)
+            .call(name: _nameController.text, initialBalance: initialBalance);
+      } else {
+        await ref
+            .read(updateWalletProvider)
+            .details(
+              wallet: wallet,
+              name: _nameController.text,
+              initialBalance: initialBalance,
+            );
+      }
+
+      ref.invalidate(walletsProvider);
       ref.invalidate(balanceSummaryProvider);
 
       if (mounted) {
         Navigator.of(context).pop();
+      }
+    } on WalletCurrencyChangeNotAllowed {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _saveError = context.l10n.walletCurrencyChangeNotAllowed;
+        });
       }
     } on Object {
       if (mounted) {
@@ -79,9 +104,12 @@ final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final isEditing = widget.wallet != null;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.newWalletTitle)),
+      appBar: AppBar(
+        title: Text(isEditing ? l10n.editWalletTitle : l10n.newWalletTitle),
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -89,7 +117,7 @@ final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              autofocus: true,
+              autofocus: !isEditing,
               textCapitalization: TextCapitalization.sentences,
               textInputAction: TextInputAction.next,
               decoration: InputDecoration(
@@ -146,26 +174,6 @@ final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
                 }
               },
             ),
-            const SizedBox(height: 24),
-            Text(
-              l10n.walletColorLabel,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                for (final color in _colors)
-                  _ColorOption(
-                    color: color,
-                    isSelected: color == _colorValue,
-                    onSelected: _isSaving
-                        ? null
-                        : () => setState(() => _colorValue = color),
-                  ),
-              ],
-            ),
             if (_saveError != null) ...[
               const SizedBox(height: 24),
               Text(
@@ -186,48 +194,6 @@ final class _WalletFormScreenState extends ConsumerState<WalletFormScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Text(l10n.save),
-        ),
-      ),
-    );
-  }
-}
-
-final class _ColorOption extends StatelessWidget {
-  const _ColorOption({
-    required this.color,
-    required this.isSelected,
-    required this.onSelected,
-  });
-
-  final int color;
-  final bool isSelected;
-  final VoidCallback? onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      child: InkWell(
-        key: ValueKey('wallet-color-$color'),
-        customBorder: const CircleBorder(),
-        onTap: onSelected,
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(color),
-            border: Border.all(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.onSurface
-                  : Colors.transparent,
-              width: 3,
-            ),
-          ),
-          child: isSelected
-              ? const Icon(Icons.check, color: Colors.white)
-              : null,
         ),
       ),
     );

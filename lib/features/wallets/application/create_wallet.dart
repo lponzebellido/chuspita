@@ -1,4 +1,3 @@
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
@@ -16,13 +15,11 @@ final class CreateWallet {
   Future<Wallet> call({
     required String name,
     required Money initialBalance,
-    required ArgbColor color,
   }) async {
     final wallet = Wallet(
       id: WalletId(idGenerator()),
       name: name,
       initialBalance: initialBalance,
-      color: color,
     );
 
     await walletRepository.save(wallet);

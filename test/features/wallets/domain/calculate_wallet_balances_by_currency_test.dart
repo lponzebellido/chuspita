@@ -1,4 +1,3 @@
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/money.dart';
@@ -126,7 +125,6 @@ Wallet buildWallet(String id, Currency currency, int initialMinorUnits) {
     id: WalletId(id),
     name: id,
     initialBalance: Money(minorUnits: initialMinorUnits, currency: currency),
-    color: ArgbColor(0xFF3366CC),
   );
 }
 

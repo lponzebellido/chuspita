@@ -26,6 +26,31 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addWallet => 'Añadir monedero';
 
   @override
+  String get manageWallets => 'Gestionar monederos';
+
+  @override
+  String get walletsTitle => 'Monederos';
+
+  @override
+  String get editWalletTitle => 'Editar monedero';
+
+  @override
+  String get edit => 'Editar';
+
+  @override
+  String get archive => 'Archivar';
+
+  @override
+  String get restore => 'Restaurar';
+
+  @override
+  String get archived => 'Archivado';
+
+  @override
+  String get walletCurrencyChangeNotAllowed =>
+      'No puedes cambiar la moneda porque este monedero ya tiene movimientos financieros.';
+
+  @override
   String get loadDataError => 'No pudimos cargar tus datos.';
 
   @override
@@ -45,9 +70,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get initialBalanceLabel => 'Saldo inicial';
-
-  @override
-  String get walletColorLabel => 'Color';
 
   @override
   String get save => 'Guardar';

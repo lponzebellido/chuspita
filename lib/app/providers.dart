@@ -8,7 +8,9 @@ import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/application/create_wallet.dart';
 import 'package:chuspita/features/wallets/application/load_balance_summary.dart';
+import 'package:chuspita/features/wallets/application/update_wallet.dart';
 import 'package:chuspita/features/wallets/data/repositories/drift_wallet_repository.dart';
+import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -39,6 +41,15 @@ final createWalletProvider = Provider<CreateWallet>((ref) {
     idGenerator: ref.watch(walletIdGeneratorProvider),
   );
 });
+
+final updateWalletProvider = Provider<UpdateWallet>((ref) {
+  return UpdateWallet(walletRepository: ref.watch(walletRepositoryProvider));
+});
+
+final walletsProvider = FutureProvider<List<Wallet>>(
+  (ref) => ref.watch(walletRepositoryProvider).getAll(),
+  retry: (retryCount, error) => null,
+);
 
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
   return DriftTransactionRepository(ref.watch(appDatabaseProvider));

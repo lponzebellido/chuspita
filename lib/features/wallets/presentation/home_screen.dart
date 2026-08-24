@@ -3,6 +3,7 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
+import 'package:chuspita/features/wallets/presentation/wallet_list_screen.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,8 +22,23 @@ final class HomeScreen extends ConsumerWidget {
       );
     }
 
+    void openWalletList() {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (context) => const WalletListScreen()),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.appName)),
+      appBar: AppBar(
+        title: Text(l10n.appName),
+        actions: [
+          IconButton(
+            tooltip: l10n.manageWallets,
+            onPressed: openWalletList,
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: summary.when(
           data: (value) =>
@@ -88,10 +104,17 @@ final class _CurrencyBalanceCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            CircleAvatar(
-              backgroundColor: colorScheme.primaryContainer,
-              foregroundColor: colorScheme.onPrimaryContainer,
-              child: Text(balance.currency.code.substring(0, 1)),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.payments_outlined,
+                color: colorScheme.onPrimaryContainer,
+              ),
             ),
             const SizedBox(width: 16),
             Text(

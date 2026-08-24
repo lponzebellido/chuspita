@@ -1,4 +1,3 @@
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/money/money.dart';
@@ -16,7 +15,6 @@ extension WalletRowMapper on WalletRow {
         minorUnits: initialBalanceMinor,
         currency: currency,
       ),
-      color: ArgbColor(colorArgb),
       isArchived: isArchived,
     );
   }

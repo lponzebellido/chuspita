@@ -1,6 +1,7 @@
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/features/wallets/data/mappers/wallet_mapper.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
+import 'package:chuspita/features/wallets/domain/wallet_currency_change_not_allowed.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/features/wallets/domain/wallet_repository.dart';
 import 'package:drift/drift.dart';
@@ -50,7 +51,6 @@ final class DriftWalletRepository implements WalletRepository {
               name: wallet.name,
               currencyCode: wallet.currency.code,
               initialBalanceMinor: wallet.initialBalance.minorUnits,
-              colorArgb: wallet.color.value,
               isArchived: Value(wallet.isArchived),
               createdAtMillis: now,
               updatedAtMillis: now,
@@ -63,9 +63,7 @@ final class DriftWalletRepository implements WalletRepository {
     final isChangingCurrency = existingRow.currencyCode != wallet.currency.code;
 
     if (isChangingCurrency && await _hasFinancialMovements(wallet.id)) {
-      throw StateError(
-        'Wallet currency cannot change after financial movements exist',
-      );
+      throw const WalletCurrencyChangeNotAllowed();
     }
 
     final updatedAtMillis = now < existingRow.createdAtMillis
@@ -79,7 +77,6 @@ final class DriftWalletRepository implements WalletRepository {
         name: Value(wallet.name),
         currencyCode: Value(wallet.currency.code),
         initialBalanceMinor: Value(wallet.initialBalance.minorUnits),
-        colorArgb: Value(wallet.color.value),
         isArchived: Value(wallet.isArchived),
         updatedAtMillis: Value(updatedAtMillis),
       ),

@@ -123,7 +123,6 @@ Wallet buildWallet() {
     id: WalletId('wallet-1'),
     name: 'Cash',
     initialBalance: const Money(minorUnits: 0, currency: Currency.eur),
-    color: ArgbColor(0xFF3366CC),
   );
 }
 

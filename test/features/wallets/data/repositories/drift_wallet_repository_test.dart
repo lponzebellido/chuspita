@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:chuspita/core/color/argb_color.dart';
 import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/data/repositories/drift_wallet_repository.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
+import 'package:chuspita/features/wallets/domain/wallet_currency_change_not_allowed.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:drift/drift.dart' hide isNotNull;
 import 'package:drift/native.dart';
@@ -41,7 +41,6 @@ void main() {
       expect(restored.name, wallet.name);
       expect(restored.currency, Currency.eur);
       expect(restored.initialBalance, wallet.initialBalance);
-      expect(restored.color, wallet.color);
       expect(restored.isArchived, isFalse);
     });
 
@@ -117,7 +116,7 @@ void main() {
 
       expect(
         () => repository.save(buildWallet(currency: Currency.usd)),
-        throwsA(isA<StateError>()),
+        throwsA(isA<WalletCurrencyChangeNotAllowed>()),
       );
     });
 
@@ -143,7 +142,7 @@ void main() {
 
       expect(
         () => repository.save(buildWallet(currency: Currency.usd)),
-        throwsA(isA<StateError>()),
+        throwsA(isA<WalletCurrencyChangeNotAllowed>()),
       );
     });
   });
@@ -194,6 +193,5 @@ Wallet buildWallet({String id = 'wallet-1', Currency currency = Currency.eur}) {
     id: WalletId(id),
     name: 'Cash',
     initialBalance: Money(minorUnits: 12500, currency: currency),
-    color: ArgbColor(0xFF3366CC),
   );
 }

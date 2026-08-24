@@ -1,22 +1,47 @@
 # Chuspita
 
-Gestor financiero personal desarrollado con Flutter.
+**Keep every wallet, currency, and journey within reach.**
 
-## Requisitos
+## About
+
+Chuspita is a personal finance manager for keeping expenses, income, wallets,
+and transfers clear and easy to understand.
+
+It is especially useful while traveling, when money may be spread across cash,
+cards, bank accounts, and different currencies. Chuspita helps travelers keep a
+transparent record of their movements without losing sight of where their money
+is or how it has changed along the way.
+
+The name is inspired by the *chuspa*, a traditional Andean pouch, and reflects
+the idea of carrying a small, dependable wallet wherever the journey leads.
+
+Chuspita currently supports:
+
+- Multiple wallets and currencies.
+- Expenses, income, and transfers between wallets.
+- Cross-currency transfers with an editable conversion factor.
+- Categories, filters, summaries, and spending statistics.
+- Spanish and English interfaces.
+- Light and dark themes.
+
+Financial data is currently stored locally. Each installation has its own
+independent database and data is not synchronized through GitHub.
+
+## Requirements
 
 - Git.
-- Flutter estable. El proyecto se desarrolla con Flutter 3.47.1 y Dart 3.13.1.
-- Para Android: Android Studio, Android SDK y un emulador o dispositivo.
-- Para iOS: macOS, Xcode, un simulador o dispositivo y CocoaPods.
+- Flutter stable. The project is developed with Flutter 3.47.1 and Dart 3.13.1.
+- For Android: Android Studio, the Android SDK, and an emulator or device.
+- For iOS: macOS, Xcode, a simulator or device, and CocoaPods.
 
-Comprueba el entorno antes de comenzar:
+Check the development environment before starting:
 
 ```bash
 flutter --version
 flutter doctor -v
 ```
 
-## Preparar el proyecto en otro equipo
+## Set up the project on another computer
 
 ```bash
 git clone https://github.com/lponzebellido/chuspita.git
@@ -26,19 +51,18 @@ flutter test
 flutter analyze
 ```
 
-`pubspec.lock` y los archivos generados necesarios están versionados, por lo
-que no es necesario ejecutar `build_runner` para iniciar el proyecto.
+`pubspec.lock` and the required generated files are versioned, so running
+`build_runner` is not necessary to start the project.
 
-## Ejecutar la aplicación
+## Run the application
 
-Consulta primero los dispositivos disponibles:
+List the available devices first:
 
 ```bash
 flutter devices
 ```
 
-Ejecuta la aplicación indicando el identificador mostrado por el comando
-anterior:
+Run the application using an identifier shown by the previous command:
 
 ```bash
 flutter run -d <device-id>
@@ -46,7 +70,7 @@ flutter run -d <device-id>
 
 ### Android
 
-Para usar un emulador existente:
+To use an existing emulator:
 
 ```bash
 flutter emulators
@@ -55,12 +79,12 @@ flutter devices
 flutter run -d <device-id>
 ```
 
-También puedes conectar un teléfono con la depuración USB habilitada y aceptar
-la autorización del equipo.
+You can also connect a phone with USB debugging enabled and authorize the
+computer when prompted.
 
 ### iOS
 
-Abre primero el simulador y después ejecuta la aplicación:
+Open the simulator before running the application:
 
 ```bash
 open -a Simulator
@@ -68,9 +92,9 @@ flutter devices
 flutter run -d <device-id>
 ```
 
-En un iPhone físico será necesario configurar un equipo de firma en Xcode.
+A physical iPhone requires a development team to be configured in Xcode.
 
-## Flujo habitual después de recibir cambios
+## Everyday development workflow
 
 ```bash
 git pull
@@ -79,5 +103,4 @@ flutter test
 flutter analyze
 ```
 
-Vuelve a ejecutar `flutter pub get` cuando cambie `pubspec.yaml` o
-`pubspec.lock`.
+Run `flutter pub get` again whenever `pubspec.yaml` or `pubspec.lock` changes.

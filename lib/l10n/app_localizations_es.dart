@@ -51,11 +51,36 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get backupDescription =>
-      'Guarda una copia restaurable de tus monederos, categorías y movimientos.';
+      'Guarda una copia restaurable de tus monederos, categorías y movimientos. Mantén este archivo en privado.';
 
   @override
   String get createBackupError =>
       'No pudimos crear la copia de seguridad. Inténtalo nuevamente.';
+
+  @override
+  String get restoreBackup => 'Restaurar copia de seguridad';
+
+  @override
+  String get restoreBackupDescription =>
+      'Reemplaza los datos financieros actuales con una copia de Chuspita.';
+
+  @override
+  String get restoreBackupTitle => '¿Restaurar la copia de seguridad?';
+
+  @override
+  String get restoreBackupConfirmation =>
+      'Tus monederos, categorías y movimientos actuales serán reemplazados por el contenido de la copia seleccionada.';
+
+  @override
+  String get restoreBackupSuccess => 'La copia de seguridad fue restaurada.';
+
+  @override
+  String get invalidBackupError =>
+      'Este archivo no es una copia válida o compatible de Chuspita.';
+
+  @override
+  String get restoreBackupError =>
+      'No pudimos restaurar la copia. Tus datos anteriores fueron conservados.';
 
   @override
   String get balanceByCurrency => 'Balance por moneda';

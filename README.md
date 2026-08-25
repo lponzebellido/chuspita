@@ -23,6 +23,7 @@ Chuspita currently supports:
 - Expenses, income, and transfers between wallets.
 - Cross-currency transfers with an editable conversion factor.
 - Categories, filters, summaries, and spending statistics.
+- Manual database backup and restore.
 - Spanish and English interfaces.
 - Light and dark themes.
 

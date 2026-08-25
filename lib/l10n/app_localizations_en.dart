@@ -51,11 +51,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupDescription =>
-      'Save a restorable copy of your wallets, categories, and movements.';
+      'Save a restorable copy of your wallets, categories, and movements. Keep this file private.';
 
   @override
   String get createBackupError =>
       'We couldn\'t create the backup. Please try again.';
+
+  @override
+  String get restoreBackup => 'Restore backup';
+
+  @override
+  String get restoreBackupDescription =>
+      'Replace the current financial data with a Chuspita backup.';
+
+  @override
+  String get restoreBackupTitle => 'Restore backup?';
+
+  @override
+  String get restoreBackupConfirmation =>
+      'Your current wallets, categories, and movements will be replaced with the contents of the selected backup.';
+
+  @override
+  String get restoreBackupSuccess => 'The backup was restored.';
+
+  @override
+  String get invalidBackupError =>
+      'This file isn\'t a valid or compatible Chuspita backup.';
+
+  @override
+  String get restoreBackupError =>
+      'We couldn\'t restore the backup. Your previous data was preserved.';
 
   @override
   String get balanceByCurrency => 'Balance by currency';

@@ -179,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupDescription.
   ///
   /// In en, this message translates to:
-  /// **'Save a restorable copy of your wallets, categories, and movements.'**
+  /// **'Save a restorable copy of your wallets, categories, and movements. Keep this file private.'**
   String get backupDescription;
 
   /// No description provided for @createBackupError.
@@ -187,6 +187,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t create the backup. Please try again.'**
   String get createBackupError;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackup;
+
+  /// No description provided for @restoreBackupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the current financial data with a Chuspita backup.'**
+  String get restoreBackupDescription;
+
+  /// No description provided for @restoreBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup?'**
+  String get restoreBackupTitle;
+
+  /// No description provided for @restoreBackupConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current wallets, categories, and movements will be replaced with the contents of the selected backup.'**
+  String get restoreBackupConfirmation;
+
+  /// No description provided for @restoreBackupSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup was restored.'**
+  String get restoreBackupSuccess;
+
+  /// No description provided for @invalidBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'This file isn\'t a valid or compatible Chuspita backup.'**
+  String get invalidBackupError;
+
+  /// No description provided for @restoreBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t restore the backup. Your previous data was preserved.'**
+  String get restoreBackupError;
 
   /// No description provided for @balanceByCurrency.
   ///

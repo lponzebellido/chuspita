@@ -5,7 +5,10 @@ import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
 import 'package:chuspita/features/backup/application/create_database_backup.dart';
+import 'package:chuspita/features/backup/application/database_backup_file_picker.dart';
+import 'package:chuspita/features/backup/application/restore_database_backup.dart';
 import 'package:chuspita/features/backup/data/backup_share_service.dart';
+import 'package:chuspita/features/backup/data/native_database_backup_file_picker.dart';
 import 'package:chuspita/features/categories/application/create_category.dart';
 import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
@@ -55,6 +58,19 @@ final databaseBackupCreatorProvider = Provider<DatabaseBackupCreator>((ref) {
 
 final backupShareServiceProvider = Provider<BackupShareService>((ref) {
   return const NativeBackupShareService();
+});
+
+final databaseBackupFilePickerProvider = Provider<DatabaseBackupFilePicker>((
+  ref,
+) {
+  return const NativeDatabaseBackupFilePicker();
+});
+
+final databaseBackupRestorerProvider = Provider<DatabaseBackupRestorer>((ref) {
+  return RestoreDatabaseBackup(
+    ref.watch(appDatabaseProvider),
+    () => ref.invalidate(appDatabaseProvider),
+  );
 });
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {

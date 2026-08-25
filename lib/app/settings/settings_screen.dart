@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/app/settings/app_settings.dart';
 import 'package:chuspita/app/settings/settings_providers.dart';
+import 'package:chuspita/features/backup/application/invalid_database_backup.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+enum _BackupOperation { create, restore }
 
 final class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -15,7 +18,7 @@ final class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 final class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  var _isCreatingBackup = false;
+  _BackupOperation? _backupOperation;
 
   @override
   Widget build(BuildContext context) {
@@ -98,19 +101,38 @@ final class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 8),
             Builder(
               builder: (shareAnchorContext) => Card(
-                child: ListTile(
-                  leading: const Icon(Icons.save_alt_outlined),
-                  title: Text(context.l10n.createBackup),
-                  subtitle: Text(context.l10n.backupDescription),
-                  trailing: _isCreatingBackup
-                      ? const SizedBox.square(
-                          dimension: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.chevron_right),
-                  onTap: _isCreatingBackup
-                      ? null
-                      : () => unawaited(_createBackup(shareAnchorContext)),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.save_alt_outlined),
+                      title: Text(context.l10n.createBackup),
+                      subtitle: Text(context.l10n.backupDescription),
+                      trailing: _backupOperation == _BackupOperation.create
+                          ? const SizedBox.square(
+                              dimension: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.chevron_right),
+                      onTap: _backupOperation != null
+                          ? null
+                          : () => unawaited(_createBackup(shareAnchorContext)),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.restore_outlined),
+                      title: Text(context.l10n.restoreBackup),
+                      subtitle: Text(context.l10n.restoreBackupDescription),
+                      trailing: _backupOperation == _BackupOperation.restore
+                          ? const SizedBox.square(
+                              dimension: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.chevron_right),
+                      onTap: _backupOperation != null
+                          ? null
+                          : () => unawaited(_restoreBackup()),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -173,7 +195,7 @@ final class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ? renderObject.localToGlobal(Offset.zero) & renderObject.size
         : null;
 
-    setState(() => _isCreatingBackup = true);
+    setState(() => _backupOperation = _BackupOperation.create);
 
     try {
       final file = await ref.read(databaseBackupCreatorProvider)();
@@ -188,7 +210,66 @@ final class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isCreatingBackup = false);
+        setState(() => _backupOperation = null);
+      }
+    }
+  }
+
+  Future<void> _restoreBackup() async {
+    setState(() => _backupOperation = _BackupOperation.restore);
+
+    try {
+      final file = await ref.read(databaseBackupFilePickerProvider).pick();
+      if (file == null || !mounted) {
+        return;
+      }
+
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(context.l10n.restoreBackupTitle),
+          content: Text(context.l10n.restoreBackupConfirmation),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(context.l10n.restore),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true || !mounted) {
+        return;
+      }
+
+      final messenger = ScaffoldMessenger.of(context);
+      await ref.read(databaseBackupRestorerProvider)(file);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+        messenger.showSnackBar(
+          SnackBar(content: Text(context.l10n.restoreBackupSuccess)),
+        );
+      }
+    } on InvalidDatabaseBackup {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.invalidBackupError)),
+        );
+      }
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.restoreBackupError)),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _backupOperation = null);
       }
     }
   }

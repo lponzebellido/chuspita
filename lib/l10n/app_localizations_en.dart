@@ -44,6 +44,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadSettingsError => 'We couldn\'t load the settings.';
 
   @override
+  String get backupSettingsTitle => 'Backup';
+
+  @override
+  String get createBackup => 'Create backup';
+
+  @override
+  String get backupDescription =>
+      'Save a restorable copy of your wallets, categories, and movements.';
+
+  @override
+  String get createBackupError =>
+      'We couldn\'t create the backup. Please try again.';
+
+  @override
   String get balanceByCurrency => 'Balance by currency';
 
   @override

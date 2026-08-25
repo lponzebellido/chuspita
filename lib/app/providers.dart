@@ -4,6 +4,8 @@ import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
+import 'package:chuspita/features/backup/application/create_database_backup.dart';
+import 'package:chuspita/features/backup/data/backup_share_service.dart';
 import 'package:chuspita/features/categories/application/create_category.dart';
 import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
@@ -45,6 +47,14 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
 
 final exportShareServiceProvider = Provider<ExportShareService>((ref) {
   return const NativeExportShareService();
+});
+
+final databaseBackupCreatorProvider = Provider<DatabaseBackupCreator>((ref) {
+  return CreateDatabaseBackup(ref.watch(appDatabaseProvider));
+});
+
+final backupShareServiceProvider = Provider<BackupShareService>((ref) {
+  return const NativeBackupShareService();
 });
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {

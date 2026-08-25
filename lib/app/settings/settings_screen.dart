@@ -1,16 +1,24 @@
 import 'dart:async';
 
+import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/app/settings/app_settings.dart';
 import 'package:chuspita/app/settings/settings_providers.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final class SettingsScreen extends ConsumerWidget {
+final class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+final class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  var _isCreatingBackup = false;
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider);
 
     return Scaffold(
@@ -29,7 +37,7 @@ final class SettingsScreen extends ConsumerWidget {
                 groupValue: value.language,
                 onChanged: (language) {
                   if (language != null) {
-                    unawaited(_setLanguage(context, ref, language));
+                    unawaited(_setLanguage(context, language));
                   }
                 },
                 child: Column(
@@ -61,7 +69,7 @@ final class SettingsScreen extends ConsumerWidget {
                 groupValue: value.theme,
                 onChanged: (theme) {
                   if (theme != null) {
-                    unawaited(_setTheme(context, ref, theme));
+                    unawaited(_setTheme(context, theme));
                   }
                 },
                 child: Column(
@@ -79,6 +87,30 @@ final class SettingsScreen extends ConsumerWidget {
                       title: Text(context.l10n.darkTheme),
                     ),
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            _SectionTitle(
+              icon: Icons.shield_outlined,
+              title: context.l10n.backupSettingsTitle,
+            ),
+            const SizedBox(height: 8),
+            Builder(
+              builder: (shareAnchorContext) => Card(
+                child: ListTile(
+                  leading: const Icon(Icons.save_alt_outlined),
+                  title: Text(context.l10n.createBackup),
+                  subtitle: Text(context.l10n.backupDescription),
+                  trailing: _isCreatingBackup
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right),
+                  onTap: _isCreatingBackup
+                      ? null
+                      : () => unawaited(_createBackup(shareAnchorContext)),
                 ),
               ),
             ),
@@ -110,11 +142,7 @@ final class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _setLanguage(
-    BuildContext context,
-    WidgetRef ref,
-    AppLanguage language,
-  ) async {
+  Future<void> _setLanguage(BuildContext context, AppLanguage language) async {
     try {
       await ref.read(appSettingsProvider.notifier).setLanguage(language);
     } on Object {
@@ -124,11 +152,7 @@ final class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _setTheme(
-    BuildContext context,
-    WidgetRef ref,
-    AppThemePreference theme,
-  ) async {
+  Future<void> _setTheme(BuildContext context, AppThemePreference theme) async {
     try {
       await ref.read(appSettingsProvider.notifier).setTheme(theme);
     } on Object {
@@ -141,6 +165,32 @@ final class SettingsScreen extends ConsumerWidget {
   void _showSaveError(BuildContext context) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(context.l10n.saveSettingsError)));
+  }
+
+  Future<void> _createBackup(BuildContext shareAnchorContext) async {
+    final renderObject = shareAnchorContext.findRenderObject();
+    final sharePositionOrigin = renderObject is RenderBox
+        ? renderObject.localToGlobal(Offset.zero) & renderObject.size
+        : null;
+
+    setState(() => _isCreatingBackup = true);
+
+    try {
+      final file = await ref.read(databaseBackupCreatorProvider)();
+      await ref
+          .read(backupShareServiceProvider)
+          .share(file, sharePositionOrigin: sharePositionOrigin);
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.createBackupError)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isCreatingBackup = false);
+      }
+    }
   }
 }
 

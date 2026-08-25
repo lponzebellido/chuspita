@@ -164,6 +164,30 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load the settings.'**
   String get loadSettingsError;
 
+  /// No description provided for @backupSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backupSettingsTitle;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get createBackup;
+
+  /// No description provided for @backupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a restorable copy of your wallets, categories, and movements.'**
+  String get backupDescription;
+
+  /// No description provided for @createBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t create the backup. Please try again.'**
+  String get createBackupError;
+
   /// No description provided for @balanceByCurrency.
   ///
   /// In en, this message translates to:

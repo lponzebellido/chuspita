@@ -44,6 +44,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loadSettingsError => 'No pudimos cargar la configuración.';
 
   @override
+  String get backupSettingsTitle => 'Copia de seguridad';
+
+  @override
+  String get createBackup => 'Crear copia de seguridad';
+
+  @override
+  String get backupDescription =>
+      'Guarda una copia restaurable de tus monederos, categorías y movimientos.';
+
+  @override
+  String get createBackupError =>
+      'No pudimos crear la copia de seguridad. Inténtalo nuevamente.';
+
+  @override
   String get balanceByCurrency => 'Balance por moneda';
 
   @override

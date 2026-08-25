@@ -10,10 +10,13 @@ import 'package:chuspita/features/analytics/presentation/expense_trend_section.d
 import 'package:chuspita/features/analytics/presentation/income_expense_section.dart';
 import 'package:chuspita/features/analytics/presentation/period_comparison_section.dart';
 import 'package:chuspita/features/analytics/presentation/spending_metrics_section.dart';
+import 'package:chuspita/features/export/data/csv_financial_exporter.dart';
 import 'package:chuspita/features/export/data/xlsx_financial_exporter.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+enum _ExportFormat { xlsx, csv }
 
 final class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
@@ -110,9 +113,10 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     }
   }
 
-  Future<void> _exportXlsx(
+  Future<void> _export(
     BuildContext shareAnchorContext,
     PeriodSummary summary,
+    _ExportFormat format,
   ) async {
     final renderObject = shareAnchorContext.findRenderObject();
     final sharePositionOrigin = renderObject is RenderBox
@@ -126,13 +130,22 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       final transfers = await ref.read(transfersProvider.future);
       final categories = await ref.read(categoriesProvider.future);
       final wallets = await ref.read(walletsProvider.future);
-      final file = buildFinancialXlsx(
-        summary: summary,
-        transactions: transactions,
-        transfers: transfers,
-        categories: categories,
-        wallets: wallets,
-      );
+      final file = switch (format) {
+        _ExportFormat.xlsx => buildFinancialXlsx(
+          summary: summary,
+          transactions: transactions,
+          transfers: transfers,
+          categories: categories,
+          wallets: wallets,
+        ),
+        _ExportFormat.csv => buildFinancialCsv(
+          summary: summary,
+          transactions: transactions,
+          transfers: transfers,
+          categories: categories,
+          wallets: wallets,
+        ),
+      };
       await ref
           .read(exportShareServiceProvider)
           .share(file, sharePositionOrigin: sharePositionOrigin);
@@ -140,7 +153,7 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(context.l10n.exportXlsxError)));
+        ).showSnackBar(SnackBar(content: Text(context.l10n.exportDataError)));
       }
     } finally {
       if (mounted) {
@@ -186,21 +199,53 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         title: Text(context.l10n.statisticsTitle),
         actions: [
           Builder(
-            builder: (shareAnchorContext) => IconButton(
-              tooltip: context.l10n.exportXlsx,
-              onPressed: summaries.hasValue && !_isExporting
-                  ? () => _exportXlsx(
-                      shareAnchorContext,
-                      summaries.requireValue.current,
-                    )
-                  : null,
-              icon: _isExporting
-                  ? const SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.file_download_outlined),
-            ),
+            builder: (shareAnchorContext) {
+              if (_isExporting) {
+                return IconButton(
+                  tooltip: context.l10n.exportData,
+                  onPressed: null,
+                  icon: const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+
+              return PopupMenuButton<_ExportFormat>(
+                tooltip: context.l10n.exportData,
+                enabled: summaries.hasValue,
+                icon: const Icon(Icons.file_download_outlined),
+                onSelected: (format) {
+                  final summary = summaries.asData?.value.current;
+
+                  if (summary != null) {
+                    unawaited(_export(shareAnchorContext, summary, format));
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _ExportFormat.xlsx,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.table_chart_outlined),
+                        const SizedBox(width: 12),
+                        Text(context.l10n.exportXlsx),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _ExportFormat.csv,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.text_snippet_outlined),
+                        const SizedBox(width: 12),
+                        Text(context.l10n.exportCsv),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

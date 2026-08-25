@@ -253,14 +253,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Estadísticas'), findsOneWidget);
-    expect(find.byTooltip('Exportar XLSX'), findsOneWidget);
+    expect(find.byTooltip('Exportar datos'), findsOneWidget);
     expect(find.text('Este mes'), findsOneWidget);
     expect(find.text('Ingresos vs. gastos'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('income-expense-chart-EUR')),
       findsOneWidget,
     );
-    await tester.tap(find.byTooltip('Exportar XLSX'));
+    await tester.tap(find.byTooltip('Exportar datos'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Exportar XLSX'), findsOneWidget);
+    expect(find.text('Exportar CSV'), findsOneWidget);
+    await tester.tap(find.text('Exportar XLSX'));
     await tester.pumpAndSettle();
 
     expect(exportShareService.sharedFile, isNotNull);
@@ -269,6 +274,18 @@ void main() {
       'chuspita-2026-08-01-to-2026-08-31.xlsx',
     );
     expect(exportShareService.sharePositionOrigin, isNotNull);
+
+    await tester.tap(find.byTooltip('Exportar datos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Exportar CSV'));
+    await tester.pumpAndSettle();
+
+    expect(exportShareService.sharedFiles, hasLength(2));
+    expect(
+      exportShareService.sharedFile!.fileName,
+      'chuspita-movements-2026-08-01-to-2026-08-31.csv',
+    );
+    expect(exportShareService.sharedFile!.mimeType, 'text/csv');
     expect(find.text('Métricas de gasto'), findsOneWidget);
     expect(
       find.descendant(
@@ -477,11 +494,13 @@ Category buildCategory(String id, String name, int color) {
 
 final class FakeExportShareService implements ExportShareService {
   ExportFile? sharedFile;
+  final sharedFiles = <ExportFile>[];
   Rect? sharePositionOrigin;
 
   @override
   Future<void> share(ExportFile file, {Rect? sharePositionOrigin}) async {
     sharedFile = file;
+    sharedFiles.add(file);
     this.sharePositionOrigin = sharePositionOrigin;
   }
 }

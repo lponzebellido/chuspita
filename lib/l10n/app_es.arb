@@ -111,6 +111,7 @@
   "saveTransactionError": "No pudimos guardar el movimiento. Inténtalo nuevamente.",
   "transferBetweenWallets": "Transferir entre monederos",
   "newTransferTitle": "Nueva transferencia",
+  "editTransferTitle": "Editar transferencia",
   "sourceWalletLabel": "Monedero de origen",
   "destinationWalletLabel": "Monedero de destino",
   "sourceAmountLabel": "Cantidad enviada",

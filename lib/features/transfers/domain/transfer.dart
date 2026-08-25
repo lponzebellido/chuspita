@@ -83,6 +83,27 @@ final class Transfer {
     return sourceAmount.currency != destinationAmount.currency;
   }
 
+  Transfer updateDetails({
+    required WalletId sourceWalletId,
+    required WalletId destinationWalletId,
+    required Money sourceAmount,
+    required Money destinationAmount,
+    required LocalDate occurredOn,
+    LocalTime? occurredAt,
+    String? note,
+  }) {
+    return Transfer(
+      id: id,
+      sourceWalletId: sourceWalletId,
+      destinationWalletId: destinationWalletId,
+      sourceAmount: sourceAmount,
+      destinationAmount: destinationAmount,
+      occurredOn: occurredOn,
+      occurredAt: occurredAt ?? this.occurredAt,
+      note: note,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) || other is Transfer && id == other.id;

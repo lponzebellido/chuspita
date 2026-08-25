@@ -15,7 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final class TransferFormScreen extends ConsumerStatefulWidget {
-  const TransferFormScreen({super.key});
+  const TransferFormScreen({super.key, this.transfer});
+
+  final Transfer? transfer;
 
   @override
   ConsumerState<TransferFormScreen> createState() => _TransferFormScreenState();
@@ -23,10 +25,10 @@ final class TransferFormScreen extends ConsumerStatefulWidget {
 
 final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _sourceAmountController = TextEditingController();
-  final _destinationAmountController = TextEditingController();
-  final _exchangeRateController = TextEditingController();
-  final _noteController = TextEditingController();
+  late final TextEditingController _sourceAmountController;
+  late final TextEditingController _destinationAmountController;
+  late final TextEditingController _exchangeRateController;
+  late final TextEditingController _noteController;
   WalletId? _sourceWalletId;
   WalletId? _destinationWalletId;
   late LocalDate _occurredOn;
@@ -41,13 +43,44 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   @override
   void initState() {
     super.initState();
+    final transfer = widget.transfer;
     final today = DateTime.now();
-    _occurredOn = LocalDate(
-      year: today.year,
-      month: today.month,
-      day: today.day,
+    _sourceAmountController = TextEditingController(
+      text: transfer == null
+          ? null
+          : formatMoneyAmount(transfer.sourceAmount, localeName: 'en'),
     );
-    _occurredAt = LocalTime(hour: today.hour, minute: today.minute);
+    _destinationAmountController = TextEditingController(
+      text: transfer == null
+          ? null
+          : formatMoneyAmount(transfer.destinationAmount, localeName: 'en'),
+    );
+    _exchangeRateController = TextEditingController(
+      text: transfer == null || !transfer.isCurrencyExchange
+          ? null
+          : ExchangeRate.fromAmounts(
+              sourceAmount: transfer.sourceAmount,
+              destinationAmount: transfer.destinationAmount,
+            ).toInputValue(),
+    );
+    _noteController = TextEditingController(text: transfer?.note);
+    _sourceWalletId = transfer?.sourceWalletId;
+    _destinationWalletId = transfer?.destinationWalletId;
+    _occurredOn =
+        transfer?.occurredOn ??
+        LocalDate(year: today.year, month: today.month, day: today.day);
+    _occurredAt =
+        transfer?.occurredAt ??
+        LocalTime(hour: today.hour, minute: today.minute);
+
+    if (transfer != null && transfer.isCurrencyExchange) {
+      _useExchangeRate = false;
+      _hasSuggestedRate = true;
+      _ratePair =
+          '${transfer.sourceAmount.currency.code}-'
+          '${transfer.destinationAmount.currency.code}';
+    }
+
     _sourceAmountController.addListener(_refreshConversionPreview);
     _exchangeRateController.addListener(_refreshConversionPreview);
   }
@@ -154,17 +187,34 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
     });
 
     try {
-      await ref
-          .read(createTransferProvider)
-          .call(
-            sourceWalletId: sourceWallet.id,
-            destinationWalletId: destinationWallet.id,
-            sourceAmount: sourceAmount,
-            destinationAmount: destinationAmount,
-            occurredOn: _occurredOn,
-            occurredAt: _occurredAt,
-            note: _noteController.text,
-          );
+      final transfer = widget.transfer;
+
+      if (transfer == null) {
+        await ref
+            .read(createTransferProvider)
+            .call(
+              sourceWalletId: sourceWallet.id,
+              destinationWalletId: destinationWallet.id,
+              sourceAmount: sourceAmount,
+              destinationAmount: destinationAmount,
+              occurredOn: _occurredOn,
+              occurredAt: _occurredAt,
+              note: _noteController.text,
+            );
+      } else {
+        await ref
+            .read(updateTransferProvider)
+            .call(
+              transfer: transfer,
+              sourceWalletId: sourceWallet.id,
+              destinationWalletId: destinationWallet.id,
+              sourceAmount: sourceAmount,
+              destinationAmount: destinationAmount,
+              occurredOn: _occurredOn,
+              occurredAt: _occurredAt,
+              note: _noteController.text,
+            );
+      }
 
       ref.invalidate(balanceSummaryProvider);
       ref.invalidate(transfersProvider);
@@ -186,22 +236,36 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   Widget build(BuildContext context) {
     final wallets = ref.watch(walletsProvider);
     final transfers = ref.watch(transfersProvider);
-    final activeWallets =
-        wallets.asData?.value.where((wallet) => !wallet.isArchived).toList() ??
+    final transfer = widget.transfer;
+    final availableWallets =
+        wallets.asData?.value
+            .where(
+              (wallet) =>
+                  !wallet.isArchived ||
+                  wallet.id == transfer?.sourceWalletId ||
+                  wallet.id == transfer?.destinationWalletId,
+            )
+            .toList() ??
         const <Wallet>[];
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.newTransferTitle)),
+      appBar: AppBar(
+        title: Text(
+          transfer == null
+              ? context.l10n.newTransferTitle
+              : context.l10n.editTransferTitle,
+        ),
+      ),
       body: _buildBody(
         wallets: wallets,
         transfers: transfers,
-        activeWallets: activeWallets,
+        availableWallets: availableWallets,
       ),
-      bottomNavigationBar: wallets.hasValue && activeWallets.length >= 2
+      bottomNavigationBar: wallets.hasValue && availableWallets.length >= 2
           ? SafeArea(
               minimum: const EdgeInsets.fromLTRB(20, 12, 20, 20),
               child: FilledButton(
-                onPressed: _isSaving ? null : () => _save(activeWallets),
+                onPressed: _isSaving ? null : () => _save(availableWallets),
                 child: _isSaving
                     ? const SizedBox.square(
                         dimension: 20,
@@ -217,7 +281,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
   Widget _buildBody({
     required AsyncValue<List<Wallet>> wallets,
     required AsyncValue<List<Transfer>> transfers,
-    required List<Wallet> activeWallets,
+    required List<Wallet> availableWallets,
   }) {
     if (wallets.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -227,7 +291,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
       return _LoadError(onRetry: () => ref.invalidate(walletsProvider));
     }
 
-    if (activeWallets.length < 2) {
+    if (availableWallets.length < 2) {
       return _MissingWallets(
         onManageWallets: () => Navigator.of(context).push(
           MaterialPageRoute<void>(
@@ -237,12 +301,15 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
       );
     }
 
-    activeWallets.sort(
+    availableWallets.sort(
       (first, second) =>
           first.name.toLowerCase().compareTo(second.name.toLowerCase()),
     );
-    final sourceWallet = _selectedSource(activeWallets);
-    final destinationWallet = _selectedDestination(activeWallets, sourceWallet);
+    final sourceWallet = _selectedSource(availableWallets);
+    final destinationWallet = _selectedDestination(
+      availableWallets,
+      sourceWallet,
+    );
     final isCurrencyExchange =
         sourceWallet.currency != destinationWallet.currency;
 
@@ -271,7 +338,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
               border: const OutlineInputBorder(),
             ),
             items: [
-              for (final wallet in activeWallets)
+              for (final wallet in availableWallets)
                 DropdownMenuItem(
                   value: wallet.id,
                   child: Text('${wallet.name} · ${wallet.currency.code}'),
@@ -308,7 +375,7 @@ final class _TransferFormScreenState extends ConsumerState<TransferFormScreen> {
               border: const OutlineInputBorder(),
             ),
             items: [
-              for (final wallet in activeWallets)
+              for (final wallet in availableWallets)
                 if (wallet.id != sourceWallet.id)
                   DropdownMenuItem(
                     value: wallet.id,

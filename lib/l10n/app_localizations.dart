@@ -764,6 +764,12 @@ abstract class AppLocalizations {
   /// **'New transfer'**
   String get newTransferTitle;
 
+  /// No description provided for @editTransferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit transfer'**
+  String get editTransferTitle;
+
   /// No description provided for @sourceWalletLabel.
   ///
   /// In en, this message translates to:

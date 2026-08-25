@@ -357,6 +357,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newTransferTitle => 'New transfer';
 
   @override
+  String get editTransferTitle => 'Edit transfer';
+
+  @override
   String get sourceWalletLabel => 'From wallet';
 
   @override

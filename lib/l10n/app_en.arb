@@ -114,6 +114,7 @@
   "saveTransactionError": "We couldn't save the transaction. Please try again.",
   "transferBetweenWallets": "Transfer between wallets",
   "newTransferTitle": "New transfer",
+  "editTransferTitle": "Edit transfer",
   "sourceWalletLabel": "From wallet",
   "destinationWalletLabel": "To wallet",
   "sourceAmountLabel": "Amount sent",

@@ -226,6 +226,72 @@ void main() {
     expect(find.text('Monedero de origen'), findsNothing);
   });
 
+  testWidgets('edits a transfer while preserving its identity', (tester) async {
+    final sourceWallet = buildWallet();
+    final destinationWallet = buildWallet(
+      id: 'wallet-2',
+      name: 'Ahorros',
+      currency: Currency.pen,
+    );
+    final transfer = Transfer(
+      id: TransferId('transfer-1'),
+      sourceWalletId: sourceWallet.id,
+      destinationWalletId: destinationWallet.id,
+      sourceAmount: const Money(minorUnits: 1000, currency: Currency.eur),
+      destinationAmount: const Money(minorUnits: 4000, currency: Currency.pen),
+      occurredOn: LocalDate(year: 2026, month: 8, day: 24),
+      note: 'Cambio de moneda',
+    );
+    final transferRepository = FakeTransferRepository([transfer]);
+
+    await pumpApp(
+      tester,
+      repository: FakeTransactionRepository([]),
+      wallets: [sourceWallet, destinationWallet],
+      transfers: [transfer],
+      transferRepository: transferRepository,
+    );
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Transferencia'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Editar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Editar transferencia'), findsOneWidget);
+    final sourceAmountField = tester.widget<TextFormField>(
+      find.byKey(const ValueKey('transfer-source-amount')),
+    );
+    final destinationAmountField = tester.widget<TextFormField>(
+      find.byKey(const ValueKey('transfer-destination-amount')),
+    );
+    expect(sourceAmountField.controller!.text, '10.00');
+    expect(destinationAmountField.controller!.text, '40.00');
+
+    await tester.enterText(
+      find.byKey(const ValueKey('transfer-source-amount')),
+      '20,00',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('transfer-destination-amount')),
+      '78,00',
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(transferRepository.savedTransfer, isNotNull);
+    expect(transferRepository.savedTransfer!.id, transfer.id);
+    expect(
+      transferRepository.savedTransfer!.sourceAmount,
+      const Money(minorUnits: 2000, currency: Currency.eur),
+    );
+    expect(
+      transferRepository.savedTransfer!.destinationAmount,
+      const Money(minorUnits: 7800, currency: Currency.pen),
+    );
+    expect(transferRepository.savedTransfer!.note, 'Cambio de moneda');
+  });
+
   testWidgets('groups movements by date in both sort orders', (tester) async {
     final currentDate = LocalDate(year: 2026, month: 8, day: 24);
     final yesterday = LocalDate(year: 2026, month: 8, day: 23);
@@ -424,6 +490,7 @@ final class FakeTransferRepository implements TransferRepository {
 
   final List<Transfer> transfers;
   TransferId? deletedId;
+  Transfer? savedTransfer;
 
   @override
   Future<void> delete(TransferId id) async {
@@ -437,5 +504,7 @@ final class FakeTransferRepository implements TransferRepository {
   Future<Transfer?> getById(TransferId id) async => null;
 
   @override
-  Future<void> save(Transfer transfer) async {}
+  Future<void> save(Transfer transfer) async {
+    savedTransfer = transfer;
+  }
 }

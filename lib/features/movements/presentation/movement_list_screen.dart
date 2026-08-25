@@ -10,6 +10,7 @@ import 'package:chuspita/features/movements/presentation/movement_item.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/presentation/transaction_form_screen.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
+import 'package:chuspita/features/transfers/presentation/transfer_form_screen.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
@@ -286,7 +287,17 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
         transfer: transfer,
         sourceWalletName: sourceWalletName,
         destinationWalletName: destinationWalletName,
+        onEdit: () => _editTransfer(transfer),
         onDelete: () => _deleteTransfer(transfer),
+      ),
+    );
+  }
+
+  void _editTransfer(Transfer transfer) {
+    Navigator.of(context).pop();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => TransferFormScreen(transfer: transfer),
       ),
     );
   }
@@ -494,12 +505,14 @@ final class _TransferDetails extends StatelessWidget {
     required this.transfer,
     required this.sourceWalletName,
     required this.destinationWalletName,
+    required this.onEdit,
     required this.onDelete,
   });
 
   final Transfer transfer;
   final String sourceWalletName;
   final String destinationWalletName;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -559,14 +572,28 @@ final class _TransferDetails extends StatelessWidget {
                 subtitle: Text(transfer.note!),
               ),
             const SizedBox(height: 16),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
-                foregroundColor: Theme.of(context).colorScheme.onError,
-              ),
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline),
-              label: Text(context.l10n.delete),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(context.l10n.edit),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      foregroundColor: Theme.of(context).colorScheme.onError,
+                    ),
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text(context.l10n.delete),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

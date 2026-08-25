@@ -408,6 +408,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'No pudimos guardar la transferencia. Inténtalo nuevamente.';
 
   @override
+  String get deleteTransferTitle => 'Eliminar transferencia';
+
+  @override
+  String get deleteTransferConfirmation =>
+      'Esta acción eliminará la transferencia y modificará el balance de ambos monederos. No se puede deshacer.';
+
+  @override
+  String get deleteTransferError =>
+      'No pudimos eliminar la transferencia. Inténtalo nuevamente.';
+
+  @override
   String get deleteTransactionTitle => 'Eliminar movimiento';
 
   @override

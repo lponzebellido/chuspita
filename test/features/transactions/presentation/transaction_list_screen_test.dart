@@ -11,6 +11,7 @@ import 'package:chuspita/features/transactions/domain/transaction_id.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_id.dart';
+import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
@@ -174,6 +175,57 @@ void main() {
     expect(find.text('Cambio de moneda'), findsOneWidget);
   });
 
+  testWidgets('deletes a transfer after explicit confirmation', (tester) async {
+    final sourceWallet = buildWallet();
+    final destinationWallet = buildWallet(
+      id: 'wallet-2',
+      name: 'Ahorros',
+      currency: Currency.pen,
+    );
+    final transfer = Transfer(
+      id: TransferId('transfer-1'),
+      sourceWalletId: sourceWallet.id,
+      destinationWalletId: destinationWallet.id,
+      sourceAmount: const Money(minorUnits: 1000, currency: Currency.eur),
+      destinationAmount: const Money(minorUnits: 4000, currency: Currency.pen),
+      occurredOn: LocalDate(year: 2026, month: 8, day: 24),
+    );
+    final transferRepository = FakeTransferRepository([transfer]);
+
+    await pumpApp(
+      tester,
+      repository: FakeTransactionRepository([]),
+      wallets: [sourceWallet, destinationWallet],
+      transfers: [transfer],
+      transferRepository: transferRepository,
+    );
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Ver movimientos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Transferencia'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Eliminar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Eliminar transferencia'), findsOneWidget);
+    expect(
+      find.text(
+        'Esta acción eliminará la transferencia y modificará el balance de '
+        'ambos monederos. No se puede deshacer.',
+      ),
+      findsOneWidget,
+    );
+
+    final confirmationButton = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Eliminar'),
+    );
+    await tester.tap(confirmationButton);
+    await tester.pumpAndSettle();
+
+    expect(transferRepository.deletedId, transfer.id);
+    expect(find.text('Monedero de origen'), findsNothing);
+  });
+
   testWidgets('groups movements by date in both sort orders', (tester) async {
     final currentDate = LocalDate(year: 2026, month: 8, day: 24);
     final yesterday = LocalDate(year: 2026, month: 8, day: 23);
@@ -268,6 +320,7 @@ Future<void> pumpApp(
   required FakeTransactionRepository repository,
   List<Wallet>? wallets,
   List<Transfer> transfers = const [],
+  TransferRepository? transferRepository,
   LocalDate? currentDate,
 }) async {
   final walletValues = wallets ?? [buildWallet()];
@@ -291,6 +344,8 @@ Future<void> pumpApp(
           AsyncData(repository.transactions),
         ),
         transfersProvider.overrideWithValue(AsyncData(transfers)),
+        if (transferRepository != null)
+          transferRepositoryProvider.overrideWithValue(transferRepository),
         currentDateProvider.overrideWithValue(
           currentDate ?? LocalDate(year: 2026, month: 8, day: 24),
         ),
@@ -362,4 +417,25 @@ final class FakeTransactionRepository implements TransactionRepository {
   Future<void> save(Transaction transaction) async {
     savedTransaction = transaction;
   }
+}
+
+final class FakeTransferRepository implements TransferRepository {
+  FakeTransferRepository(this.transfers);
+
+  final List<Transfer> transfers;
+  TransferId? deletedId;
+
+  @override
+  Future<void> delete(TransferId id) async {
+    deletedId = id;
+  }
+
+  @override
+  Future<List<Transfer>> getAll() async => transfers;
+
+  @override
+  Future<Transfer?> getById(TransferId id) async => null;
+
+  @override
+  Future<void> save(Transfer transfer) async {}
 }

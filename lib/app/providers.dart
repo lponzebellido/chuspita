@@ -17,6 +17,7 @@ import 'package:chuspita/features/transactions/data/repositories/drift_transacti
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
 import 'package:chuspita/features/transfers/application/create_transfer.dart';
+import 'package:chuspita/features/transfers/application/delete_transfer.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
@@ -177,6 +178,12 @@ final createTransferProvider = Provider<CreateTransfer>((ref) {
   return CreateTransfer(
     transferRepository: ref.watch(transferRepositoryProvider),
     idGenerator: ref.watch(transferIdGeneratorProvider),
+  );
+});
+
+final deleteTransferProvider = Provider<DeleteTransfer>((ref) {
+  return DeleteTransfer(
+    transferRepository: ref.watch(transferRepositoryProvider),
   );
 });
 

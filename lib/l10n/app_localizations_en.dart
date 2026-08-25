@@ -409,6 +409,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save the transfer. Please try again.';
 
   @override
+  String get deleteTransferTitle => 'Delete transfer';
+
+  @override
+  String get deleteTransferConfirmation =>
+      'This will delete the transfer and change both wallet balances. It can\'t be undone.';
+
+  @override
+  String get deleteTransferError =>
+      'We couldn\'t delete the transfer. Please try again.';
+
+  @override
   String get deleteTransactionTitle => 'Delete transaction';
 
   @override

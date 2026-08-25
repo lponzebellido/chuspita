@@ -854,6 +854,24 @@ abstract class AppLocalizations {
   /// **'We couldn\'t save the transfer. Please try again.'**
   String get saveTransferError;
 
+  /// No description provided for @deleteTransferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transfer'**
+  String get deleteTransferTitle;
+
+  /// No description provided for @deleteTransferConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete the transfer and change both wallet balances. It can\'t be undone.'**
+  String get deleteTransferConfirmation;
+
+  /// No description provided for @deleteTransferError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t delete the transfer. Please try again.'**
+  String get deleteTransferError;
+
   /// No description provided for @deleteTransactionTitle.
   ///
   /// In en, this message translates to:

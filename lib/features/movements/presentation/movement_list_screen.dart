@@ -286,8 +286,49 @@ final class _MovementListScreenState extends ConsumerState<MovementListScreen> {
         transfer: transfer,
         sourceWalletName: sourceWalletName,
         destinationWalletName: destinationWalletName,
+        onDelete: () => _deleteTransfer(transfer),
       ),
     );
+  }
+
+  Future<void> _deleteTransfer(Transfer transfer) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.deleteTransferTitle),
+        content: Text(context.l10n.deleteTransferConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    try {
+      await ref.read(deleteTransferProvider).call(transfer);
+      ref.invalidate(transfersProvider);
+      ref.invalidate(balanceSummaryProvider);
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.deleteTransferError)),
+        );
+      }
+    }
   }
 }
 
@@ -453,11 +494,13 @@ final class _TransferDetails extends StatelessWidget {
     required this.transfer,
     required this.sourceWalletName,
     required this.destinationWalletName,
+    required this.onDelete,
   });
 
   final Transfer transfer;
   final String sourceWalletName;
   final String destinationWalletName;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -515,6 +558,16 @@ final class _TransferDetails extends StatelessWidget {
                 title: Text(context.l10n.noteLabel),
                 subtitle: Text(transfer.note!),
               ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Theme.of(context).colorScheme.onError,
+              ),
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline),
+              label: Text(context.l10n.delete),
+            ),
           ],
         ),
       ),

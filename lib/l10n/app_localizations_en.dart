@@ -54,6 +54,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your balance will appear here after you create the first one.';
 
   @override
+  String get noActiveWalletsTitle => 'You don\'t have any active wallets';
+
+  @override
+  String get noActiveWalletsBody =>
+      'Your archived wallets are still available in wallet management.';
+
+  @override
   String get addWallet => 'Add wallet';
 
   @override
@@ -466,6 +473,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get walletCurrencyChangeNotAllowed =>
       'The currency can\'t change because this wallet already has financial movements.';
+
+  @override
+  String get deleteWalletTitle => 'Delete wallet';
+
+  @override
+  String get deleteWalletConfirmation =>
+      'This permanently deletes the wallet and its initial balance. It can\'t be undone.';
+
+  @override
+  String get deleteWalletHasMovements =>
+      'This wallet has financial movements. Archive it to preserve its history.';
+
+  @override
+  String get deleteWalletError =>
+      'We couldn\'t delete the wallet. Please try again.';
 
   @override
   String get loadDataError => 'We couldn\'t load your data.';

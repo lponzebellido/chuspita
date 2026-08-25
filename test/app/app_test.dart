@@ -46,6 +46,33 @@ void main() {
     expect(find.text('Aún no tienes monederos'), findsOneWidget);
   });
 
+  testWidgets('offers to manage wallets when all of them are archived', (
+    tester,
+  ) async {
+    final summary = BalanceSummary(
+      byWallet: const {},
+      byCurrency: const {},
+      archivedWalletCount: 2,
+    );
+
+    await pumpApp(tester, summary);
+
+    expect(find.text('No tienes monederos activos'), findsOneWidget);
+    expect(
+      find.text(
+        'Tus monederos archivados siguen disponibles en la gestión de '
+        'monederos.',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(FilledButton, 'Gestionar monederos'),
+      findsOneWidget,
+    );
+    expect(find.widgetWithText(TextButton, 'Añadir monedero'), findsOneWidget);
+    expect(find.text('Balance por moneda'), findsNothing);
+  });
+
   testWidgets('shows the brand logo in the home app bar', (tester) async {
     final summary = BalanceSummary(byWallet: const {}, byCurrency: const {});
 

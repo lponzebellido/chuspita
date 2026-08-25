@@ -1,11 +1,12 @@
 import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
+import 'package:chuspita/features/wallets/domain/wallet_deletion_not_allowed.dart';
 import 'package:chuspita/features/wallets/presentation/wallet_form_screen.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum _WalletAction { edit, archive, restore }
+enum _WalletAction { edit, archive, restore, delete }
 
 final class WalletListScreen extends ConsumerWidget {
   const WalletListScreen({super.key});
@@ -30,6 +31,7 @@ final class WalletListScreen extends ConsumerWidget {
           wallets: value,
           onEdit: (wallet) => _openForm(context, wallet: wallet),
           onToggleArchive: (wallet) => _toggleArchive(context, ref, wallet),
+          onDelete: (wallet) => _delete(context, ref, wallet),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Center(
@@ -86,6 +88,52 @@ final class WalletListScreen extends ConsumerWidget {
       }
     }
   }
+
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    Wallet wallet,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(context.l10n.deleteWalletTitle),
+        content: Text(context.l10n.deleteWalletConfirmation),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(context.l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
+
+    try {
+      await ref.read(deleteWalletProvider).call(wallet);
+      ref.invalidate(walletsProvider);
+      ref.invalidate(balanceSummaryProvider);
+    } on WalletDeletionNotAllowed {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.deleteWalletHasMovements)),
+        );
+      }
+    } on Object {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.deleteWalletError)));
+      }
+    }
+  }
 }
 
 final class _WalletList extends StatelessWidget {
@@ -93,11 +141,13 @@ final class _WalletList extends StatelessWidget {
     required this.wallets,
     required this.onEdit,
     required this.onToggleArchive,
+    required this.onDelete,
   });
 
   final List<Wallet> wallets;
   final ValueChanged<Wallet> onEdit;
   final ValueChanged<Wallet> onToggleArchive;
+  final ValueChanged<Wallet> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -154,6 +204,9 @@ final class _WalletList extends StatelessWidget {
                   case _WalletAction.restore:
                     onToggleArchive(wallet);
                     return;
+                  case _WalletAction.delete:
+                    onDelete(wallet);
+                    return;
                 }
               },
               itemBuilder: (context) => [
@@ -169,6 +222,15 @@ final class _WalletList extends StatelessWidget {
                     wallet.isArchived
                         ? context.l10n.restore
                         : context.l10n.archive,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _WalletAction.delete,
+                  child: Text(
+                    context.l10n.delete,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
               ],

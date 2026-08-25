@@ -24,6 +24,7 @@ import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/application/create_wallet.dart';
+import 'package:chuspita/features/wallets/application/delete_wallet.dart';
 import 'package:chuspita/features/wallets/application/load_balance_summary.dart';
 import 'package:chuspita/features/wallets/application/update_wallet.dart';
 import 'package:chuspita/features/wallets/data/repositories/drift_wallet_repository.dart';
@@ -93,6 +94,10 @@ final createWalletProvider = Provider<CreateWallet>((ref) {
 
 final updateWalletProvider = Provider<UpdateWallet>((ref) {
   return UpdateWallet(walletRepository: ref.watch(walletRepositoryProvider));
+});
+
+final deleteWalletProvider = Provider<DeleteWallet>((ref) {
+  return DeleteWallet(walletRepository: ref.watch(walletRepositoryProvider));
 });
 
 final walletsProvider = FutureProvider<List<Wallet>>(

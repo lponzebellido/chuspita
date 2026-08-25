@@ -22,10 +22,13 @@ final class LoadBalanceSummary {
     final wallets = await walletRepository.getAll();
     final transactions = await transactionRepository.getAll();
     final transfers = await transferRepository.getAll();
+    final activeWallets = wallets
+        .where((wallet) => !wallet.isArchived)
+        .toList(growable: false);
     final byWallet = <WalletId, Money>{};
     final byCurrency = <Currency, Money>{};
 
-    for (final wallet in wallets) {
+    for (final wallet in activeWallets) {
       final balance = calculateWalletBalance(
         wallet: wallet,
         transactions: transactions,
@@ -43,7 +46,8 @@ final class LoadBalanceSummary {
     return BalanceSummary(
       byWallet: byWallet,
       byCurrency: byCurrency,
-      walletNames: {for (final wallet in wallets) wallet.id: wallet.name},
+      walletNames: {for (final wallet in activeWallets) wallet.id: wallet.name},
+      archivedWalletCount: wallets.length - activeWallets.length,
     );
   }
 }

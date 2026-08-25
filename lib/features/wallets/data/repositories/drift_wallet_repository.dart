@@ -2,6 +2,7 @@ import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/features/wallets/data/mappers/wallet_mapper.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_currency_change_not_allowed.dart';
+import 'package:chuspita/features/wallets/domain/wallet_deletion_not_allowed.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/features/wallets/domain/wallet_repository.dart';
 import 'package:drift/drift.dart';
@@ -32,6 +33,19 @@ final class DriftWalletRepository implements WalletRepository {
     final row = await query.getSingleOrNull();
 
     return row?.toDomain();
+  }
+
+  @override
+  Future<void> delete(WalletId id) async {
+    await _database.transaction(() async {
+      if (await _hasFinancialMovements(id)) {
+        throw const WalletDeletionNotAllowed();
+      }
+
+      await (_database.delete(
+        _database.wallets,
+      )..where((table) => table.id.equals(id.value))).go();
+    });
   }
 
   @override

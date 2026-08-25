@@ -70,6 +70,39 @@ void main() {
       await directory.delete(recursive: true);
     }
   });
+
+  test('excludes archived wallets from the active balance summary', () async {
+    final database = AppDatabase(NativeDatabase.memory());
+
+    try {
+      final walletRepository = DriftWalletRepository(database);
+      final activeWallet = buildWallet('active-eur', Currency.eur, 1000);
+      final archivedWallet = buildWallet(
+        'archived-eur',
+        Currency.eur,
+        5000,
+      ).archive();
+      await walletRepository.save(activeWallet);
+      await walletRepository.save(archivedWallet);
+
+      final summary = await LoadBalanceSummary(
+        walletRepository: walletRepository,
+        transactionRepository: DriftTransactionRepository(database),
+        transferRepository: DriftTransferRepository(database),
+      )();
+
+      expect(summary.byWallet, {
+        activeWallet.id: const Money(minorUnits: 1000, currency: Currency.eur),
+      });
+      expect(summary.byCurrency, {
+        Currency.eur: const Money(minorUnits: 1000, currency: Currency.eur),
+      });
+      expect(summary.walletNames, {activeWallet.id: 'active-eur'});
+      expect(summary.archivedWalletCount, 1);
+    } finally {
+      await database.close();
+    }
+  });
 }
 
 Future<void> seedDatabase(File databaseFile) async {

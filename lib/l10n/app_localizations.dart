@@ -182,6 +182,18 @@ abstract class AppLocalizations {
   /// **'Your balance will appear here after you create the first one.'**
   String get noWalletsBody;
 
+  /// No description provided for @noActiveWalletsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any active wallets'**
+  String get noActiveWalletsTitle;
+
+  /// No description provided for @noActiveWalletsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your archived wallets are still available in wallet management.'**
+  String get noActiveWalletsBody;
+
   /// No description provided for @addWallet.
   ///
   /// In en, this message translates to:
@@ -961,6 +973,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The currency can\'t change because this wallet already has financial movements.'**
   String get walletCurrencyChangeNotAllowed;
+
+  /// No description provided for @deleteWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet'**
+  String get deleteWalletTitle;
+
+  /// No description provided for @deleteWalletConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes the wallet and its initial balance. It can\'t be undone.'**
+  String get deleteWalletConfirmation;
+
+  /// No description provided for @deleteWalletHasMovements.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet has financial movements. Archive it to preserve its history.'**
+  String get deleteWalletHasMovements;
+
+  /// No description provided for @deleteWalletError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t delete the wallet. Please try again.'**
+  String get deleteWalletError;
 
   /// No description provided for @loadDataError.
   ///

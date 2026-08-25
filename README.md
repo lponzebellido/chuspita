@@ -84,6 +84,11 @@ flutter run -d <device-id>
 You can also connect a phone with USB debugging enabled and authorize the
 computer when prompted.
 
+Every successful GitHub Actions run also produces a test APK. Open the run from
+the repository's **Actions** tab and download `chuspita-android-debug` from its
+**Artifacts** section. After extracting it, install `app-debug.apk` on an
+Android device. This development build is not intended for store distribution.
+
 ### iOS
 
 Open the simulator before running the application:

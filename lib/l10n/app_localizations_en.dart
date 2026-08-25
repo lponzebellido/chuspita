@@ -169,6 +169,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadStatisticsError => 'We couldn\'t load the statistics.';
 
   @override
+  String get exportXlsx => 'Export XLSX';
+
+  @override
+  String get exportXlsxError =>
+      'We couldn\'t export the XLSX file. Please try again.';
+
+  @override
   String get incomeVsExpensesTitle => 'Income vs. expenses';
 
   @override

@@ -9,9 +9,13 @@ import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_id.dart';
+import 'package:chuspita/features/export/application/export_file.dart';
+import 'package:chuspita/features/export/data/export_share_service.dart';
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_id.dart';
+import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
+import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -159,6 +163,7 @@ void main() {
   });
 
   testWidgets('opens current month statistics from home', (tester) async {
+    final exportShareService = FakeExportShareService();
     final summary = BalanceSummary(
       byWallet: {
         WalletId('wallet-eur'): const Money(
@@ -218,6 +223,18 @@ void main() {
         buildCategory('salary', 'Sueldo', 0xFF4E9F3D),
       ],
       currentDate: LocalDate(year: 2026, month: 8, day: 24),
+      wallets: [
+        Wallet(
+          id: WalletId('wallet-eur'),
+          name: 'Efectivo',
+          initialBalance: const Money(
+            minorUnits: 10000,
+            currency: Currency.eur,
+          ),
+        ),
+      ],
+      transfers: const [],
+      exportShareService: exportShareService,
     );
     await tester.scrollUntilVisible(
       find.widgetWithText(OutlinedButton, 'Ver estadísticas'),
@@ -236,12 +253,22 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Estadísticas'), findsOneWidget);
+    expect(find.byTooltip('Exportar XLSX'), findsOneWidget);
     expect(find.text('Este mes'), findsOneWidget);
     expect(find.text('Ingresos vs. gastos'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('income-expense-chart-EUR')),
       findsOneWidget,
     );
+    await tester.tap(find.byTooltip('Exportar XLSX'));
+    await tester.pumpAndSettle();
+
+    expect(exportShareService.sharedFile, isNotNull);
+    expect(
+      exportShareService.sharedFile!.fileName,
+      'chuspita-2026-08-01-to-2026-08-31.xlsx',
+    );
+    expect(exportShareService.sharePositionOrigin, isNotNull);
     expect(find.text('Métricas de gasto'), findsOneWidget);
     expect(
       find.descendant(
@@ -402,6 +429,9 @@ Future<void> pumpApp(
   List<Transaction> transactions = const [],
   List<Category> categories = const [],
   LocalDate? currentDate,
+  List<Wallet>? wallets,
+  List<Transfer>? transfers,
+  ExportShareService? exportShareService,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -409,6 +439,12 @@ Future<void> pumpApp(
         balanceSummaryProvider.overrideWithValue(AsyncData(summary)),
         transactionsProvider.overrideWithValue(AsyncData(transactions)),
         categoriesProvider.overrideWithValue(AsyncData(categories)),
+        if (wallets != null)
+          walletsProvider.overrideWithValue(AsyncData(wallets)),
+        if (transfers != null)
+          transfersProvider.overrideWithValue(AsyncData(transfers)),
+        if (exportShareService != null)
+          exportShareServiceProvider.overrideWithValue(exportShareService),
         if (currentDate != null)
           currentDateProvider.overrideWithValue(currentDate),
       ],
@@ -437,4 +473,15 @@ Transaction buildTransaction({
 
 Category buildCategory(String id, String name, int color) {
   return Category(id: CategoryId(id), name: name, color: ArgbColor(color));
+}
+
+final class FakeExportShareService implements ExportShareService {
+  ExportFile? sharedFile;
+  Rect? sharePositionOrigin;
+
+  @override
+  Future<void> share(ExportFile file, {Rect? sharePositionOrigin}) async {
+    sharedFile = file;
+    this.sharePositionOrigin = sharePositionOrigin;
+  }
 }

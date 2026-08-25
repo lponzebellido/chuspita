@@ -410,6 +410,18 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load the statistics.'**
   String get loadStatisticsError;
 
+  /// No description provided for @exportXlsx.
+  ///
+  /// In en, this message translates to:
+  /// **'Export XLSX'**
+  String get exportXlsx;
+
+  /// No description provided for @exportXlsxError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t export the XLSX file. Please try again.'**
+  String get exportXlsxError;
+
   /// No description provided for @incomeVsExpensesTitle.
   ///
   /// In en, this message translates to:

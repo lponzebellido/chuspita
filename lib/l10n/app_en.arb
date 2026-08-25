@@ -55,6 +55,8 @@
   "statisticsTitle": "Statistics",
   "viewStatistics": "View statistics",
   "loadStatisticsError": "We couldn't load the statistics.",
+  "exportXlsx": "Export XLSX",
+  "exportXlsxError": "We couldn't export the XLSX file. Please try again.",
   "incomeVsExpensesTitle": "Income vs. expenses",
   "noPeriodActivity": "There is no income or expense activity in this period.",
   "spendingMetricsTitle": "Spending metrics",

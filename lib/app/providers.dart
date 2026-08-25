@@ -9,6 +9,7 @@ import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
+import 'package:chuspita/features/export/data/export_share_service.dart';
 import 'package:chuspita/features/transactions/application/create_transaction.dart';
 import 'package:chuspita/features/transactions/application/delete_transaction.dart';
 import 'package:chuspita/features/transactions/application/update_transaction.dart';
@@ -37,6 +38,10 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   });
 
   return database;
+});
+
+final exportShareServiceProvider = Provider<ExportShareService>((ref) {
+  return const NativeExportShareService();
 });
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {

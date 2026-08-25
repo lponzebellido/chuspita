@@ -4,11 +4,13 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/analytics_period.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
+import 'package:chuspita/features/analytics/domain/period_summary.dart';
 import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
 import 'package:chuspita/features/analytics/presentation/expense_trend_section.dart';
 import 'package:chuspita/features/analytics/presentation/income_expense_section.dart';
 import 'package:chuspita/features/analytics/presentation/period_comparison_section.dart';
 import 'package:chuspita/features/analytics/presentation/spending_metrics_section.dart';
+import 'package:chuspita/features/export/data/xlsx_financial_exporter.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,6 +26,7 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   late AnalyticsPeriod _period;
   late LocalDate _startDate;
   late LocalDate _endDate;
+  var _isExporting = false;
 
   @override
   void initState() {
@@ -107,6 +110,45 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     }
   }
 
+  Future<void> _exportXlsx(
+    BuildContext shareAnchorContext,
+    PeriodSummary summary,
+  ) async {
+    final renderObject = shareAnchorContext.findRenderObject();
+    final sharePositionOrigin = renderObject is RenderBox
+        ? renderObject.localToGlobal(Offset.zero) & renderObject.size
+        : null;
+
+    setState(() => _isExporting = true);
+
+    try {
+      final transactions = await ref.read(transactionsProvider.future);
+      final transfers = await ref.read(transfersProvider.future);
+      final categories = await ref.read(categoriesProvider.future);
+      final wallets = await ref.read(walletsProvider.future);
+      final file = buildFinancialXlsx(
+        summary: summary,
+        transactions: transactions,
+        transfers: transfers,
+        categories: categories,
+        wallets: wallets,
+      );
+      await ref
+          .read(exportShareServiceProvider)
+          .share(file, sharePositionOrigin: sharePositionOrigin);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.exportXlsxError)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isExporting = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
@@ -133,12 +175,35 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     Future<void> refresh() {
       return Future.wait<void>([
         ref.refresh(transactionsProvider.future).then((_) {}),
+        ref.refresh(transfersProvider.future).then((_) {}),
+        ref.refresh(walletsProvider.future).then((_) {}),
         ref.refresh(categoriesProvider.future).then((_) {}),
       ]);
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.statisticsTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.statisticsTitle),
+        actions: [
+          Builder(
+            builder: (shareAnchorContext) => IconButton(
+              tooltip: context.l10n.exportXlsx,
+              onPressed: summaries.hasValue && !_isExporting
+                  ? () => _exportXlsx(
+                      shareAnchorContext,
+                      summaries.requireValue.current,
+                    )
+                  : null,
+              icon: _isExporting
+                  ? const SizedBox.square(
+                      dimension: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.file_download_outlined),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: switch (summaries) {
           AsyncData(:final value) => RefreshIndicator(

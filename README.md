@@ -2,6 +2,8 @@
 
 **Keep every wallet, currency, and journey within reach.**
 
+[![CI](https://github.com/lponzebellido/chuspita/actions/workflows/ci.yml/badge.svg)](https://github.com/lponzebellido/chuspita/actions/workflows/ci.yml)
+
 ## About
 
 Chuspita is a personal finance manager for keeping expenses, income, wallets,

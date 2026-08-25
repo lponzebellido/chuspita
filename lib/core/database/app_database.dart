@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:chuspita/core/database/tables.dart';
@@ -10,6 +12,15 @@ part 'app_database.g.dart';
 @DriftDatabase(tables: [Wallets, Categories, Transactions, Transfers])
 final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+
+  Future<void> createBackup(File destination) async {
+    if (await destination.exists()) {
+      throw StateError('The backup destination already exists.');
+    }
+
+    await destination.parent.create(recursive: true);
+    await customStatement('VACUUM INTO ?', [destination.path]);
+  }
 
   @override
   int get schemaVersion => 4;

@@ -20,6 +20,18 @@ final class ChuspitaApp extends ConsumerWidget {
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) => Actions(
+        actions: <Type, Action<Intent>>{
+          EditableTextTapOutsideIntent:
+              CallbackAction<EditableTextTapOutsideIntent>(
+                onInvoke: (intent) {
+                  intent.focusNode.unfocus();
+                  return null;
+                },
+              ),
+        },
+        child: child ?? const SizedBox.shrink(),
+      ),
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeMode ?? settings.theme.themeMode,

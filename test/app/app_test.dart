@@ -13,6 +13,8 @@ import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_id.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,6 +54,33 @@ void main() {
     );
     expect(logo.image, isA<AssetImage>());
     expect((logo.image as AssetImage).assetName, AppBranding.logoAsset);
+  });
+
+  testWidgets('dismisses text field focus when tapping outside on iOS', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final summary = BalanceSummary(byWallet: const {}, byCurrency: const {});
+
+      await pumpApp(tester, summary);
+      await tester.tap(find.widgetWithText(FilledButton, 'Añadir monedero'));
+      await tester.pumpAndSettle();
+
+      final editableFinder = find.byType(EditableText).first;
+      await tester.tap(editableFinder);
+      await tester.pump();
+
+      final editable = tester.widget<EditableText>(editableFinder);
+      expect(editable.focusNode.hasFocus, isTrue);
+
+      await tester.tapAt(const Offset(300, 30));
+      await tester.pump();
+
+      expect(editable.focusNode.hasFocus, isFalse);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   testWidgets('supports English', (tester) async {

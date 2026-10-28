@@ -4,6 +4,7 @@ import 'package:chuspita/core/currency/currency.dart';
 import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
+import 'package:chuspita/features/wallets/domain/wallet_deletion_not_allowed.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
 import 'package:chuspita/features/wallets/domain/wallet_repository.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,66 @@ void main() {
     expect(repository.savedWallet, isNotNull);
     expect(repository.savedWallet!.isArchived, isTrue);
   });
+
+  testWidgets('deletes an empty wallet after confirmation', (tester) async {
+    final wallet = buildWallet();
+    final repository = FakeWalletRepository();
+
+    await pumpApp(tester, wallet: wallet, repository: repository);
+    await tester.tap(find.byTooltip('Gestionar monederos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Eliminar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Eliminar monedero'), findsOneWidget);
+    expect(
+      find.text(
+        'Esta acción eliminará permanentemente el monedero y su saldo '
+        'inicial. No se puede deshacer.',
+      ),
+      findsOneWidget,
+    );
+
+    final confirmationButton = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Eliminar'),
+    );
+    await tester.tap(confirmationButton);
+    await tester.pumpAndSettle();
+
+    expect(repository.deletedId, wallet.id);
+  });
+
+  testWidgets('suggests archiving a wallet that has movements', (tester) async {
+    final wallet = buildWallet();
+    final repository = FakeWalletRepository(
+      deleteError: const WalletDeletionNotAllowed(),
+    );
+
+    await pumpApp(tester, wallet: wallet, repository: repository);
+    await tester.tap(find.byTooltip('Gestionar monederos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Eliminar'));
+    await tester.pumpAndSettle();
+    final confirmationButton = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Eliminar'),
+    );
+    await tester.tap(confirmationButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Este monedero tiene movimientos financieros. Archívalo para '
+        'conservar su historial.',
+      ),
+      findsOneWidget,
+    );
+  });
 }
 
 Future<void> pumpApp(
@@ -85,7 +146,20 @@ Wallet buildWallet() {
 }
 
 final class FakeWalletRepository implements WalletRepository {
+  FakeWalletRepository({this.deleteError});
+
+  final Object? deleteError;
   Wallet? savedWallet;
+  WalletId? deletedId;
+
+  @override
+  Future<void> delete(WalletId id) async {
+    if (deleteError case final error?) {
+      throw error;
+    }
+
+    deletedId = id;
+  }
 
   @override
   Future<List<Wallet>> getAll() async => const [];

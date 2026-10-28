@@ -51,6 +51,9 @@ final class FakeWalletRepository implements WalletRepository {
   Wallet? savedWallet;
 
   @override
+  Future<void> delete(WalletId id) async {}
+
+  @override
   Future<List<Wallet>> getAll() async => const [];
 
   @override

@@ -4,11 +4,17 @@ import 'package:chuspita/core/database/app_database.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
 import 'package:chuspita/features/analytics/domain/period_summary.dart';
+import 'package:chuspita/features/backup/application/create_database_backup.dart';
+import 'package:chuspita/features/backup/application/database_backup_file_picker.dart';
+import 'package:chuspita/features/backup/application/restore_database_backup.dart';
+import 'package:chuspita/features/backup/data/backup_share_service.dart';
+import 'package:chuspita/features/backup/data/native_database_backup_file_picker.dart';
 import 'package:chuspita/features/categories/application/create_category.dart';
 import 'package:chuspita/features/categories/application/update_category.dart';
 import 'package:chuspita/features/categories/data/repositories/drift_category_repository.dart';
 import 'package:chuspita/features/categories/domain/category.dart';
 import 'package:chuspita/features/categories/domain/category_repository.dart';
+import 'package:chuspita/features/export/data/export_share_service.dart';
 import 'package:chuspita/features/transactions/application/create_transaction.dart';
 import 'package:chuspita/features/transactions/application/delete_transaction.dart';
 import 'package:chuspita/features/transactions/application/update_transaction.dart';
@@ -16,11 +22,14 @@ import 'package:chuspita/features/transactions/data/repositories/drift_transacti
 import 'package:chuspita/features/transactions/domain/transaction.dart';
 import 'package:chuspita/features/transactions/domain/transaction_repository.dart';
 import 'package:chuspita/features/transfers/application/create_transfer.dart';
+import 'package:chuspita/features/transfers/application/delete_transfer.dart';
+import 'package:chuspita/features/transfers/application/update_transfer.dart';
 import 'package:chuspita/features/transfers/data/repositories/drift_transfer_repository.dart';
 import 'package:chuspita/features/transfers/domain/transfer.dart';
 import 'package:chuspita/features/transfers/domain/transfer_repository.dart';
 import 'package:chuspita/features/wallets/application/balance_summary.dart';
 import 'package:chuspita/features/wallets/application/create_wallet.dart';
+import 'package:chuspita/features/wallets/application/delete_wallet.dart';
 import 'package:chuspita/features/wallets/application/load_balance_summary.dart';
 import 'package:chuspita/features/wallets/application/update_wallet.dart';
 import 'package:chuspita/features/wallets/data/repositories/drift_wallet_repository.dart';
@@ -37,6 +46,31 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   });
 
   return database;
+});
+
+final exportShareServiceProvider = Provider<ExportShareService>((ref) {
+  return const NativeExportShareService();
+});
+
+final databaseBackupCreatorProvider = Provider<DatabaseBackupCreator>((ref) {
+  return CreateDatabaseBackup(ref.watch(appDatabaseProvider));
+});
+
+final backupShareServiceProvider = Provider<BackupShareService>((ref) {
+  return const NativeBackupShareService();
+});
+
+final databaseBackupFilePickerProvider = Provider<DatabaseBackupFilePicker>((
+  ref,
+) {
+  return const NativeDatabaseBackupFilePicker();
+});
+
+final databaseBackupRestorerProvider = Provider<DatabaseBackupRestorer>((ref) {
+  return RestoreDatabaseBackup(
+    ref.watch(appDatabaseProvider),
+    () => ref.invalidate(appDatabaseProvider),
+  );
 });
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
@@ -86,6 +120,10 @@ final createWalletProvider = Provider<CreateWallet>((ref) {
 
 final updateWalletProvider = Provider<UpdateWallet>((ref) {
   return UpdateWallet(walletRepository: ref.watch(walletRepositoryProvider));
+});
+
+final deleteWalletProvider = Provider<DeleteWallet>((ref) {
+  return DeleteWallet(walletRepository: ref.watch(walletRepositoryProvider));
 });
 
 final walletsProvider = FutureProvider<List<Wallet>>(
@@ -172,6 +210,18 @@ final createTransferProvider = Provider<CreateTransfer>((ref) {
   return CreateTransfer(
     transferRepository: ref.watch(transferRepositoryProvider),
     idGenerator: ref.watch(transferIdGeneratorProvider),
+  );
+});
+
+final deleteTransferProvider = Provider<DeleteTransfer>((ref) {
+  return DeleteTransfer(
+    transferRepository: ref.watch(transferRepositoryProvider),
+  );
+});
+
+final updateTransferProvider = Provider<UpdateTransfer>((ref) {
+  return UpdateTransfer(
+    transferRepository: ref.watch(transferRepositoryProvider),
   );
 });
 

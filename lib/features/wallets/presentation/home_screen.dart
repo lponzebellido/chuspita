@@ -119,6 +119,7 @@ final class HomeScreen extends ConsumerWidget {
             summary: value,
             currentMonthSummary: currentMonthSummary,
             onAddWallet: openWalletForm,
+            onManageWallets: openWalletList,
             onViewTransactions: openTransactionList,
             onTransfer: openTransferForm,
             onViewStatistics: openStatistics,
@@ -145,6 +146,7 @@ final class _BalanceContent extends StatelessWidget {
     required this.summary,
     required this.currentMonthSummary,
     required this.onAddWallet,
+    required this.onManageWallets,
     required this.onViewTransactions,
     required this.onTransfer,
     required this.onViewStatistics,
@@ -155,6 +157,7 @@ final class _BalanceContent extends StatelessWidget {
   final BalanceSummary summary;
   final AsyncValue<PeriodSummary> currentMonthSummary;
   final VoidCallback onAddWallet;
+  final VoidCallback onManageWallets;
   final VoidCallback onViewTransactions;
   final VoidCallback onTransfer;
   final VoidCallback onViewStatistics;
@@ -171,7 +174,11 @@ final class _BalanceContent extends StatelessWidget {
           slivers: [
             SliverFillRemaining(
               hasScrollBody: false,
-              child: _EmptyContent(onAddWallet: onAddWallet),
+              child: _EmptyContent(
+                hasArchivedWallets: summary.archivedWalletCount > 0,
+                onAddWallet: onAddWallet,
+                onManageWallets: onManageWallets,
+              ),
             ),
           ],
         ),
@@ -326,9 +333,15 @@ final class _CurrencyBalanceCard extends StatelessWidget {
 }
 
 final class _EmptyContent extends StatelessWidget {
-  const _EmptyContent({required this.onAddWallet});
+  const _EmptyContent({
+    required this.hasArchivedWallets,
+    required this.onAddWallet,
+    required this.onManageWallets,
+  });
 
+  final bool hasArchivedWallets;
   final VoidCallback onAddWallet;
+  final VoidCallback onManageWallets;
 
   @override
   Widget build(BuildContext context) {
@@ -345,22 +358,39 @@ final class _EmptyContent extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              context.l10n.noWalletsTitle,
+              hasArchivedWallets
+                  ? context.l10n.noActiveWalletsTitle
+                  : context.l10n.noWalletsTitle,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
-              context.l10n.noWalletsBody,
+              hasArchivedWallets
+                  ? context.l10n.noActiveWalletsBody
+                  : context.l10n.noWalletsBody,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: onAddWallet,
-              icon: const Icon(Icons.add),
-              label: Text(context.l10n.addWallet),
-            ),
+            if (hasArchivedWallets) ...[
+              FilledButton.icon(
+                onPressed: onManageWallets,
+                icon: const Icon(Icons.account_balance_wallet_outlined),
+                label: Text(context.l10n.manageWallets),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: onAddWallet,
+                icon: const Icon(Icons.add),
+                label: Text(context.l10n.addWallet),
+              ),
+            ] else
+              FilledButton.icon(
+                onPressed: onAddWallet,
+                icon: const Icon(Icons.add),
+                label: Text(context.l10n.addWallet),
+              ),
           ],
         ),
       ),

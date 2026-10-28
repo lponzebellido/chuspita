@@ -7,4 +7,6 @@ abstract interface class WalletRepository {
   Future<Wallet?> getById(WalletId id);
 
   Future<void> save(Wallet wallet);
+
+  Future<void> delete(WalletId id);
 }

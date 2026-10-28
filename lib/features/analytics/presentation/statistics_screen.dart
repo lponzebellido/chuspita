@@ -4,14 +4,19 @@ import 'package:chuspita/app/providers.dart';
 import 'package:chuspita/core/date/local_date.dart';
 import 'package:chuspita/features/analytics/domain/analytics_period.dart';
 import 'package:chuspita/features/analytics/domain/calculate_period_summary.dart';
+import 'package:chuspita/features/analytics/domain/period_summary.dart';
 import 'package:chuspita/features/analytics/presentation/category_spending_section.dart';
 import 'package:chuspita/features/analytics/presentation/expense_trend_section.dart';
 import 'package:chuspita/features/analytics/presentation/income_expense_section.dart';
 import 'package:chuspita/features/analytics/presentation/period_comparison_section.dart';
 import 'package:chuspita/features/analytics/presentation/spending_metrics_section.dart';
+import 'package:chuspita/features/export/data/csv_financial_exporter.dart';
+import 'package:chuspita/features/export/data/xlsx_financial_exporter.dart';
 import 'package:chuspita/l10n/app_localizations_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+enum _ExportFormat { xlsx, csv }
 
 final class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
@@ -24,6 +29,7 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   late AnalyticsPeriod _period;
   late LocalDate _startDate;
   late LocalDate _endDate;
+  var _isExporting = false;
 
   @override
   void initState() {
@@ -107,6 +113,55 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     }
   }
 
+  Future<void> _export(
+    BuildContext shareAnchorContext,
+    PeriodSummary summary,
+    _ExportFormat format,
+  ) async {
+    final renderObject = shareAnchorContext.findRenderObject();
+    final sharePositionOrigin = renderObject is RenderBox
+        ? renderObject.localToGlobal(Offset.zero) & renderObject.size
+        : null;
+
+    setState(() => _isExporting = true);
+
+    try {
+      final transactions = await ref.read(transactionsProvider.future);
+      final transfers = await ref.read(transfersProvider.future);
+      final categories = await ref.read(categoriesProvider.future);
+      final wallets = await ref.read(walletsProvider.future);
+      final file = switch (format) {
+        _ExportFormat.xlsx => buildFinancialXlsx(
+          summary: summary,
+          transactions: transactions,
+          transfers: transfers,
+          categories: categories,
+          wallets: wallets,
+        ),
+        _ExportFormat.csv => buildFinancialCsv(
+          summary: summary,
+          transactions: transactions,
+          transfers: transfers,
+          categories: categories,
+          wallets: wallets,
+        ),
+      };
+      await ref
+          .read(exportShareServiceProvider)
+          .share(file, sharePositionOrigin: sharePositionOrigin);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.exportDataError)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isExporting = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
@@ -133,12 +188,67 @@ final class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     Future<void> refresh() {
       return Future.wait<void>([
         ref.refresh(transactionsProvider.future).then((_) {}),
+        ref.refresh(transfersProvider.future).then((_) {}),
+        ref.refresh(walletsProvider.future).then((_) {}),
         ref.refresh(categoriesProvider.future).then((_) {}),
       ]);
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.statisticsTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.statisticsTitle),
+        actions: [
+          Builder(
+            builder: (shareAnchorContext) {
+              if (_isExporting) {
+                return IconButton(
+                  tooltip: context.l10n.exportData,
+                  onPressed: null,
+                  icon: const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+
+              return PopupMenuButton<_ExportFormat>(
+                tooltip: context.l10n.exportData,
+                enabled: summaries.hasValue,
+                icon: const Icon(Icons.file_download_outlined),
+                onSelected: (format) {
+                  final summary = summaries.asData?.value.current;
+
+                  if (summary != null) {
+                    unawaited(_export(shareAnchorContext, summary, format));
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _ExportFormat.xlsx,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.table_chart_outlined),
+                        const SizedBox(width: 12),
+                        Text(context.l10n.exportXlsx),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _ExportFormat.csv,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.text_snippet_outlined),
+                        const SizedBox(width: 12),
+                        Text(context.l10n.exportCsv),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: switch (summaries) {
           AsyncData(:final value) => RefreshIndicator(

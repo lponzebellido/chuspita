@@ -6,8 +6,9 @@ import 'package:chuspita/core/money/money.dart';
 import 'package:chuspita/features/wallets/data/repositories/drift_wallet_repository.dart';
 import 'package:chuspita/features/wallets/domain/wallet.dart';
 import 'package:chuspita/features/wallets/domain/wallet_currency_change_not_allowed.dart';
+import 'package:chuspita/features/wallets/domain/wallet_deletion_not_allowed.dart';
 import 'package:chuspita/features/wallets/domain/wallet_id.dart';
-import 'package:drift/drift.dart' hide isNotNull;
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -72,6 +73,81 @@ void main() {
         WalletId('wallet-1'),
         WalletId('wallet-2'),
       });
+    });
+
+    test('deletes a wallet without financial movements', () async {
+      final wallet = buildWallet();
+      await repository.save(wallet);
+
+      await repository.delete(wallet.id);
+
+      expect(await repository.getById(wallet.id), isNull);
+    });
+
+    test('prevents deleting a wallet after a transaction exists', () async {
+      final wallet = buildWallet();
+      await repository.save(wallet);
+      await database
+          .into(database.categories)
+          .insert(
+            CategoriesCompanion.insert(
+              id: 'category-1',
+              name: 'Food',
+              colorArgb: 0xFFFF9800,
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+      await database
+          .into(database.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              id: 'transaction-1',
+              type: 'expense',
+              amountMinor: 1000,
+              walletId: wallet.id.value,
+              categoryId: 'category-1',
+              occurredOn: '2026-08-23',
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+
+      expect(
+        () => repository.delete(wallet.id),
+        throwsA(isA<WalletDeletionNotAllowed>()),
+      );
+      expect(await repository.getById(wallet.id), isNotNull);
+    });
+
+    test('prevents deleting either wallet used by a transfer', () async {
+      final sourceWallet = buildWallet();
+      final destinationWallet = buildWallet(id: 'wallet-2');
+      await repository.save(sourceWallet);
+      await repository.save(destinationWallet);
+      await database
+          .into(database.transfers)
+          .insert(
+            TransfersCompanion.insert(
+              id: 'transfer-1',
+              sourceWalletId: sourceWallet.id.value,
+              destinationWalletId: destinationWallet.id.value,
+              sourceAmountMinor: 1000,
+              destinationAmountMinor: 1000,
+              occurredOn: '2026-08-23',
+              createdAtMillis: 1000,
+              updatedAtMillis: 1000,
+            ),
+          );
+
+      expect(
+        () => repository.delete(sourceWallet.id),
+        throwsA(isA<WalletDeletionNotAllowed>()),
+      );
+      expect(
+        () => repository.delete(destinationWallet.id),
+        throwsA(isA<WalletDeletionNotAllowed>()),
+      );
     });
 
     test('allows changing currency before financial movements exist', () async {

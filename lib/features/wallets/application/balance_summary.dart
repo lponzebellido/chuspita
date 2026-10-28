@@ -7,6 +7,7 @@ final class BalanceSummary {
     required Map<WalletId, Money> byWallet,
     required Map<Currency, Money> byCurrency,
     Map<WalletId, String> walletNames = const {},
+    this.archivedWalletCount = 0,
   }) : byWallet = Map.unmodifiable(byWallet),
        byCurrency = Map.unmodifiable(byCurrency),
        walletNames = Map.unmodifiable(walletNames);
@@ -14,4 +15,5 @@ final class BalanceSummary {
   final Map<WalletId, Money> byWallet;
   final Map<Currency, Money> byCurrency;
   final Map<WalletId, String> walletNames;
+  final int archivedWalletCount;
 }

@@ -44,6 +44,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadSettingsError => 'We couldn\'t load the settings.';
 
   @override
+  String get backupSettingsTitle => 'Backup';
+
+  @override
+  String get createBackup => 'Create backup';
+
+  @override
+  String get backupDescription =>
+      'Save a restorable copy of your wallets, categories, and movements. Keep this file private.';
+
+  @override
+  String get createBackupError =>
+      'We couldn\'t create the backup. Please try again.';
+
+  @override
+  String get restoreBackup => 'Restore backup';
+
+  @override
+  String get restoreBackupDescription =>
+      'Replace the current financial data with a Chuspita backup.';
+
+  @override
+  String get restoreBackupTitle => 'Restore backup?';
+
+  @override
+  String get restoreBackupConfirmation =>
+      'Your current wallets, categories, and movements will be replaced with the contents of the selected backup.';
+
+  @override
+  String get restoreBackupSuccess => 'The backup was restored.';
+
+  @override
+  String get invalidBackupError =>
+      'This file isn\'t a valid or compatible Chuspita backup.';
+
+  @override
+  String get restoreBackupError =>
+      'We couldn\'t restore the backup. Your previous data was preserved.';
+
+  @override
   String get balanceByCurrency => 'Balance by currency';
 
   @override
@@ -52,6 +91,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noWalletsBody =>
       'Your balance will appear here after you create the first one.';
+
+  @override
+  String get noActiveWalletsTitle => 'You don\'t have any active wallets';
+
+  @override
+  String get noActiveWalletsBody =>
+      'Your archived wallets are still available in wallet management.';
 
   @override
   String get addWallet => 'Add wallet';
@@ -167,6 +213,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadStatisticsError => 'We couldn\'t load the statistics.';
+
+  @override
+  String get exportData => 'Export data';
+
+  @override
+  String get exportXlsx => 'Export XLSX';
+
+  @override
+  String get exportCsv => 'Export CSV';
+
+  @override
+  String get exportDataError =>
+      'We couldn\'t export the file. Please try again.';
 
   @override
   String get incomeVsExpensesTitle => 'Income vs. expenses';
@@ -344,6 +403,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newTransferTitle => 'New transfer';
 
   @override
+  String get editTransferTitle => 'Edit transfer';
+
+  @override
   String get sourceWalletLabel => 'From wallet';
 
   @override
@@ -396,6 +458,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save the transfer. Please try again.';
 
   @override
+  String get deleteTransferTitle => 'Delete transfer';
+
+  @override
+  String get deleteTransferConfirmation =>
+      'This will delete the transfer and change both wallet balances. It can\'t be undone.';
+
+  @override
+  String get deleteTransferError =>
+      'We couldn\'t delete the transfer. Please try again.';
+
+  @override
   String get deleteTransactionTitle => 'Delete transaction';
 
   @override
@@ -439,6 +512,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get walletCurrencyChangeNotAllowed =>
       'The currency can\'t change because this wallet already has financial movements.';
+
+  @override
+  String get deleteWalletTitle => 'Delete wallet';
+
+  @override
+  String get deleteWalletConfirmation =>
+      'This permanently deletes the wallet and its initial balance. It can\'t be undone.';
+
+  @override
+  String get deleteWalletHasMovements =>
+      'This wallet has financial movements. Archive it to preserve its history.';
+
+  @override
+  String get deleteWalletError =>
+      'We couldn\'t delete the wallet. Please try again.';
 
   @override
   String get loadDataError => 'We couldn\'t load your data.';

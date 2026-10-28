@@ -44,6 +44,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loadSettingsError => 'No pudimos cargar la configuración.';
 
   @override
+  String get backupSettingsTitle => 'Copia de seguridad';
+
+  @override
+  String get createBackup => 'Crear copia de seguridad';
+
+  @override
+  String get backupDescription =>
+      'Guarda una copia restaurable de tus monederos, categorías y movimientos. Mantén este archivo en privado.';
+
+  @override
+  String get createBackupError =>
+      'No pudimos crear la copia de seguridad. Inténtalo nuevamente.';
+
+  @override
+  String get restoreBackup => 'Restaurar copia de seguridad';
+
+  @override
+  String get restoreBackupDescription =>
+      'Reemplaza los datos financieros actuales con una copia de Chuspita.';
+
+  @override
+  String get restoreBackupTitle => '¿Restaurar la copia de seguridad?';
+
+  @override
+  String get restoreBackupConfirmation =>
+      'Tus monederos, categorías y movimientos actuales serán reemplazados por el contenido de la copia seleccionada.';
+
+  @override
+  String get restoreBackupSuccess => 'La copia de seguridad fue restaurada.';
+
+  @override
+  String get invalidBackupError =>
+      'Este archivo no es una copia válida o compatible de Chuspita.';
+
+  @override
+  String get restoreBackupError =>
+      'No pudimos restaurar la copia. Tus datos anteriores fueron conservados.';
+
+  @override
   String get balanceByCurrency => 'Balance por moneda';
 
   @override
@@ -52,6 +91,13 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noWalletsBody =>
       'Tu balance aparecerá aquí cuando crees el primero.';
+
+  @override
+  String get noActiveWalletsTitle => 'No tienes monederos activos';
+
+  @override
+  String get noActiveWalletsBody =>
+      'Tus monederos archivados siguen disponibles en la gestión de monederos.';
 
   @override
   String get addWallet => 'Añadir monedero';
@@ -167,6 +213,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loadStatisticsError => 'No pudimos cargar las estadísticas.';
+
+  @override
+  String get exportData => 'Exportar datos';
+
+  @override
+  String get exportXlsx => 'Exportar XLSX';
+
+  @override
+  String get exportCsv => 'Exportar CSV';
+
+  @override
+  String get exportDataError =>
+      'No pudimos exportar el archivo. Inténtalo nuevamente.';
 
   @override
   String get incomeVsExpensesTitle => 'Ingresos vs. gastos';
@@ -343,6 +402,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newTransferTitle => 'Nueva transferencia';
 
   @override
+  String get editTransferTitle => 'Editar transferencia';
+
+  @override
   String get sourceWalletLabel => 'Monedero de origen';
 
   @override
@@ -395,6 +457,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'No pudimos guardar la transferencia. Inténtalo nuevamente.';
 
   @override
+  String get deleteTransferTitle => 'Eliminar transferencia';
+
+  @override
+  String get deleteTransferConfirmation =>
+      'Esta acción eliminará la transferencia y modificará el balance de ambos monederos. No se puede deshacer.';
+
+  @override
+  String get deleteTransferError =>
+      'No pudimos eliminar la transferencia. Inténtalo nuevamente.';
+
+  @override
   String get deleteTransactionTitle => 'Eliminar movimiento';
 
   @override
@@ -438,6 +511,21 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get walletCurrencyChangeNotAllowed =>
       'No puedes cambiar la moneda porque este monedero ya tiene movimientos financieros.';
+
+  @override
+  String get deleteWalletTitle => 'Eliminar monedero';
+
+  @override
+  String get deleteWalletConfirmation =>
+      'Esta acción eliminará permanentemente el monedero y su saldo inicial. No se puede deshacer.';
+
+  @override
+  String get deleteWalletHasMovements =>
+      'Este monedero tiene movimientos financieros. Archívalo para conservar su historial.';
+
+  @override
+  String get deleteWalletError =>
+      'No pudimos eliminar el monedero. Inténtalo nuevamente.';
 
   @override
   String get loadDataError => 'No pudimos cargar tus datos.';

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:chuspita/core/database/tables.dart';
@@ -11,8 +13,31 @@ part 'app_database.g.dart';
 final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
+  static const currentSchemaVersion = 4;
+
+  var _isClosed = false;
+
+  Future<void> createBackup(File destination) async {
+    if (await destination.exists()) {
+      throw StateError('The backup destination already exists.');
+    }
+
+    await destination.parent.create(recursive: true);
+    await customStatement('VACUUM INTO ?', [destination.path]);
+  }
+
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => currentSchemaVersion;
+
+  @override
+  Future<void> close() {
+    if (_isClosed) {
+      return Future.value();
+    }
+
+    _isClosed = true;
+    return super.close();
+  }
 
   @override
   MigrationStrategy get migration {
@@ -62,9 +87,14 @@ final class AppDatabase extends _$AppDatabase {
   static QueryExecutor _openConnection() {
     return driftDatabase(
       name: 'chuspita',
-      native: const DriftNativeOptions(
-        databaseDirectory: getApplicationSupportDirectory,
+      native: DriftNativeOptions(
+        databasePath: () async => (await defaultDatabaseFile()).path,
       ),
     );
+  }
+
+  static Future<File> defaultDatabaseFile() async {
+    final directory = await getApplicationSupportDirectory();
+    return File.fromUri(directory.uri.resolve('chuspita.sqlite'));
   }
 }

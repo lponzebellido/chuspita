@@ -164,6 +164,72 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load the settings.'**
   String get loadSettingsError;
 
+  /// No description provided for @backupSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backupSettingsTitle;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get createBackup;
+
+  /// No description provided for @backupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a restorable copy of your wallets, categories, and movements. Keep this file private.'**
+  String get backupDescription;
+
+  /// No description provided for @createBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t create the backup. Please try again.'**
+  String get createBackupError;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackup;
+
+  /// No description provided for @restoreBackupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the current financial data with a Chuspita backup.'**
+  String get restoreBackupDescription;
+
+  /// No description provided for @restoreBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup?'**
+  String get restoreBackupTitle;
+
+  /// No description provided for @restoreBackupConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current wallets, categories, and movements will be replaced with the contents of the selected backup.'**
+  String get restoreBackupConfirmation;
+
+  /// No description provided for @restoreBackupSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup was restored.'**
+  String get restoreBackupSuccess;
+
+  /// No description provided for @invalidBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'This file isn\'t a valid or compatible Chuspita backup.'**
+  String get invalidBackupError;
+
+  /// No description provided for @restoreBackupError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t restore the backup. Your previous data was preserved.'**
+  String get restoreBackupError;
+
   /// No description provided for @balanceByCurrency.
   ///
   /// In en, this message translates to:
@@ -181,6 +247,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your balance will appear here after you create the first one.'**
   String get noWalletsBody;
+
+  /// No description provided for @noActiveWalletsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any active wallets'**
+  String get noActiveWalletsTitle;
+
+  /// No description provided for @noActiveWalletsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your archived wallets are still available in wallet management.'**
+  String get noActiveWalletsBody;
 
   /// No description provided for @addWallet.
   ///
@@ -409,6 +487,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t load the statistics.'**
   String get loadStatisticsError;
+
+  /// No description provided for @exportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export data'**
+  String get exportData;
+
+  /// No description provided for @exportXlsx.
+  ///
+  /// In en, this message translates to:
+  /// **'Export XLSX'**
+  String get exportXlsx;
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Export CSV'**
+  String get exportCsv;
+
+  /// No description provided for @exportDataError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t export the file. Please try again.'**
+  String get exportDataError;
 
   /// No description provided for @incomeVsExpensesTitle.
   ///
@@ -740,6 +842,12 @@ abstract class AppLocalizations {
   /// **'New transfer'**
   String get newTransferTitle;
 
+  /// No description provided for @editTransferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit transfer'**
+  String get editTransferTitle;
+
   /// No description provided for @sourceWalletLabel.
   ///
   /// In en, this message translates to:
@@ -830,6 +938,24 @@ abstract class AppLocalizations {
   /// **'We couldn\'t save the transfer. Please try again.'**
   String get saveTransferError;
 
+  /// No description provided for @deleteTransferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transfer'**
+  String get deleteTransferTitle;
+
+  /// No description provided for @deleteTransferConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete the transfer and change both wallet balances. It can\'t be undone.'**
+  String get deleteTransferConfirmation;
+
+  /// No description provided for @deleteTransferError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t delete the transfer. Please try again.'**
+  String get deleteTransferError;
+
   /// No description provided for @deleteTransactionTitle.
   ///
   /// In en, this message translates to:
@@ -913,6 +1039,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The currency can\'t change because this wallet already has financial movements.'**
   String get walletCurrencyChangeNotAllowed;
+
+  /// No description provided for @deleteWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet'**
+  String get deleteWalletTitle;
+
+  /// No description provided for @deleteWalletConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes the wallet and its initial balance. It can\'t be undone.'**
+  String get deleteWalletConfirmation;
+
+  /// No description provided for @deleteWalletHasMovements.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet has financial movements. Archive it to preserve its history.'**
+  String get deleteWalletHasMovements;
+
+  /// No description provided for @deleteWalletError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t delete the wallet. Please try again.'**
+  String get deleteWalletError;
 
   /// No description provided for @loadDataError.
   ///

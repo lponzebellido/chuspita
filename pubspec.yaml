@@ -1,7 +1,7 @@
 name: chuspita
 description: "Gestor financiero personal."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.0+2
 
 environment:
   sdk: ^3.13.1
@@ -35,4 +35,4 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/branding/chuspa_de_coca.jpg
+    - assets/branding/chuspita_logo_transparent.png

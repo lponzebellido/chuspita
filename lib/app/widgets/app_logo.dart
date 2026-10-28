@@ -10,15 +10,21 @@ final class AppLogo extends StatelessWidget {
     return Semantics(
       label: context.l10n.appName,
       image: true,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.asset(
-          AppBranding.logoAsset,
-          key: const ValueKey('chuspita-logo'),
-          width: 44,
-          height: 44,
-          fit: BoxFit.cover,
-          filterQuality: FilterQuality.high,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppBranding.logoSurface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          child: Image.asset(
+            AppBranding.logoAsset,
+            key: const ValueKey('chuspita-logo'),
+            width: 150,
+            height: 38,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+          ),
         ),
       ),
     );
